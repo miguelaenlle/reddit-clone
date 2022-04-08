@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
+const atlasPlugin = require("mongoose-atlas-search");
 
 const Schema = mongoose.Schema;
 
@@ -20,10 +21,30 @@ const userSchema = new Schema({
   },
   isVerified: {
     type: Boolean,
-    required: true
-  }
+    required: true,
+  },
 });
 
 userSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model("users", userSchema);
+const UserModel = mongoose.model("users", userSchema);
+
+atlasPlugin.initialize({
+  model: UserModel,
+  overwriteFind: true,
+  searchKey: "search",
+  addFields: {
+    id: "$_id",
+  },
+  searchFunction: (query) => {
+    return {
+      wildcard: {
+        query: `${query}*`,
+        path: "_id",
+        allowAnalyzedField: true,
+      },
+    };
+  },
+});
+
+module.exports = UserModel;
