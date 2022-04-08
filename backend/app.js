@@ -2,10 +2,22 @@ const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 const authRoutes = require("./routes/auth-routes");
+const userRoutes = require("./routes/user-routes");
+
 const HttpError = require("./models/http-error");
+
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per 15 minutes
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 const app = express();
 
+app.use(limiter);
 app.use(bodyParser.json());
 
 app.use((request, response, next) => {
@@ -19,6 +31,7 @@ app.use((request, response, next) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 app.use((request, response, next) => {
   const error = new HttpError("Could not find this route.", 404);
