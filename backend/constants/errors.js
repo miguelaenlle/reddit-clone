@@ -46,9 +46,12 @@ const passwordResetTokenVerifyError = new HttpError(
   500
 );
 
-
-
 const invalidPasswordError = new HttpError("Incorrect password", 422);
+
+// users
+
+const requestTooLargeError = new HttpError("Request size too large, please request less results.")
+
 
 module.exports = {
   invalidInputsError,
@@ -61,5 +64,6 @@ module.exports = {
   loginFailedError,
   invalidPasswordError,
   passwordResetFailedError,
-  passwordResetTokenVerifyError
+  passwordResetTokenVerifyError,
+  requestTooLargeError
 };

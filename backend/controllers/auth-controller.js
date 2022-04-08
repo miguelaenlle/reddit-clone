@@ -23,7 +23,7 @@ const createUser = async (request, response, next) => {
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
     return next(
-      new HttpError("Invalid inputs passed, please check your data.", 422)
+      errorMessages.invalidInputsError
     );
   }
   const { username, email, password } = request.body;
@@ -59,11 +59,8 @@ const createUser = async (request, response, next) => {
 
   try {
     hashedPassword = await hashPassword(password);
-  } catch (errorMesge) {
-    const error = new HttpError(
-      "Could not create the user, please try again.",
-      500
-    );
+  } catch (errorMessage) {
+    const error = errorMessages.signupFailedError
     next(error);
   }
 
@@ -111,7 +108,7 @@ const resendEmailVerification = async (request, response, next) => {
   if (!errors.isEmpty()) {
     // needs email and id
     return next(
-      new HttpError("Invalid inputs passed, please check your data.", 422)
+      errorMessages.invalidInputsError
     );
   }
   const { email } = request.body;
