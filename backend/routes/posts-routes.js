@@ -1,5 +1,5 @@
 const express = require("express");
-const { check } = require("express-validator");
+const { check, sanitize } = require("express-validator");
 const router = express.Router();
 
 const postsController = require("../controllers/posts-controller");
@@ -26,6 +26,17 @@ router.get(
   [
     check("page").trim().notEmpty().isInt({ min: 0 }),
     check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
+    check("sortMode").trim().notEmpty()
+  ],
+  postsController.getAllPosts
+);
+
+router.get(
+  "/all",
+  [
+    check("page").trim().notEmpty().isInt({ min: 0 }),
+    check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
+    check("sortMode").trim().notEmpty()
   ],
   postsController.getAllPosts
 );
