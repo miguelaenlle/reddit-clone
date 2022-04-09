@@ -1,6 +1,5 @@
-const { response } = require("express");
 const { validationResult } = require("express-validator");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const errorMessages = require("../constants/errors");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
 const Subreddit = require("../models/subreddit");
