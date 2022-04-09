@@ -30,6 +30,10 @@ const postSchema = new Schema({
     type: Number,
     required: true,
   },
+  deleted: {
+    type: Boolean,
+    required: true
+  },
   num_comments: {
     type: Number,
     required: true,
