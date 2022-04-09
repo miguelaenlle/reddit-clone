@@ -18,13 +18,12 @@ const verificationResetTokenIsValid = require("../helpers/jwt/verify-reset-token
 const validatePassword = require("../helpers/bcrypt/compare-hashed-password");
 
 const errorMessages = require("../constants/errors");
+const jwt = require("jsonwebtoken");
 
 const createUser = async (request, response, next) => {
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
-    return next(
-      errorMessages.invalidInputsError
-    );
+    return next(errorMessages.invalidInputsError);
   }
   const { username, email, password } = request.body;
   let existingUser;
@@ -60,7 +59,7 @@ const createUser = async (request, response, next) => {
   try {
     hashedPassword = await hashPassword(password);
   } catch (errorMessage) {
-    const error = errorMessages.signupFailedError
+    const error = errorMessages.signupFailedError;
     next(error);
   }
 
@@ -69,6 +68,12 @@ const createUser = async (request, response, next) => {
     email: email,
     password: hashedPassword,
     isVerified: false,
+    pfp_url: "",
+    num_upvotes: 0,
+    sub_ids: [],
+    post_ids: [],
+    comment_ids: [],
+    vote_ids: [],
   });
 
   try {
@@ -107,15 +112,16 @@ const resendEmailVerification = async (request, response, next) => {
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
     // needs email and id
-    return next(
-      errorMessages.invalidInputsError
-    );
+    return next(errorMessages.invalidInputsError);
   }
   const { email } = request.body;
   let existingUser;
 
   try {
-    existingUser = User.findOne({ email: email });
+    existingUser = await User.findOne({ email: email });
+    if (!existingUser) {
+      return next(errorMessages.failedToFindUserError);
+    }
   } catch (error) {
     return next(errorMessages.failedToFindUserError);
   }
@@ -127,10 +133,10 @@ const resendEmailVerification = async (request, response, next) => {
   let signupToken;
   try {
     signupToken = await generateSignupToken(existingUser.id);
+    console.log(signupToken);
   } catch (errorMessage) {
     return next(errorMessages.signupFailedError);
   }
-
   try {
     await sendVerificationEmail(email, process.env.SENDGRID_EMAIL, signupToken);
   } catch (errorMessage) {
@@ -151,19 +157,22 @@ const confirmVerificationToken = async (request, response, next) => {
   const { verificationToken } = request.body;
   let userId;
   try {
-    userId = verificationTokenIsValid(verificationToken);
+    const decodedToken = await verificationTokenIsValid(verificationToken);
+    console.log(decodedToken);
+    userId = decodedToken.userId;
   } catch (errorMessage) {
-    return next(errorMessages.signupTokenVerifyError);
+    return next(errorMessages.authTokenVerifyError);
   }
   let existingUser;
   if (!userId) {
-    return next(errorMessages.signupTokenVerifyError);
+    return next(errorMessages.authTokenVerifyError);
   }
   try {
-    existingUser = await User.findById(userId).exec();
+    existingUser = await User.findById(userId);
   } catch (errorMessage) {
     return next(errorMessages.failedToFindUserError);
   }
+  console.log(existingUser);
 
   if (!existingUser) {
     return next(errorMessages.failedToFindUserError);
@@ -173,11 +182,9 @@ const confirmVerificationToken = async (request, response, next) => {
   }
 
   try {
-    
-    existingUser.isVerified = true;
-    await existingUser.save();
+    await User.findByIdAndUpdate(existingUser.id, { isVerified: true });
   } catch (errorMessage) {
-    return next(errorMessages.signupTokenVerifyError);
+    return next(errorMessages.authTokenVerifyError);
   }
 
   return response.status(201).json({
@@ -195,7 +202,7 @@ const loginUser = async (request, response, next) => {
   // check if the user exists
   let existingUser;
   try {
-    existingUser = await User.findOne({ email: email }).exec();
+    existingUser = await User.findOne({ email: email });
     if (!existingUser) {
       return next(errorMessages.failedToFindUserError);
     }
@@ -281,12 +288,11 @@ const sendForgotPasswordEmail = async (request, response, next) => {
   } catch (errorMessage) {
     return next(errorMessages.passwordResetFailedError);
   }
-  console.log(passwordResetToken)
+  console.log(passwordResetToken);
   return response.status(201).json({
     message: "Succesfully sent forgot password email.",
   });
 };
-
 
 const changePassword = async (request, response, next) => {
   // validate inputs
@@ -318,48 +324,44 @@ const changePassword = async (request, response, next) => {
       existingUser.password
     );
     if (!resetTokenData) {
-      return next(errorMessages.passwordResetTokenVerifyError);
+      return next(errorMessages.authTokenVerifyError);
     }
   } catch (errorMessage) {
-    return next(errorMessages.passwordResetTokenVerifyError);
+    return next(errorMessages.authTokenVerifyError);
   }
-  console.log(resetTokenData)
 
   if (resetTokenData) {
     if (
       (resetTokenData.userEmail !== existingUser.email) |
       (resetTokenData.userId !== existingUser.id)
     ) {
-      return next(errorMessages.passwordResetTokenVerifyError);
+      return next(errorMessages.authTokenVerifyError);
     }
   } else {
-    return next(errorMessages.passwordResetTokenVerifyError);
+    return next(errorMessages.authTokenVerifyError);
   }
 
   // hash the new password
   let hashedPassword;
   try {
-    hashedPassword = await hashPassword(newPassword)
+    hashedPassword = await hashPassword(newPassword);
   } catch (errorMessage) {
-    return next(errorMessages.passwordResetTokenVerifyError);
+    return next(errorMessages.authTokenVerifyError);
   }
 
   // update the user
   try {
     await User.findByIdAndUpdate(existingUser.id, {
-      password: hashedPassword
-    })
+      password: hashedPassword,
+    });
   } catch (errorMessage) {
-    console.log(errorMessage);
-    return next(errorMessages.passwordResetTokenVerifyError);
+    return next(errorMessages.authTokenVerifyError);
   }
 
   return response.status(201).json({
     message: "Successfully updated the user password.",
   });
 };
-
-
 
 exports.createUser = createUser;
 exports.resendEmailVerification = resendEmailVerification;

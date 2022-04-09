@@ -1,11 +1,14 @@
 const jwt = require("jsonwebtoken");
 
-const verificationTokenIsValid = (verificationToken) => {
+const verificationTokenIsValid = async (verificationToken) => {
   try {
-    const decodedToken = jwt.verify(verificationToken, process.env.JWT_KEY);
-    return decodedToken.userId;
+    const decodedToken = await jwt.verify(
+      verificationToken,
+      process.env.JWT_KEY
+    );
+    return decodedToken;
   } catch (error) {
-    throw error;
+    return 
   }
 };
 
