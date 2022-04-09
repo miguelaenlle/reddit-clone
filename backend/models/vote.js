@@ -11,12 +11,12 @@ const voteSchema = new Schema({
   },
   parent_post_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    required: false,
     ref: "posts",
   },
   parent_comment_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    required: false,
     ref: "comments",
   },
   parent_is_post: {

@@ -94,6 +94,35 @@ const notInSubError = new HttpError(
   401
 );
 
+// posts
+
+const postCreateError = new HttpError(
+  "Failed to create the post, please try again.",
+  500
+);
+
+const getPostsError = new HttpError("Failed to get all posts", 500);
+
+const getPostError = new HttpError("Failed to get a post", 500);
+
+const postNotFoundError = new HttpError("Failed to find the post.", 404);
+
+const notUserPostError = new HttpError("You do not own this post.", 401);
+
+const postUpdateFailedError = new HttpError(
+  "Failed to update post, please try again.",
+  500
+);
+
+const postDeletedError = new HttpError("Post is deleted.", 401);
+
+const postDeleteFailedError = new HttpError(
+  "Failed to delete post, please try again.",
+  500
+);
+
+const postVoteFailedError = new HttpError("Failed to vote on post", 500);
+
 module.exports = {
   invalidInputsError,
   userExistsError,
@@ -116,4 +145,13 @@ module.exports = {
   joinSubFailed,
   alreadyInSubError,
   notInSubError,
+  postCreateError,
+  getPostsError,
+  getPostError,
+  postNotFoundError,
+  notUserPostError,
+  postUpdateFailedError,
+  postDeletedError,
+  postDeleteFailedError,
+  postVoteFailedError
 };

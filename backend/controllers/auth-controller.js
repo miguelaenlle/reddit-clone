@@ -1,5 +1,4 @@
 const { validationResult } = require("express-validator");
-const HttpError = require("../models/http-error");
 
 const sendVerificationEmail = require("../util/mail/send-verification-email");
 const sendResetEmail = require("../util/mail/send-reset-email");
@@ -18,7 +17,6 @@ const verificationResetTokenIsValid = require("../helpers/jwt/verify-reset-token
 const validatePassword = require("../helpers/bcrypt/compare-hashed-password");
 
 const errorMessages = require("../constants/errors");
-const jwt = require("jsonwebtoken");
 
 const createUser = async (request, response, next) => {
   const errors = validationResult(request);

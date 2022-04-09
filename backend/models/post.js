@@ -18,9 +18,9 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  description: {
+  text: {
     type: String,
-    required: true,
+    required: false,
   },
   post_time: {
     type: Date,
@@ -30,16 +30,19 @@ const postSchema = new Schema({
     type: Number,
     required: true,
   },
+  deleted: {
+    type: Boolean,
+    required: true
+  },
   num_comments: {
     type: Number,
     required: true,
   },
   image_ids: [
     {
-      type: mongoose.Types.ObjectId,
+      type: String,
       required: true,
-      ref: "images",
-    },
+    }
   ],
   comment_ids: [
     {
