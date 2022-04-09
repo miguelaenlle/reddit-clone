@@ -1,17 +1,9 @@
 const { validationResult } = require("express-validator");
 const errorMessages = require("../constants/errors");
-const HttpError = require("../models/http-error");
 const User = require("../models/user");
-const atlasPlugin = require("mongoose-atlas-search");
 
 const getUserInformation = async (request, response, next) => {
   const userId = request.params.uid;
-  const errors = validationResult(request);
-  // verify the inputs -- just userID
-  if (!errors.isEmpty()) {
-    return errorMessages.invalidInputsError;
-  }
-
   let designatedUser;
   try {
     designatedUser = await User.findById(userId).exec();
@@ -23,8 +15,11 @@ const getUserInformation = async (request, response, next) => {
 
   const userData = {
     username: designatedUser.username,
-    email: designatedUser.email,
-  }; // eventually include posts, votes, etc here
+    sub_ids: designatedUser.sub_ids,
+    post_ids: designatedUser.post_ids,
+    comment_ids: designatedUser.comment_ids,
+    vote_ids: designatedUser.vote_ids,
+  };
 
   return response.status(200).json({
     message: "Succesfully retrieved user data",
@@ -42,22 +37,33 @@ const searchForUsers = async (request, response, next) => {
 
   // page starts at 0
   // e.g. page 1 -> skip first 50 results, then limit to 50
-  const searchResults = await User.find(
-    {
-      username: {
-        $regex: new RegExp(searchQuery),
+  let searchResults;
+  try {
+    searchResults = await User.find(
+      {
+        username: {
+          $regex: new RegExp(searchQuery),
+        },
+        isVerified: true,
       },
-    },
-    {
-      _id: 0,
-      __v: 0,
-    }
-  );
+      ["username", "num_upvotes"]
+    )
+    .skip(page * numResults)
+    .limit(numResults);
+  } catch (error) {
+    return next(errorMessages.userSearchFailed)
+    
+  }
 
   return response.status(200).json({
     message: "Successfully pulled search results",
-    data: searchResults,
+    data: searchResults.map((searchResult) =>
+      searchResult.toObject({ getters: true })
+    ),
   });
+
+
+  
 };
 
 exports.getUserInformation = getUserInformation;
