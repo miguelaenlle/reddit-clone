@@ -1,5 +1,6 @@
 const { response } = require("express");
 const { validationResult } = require("express-validator");
+const { default: mongoose } = require("mongoose");
 const errorMessages = require("../constants/errors");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
 const Subreddit = require("../models/subreddit");
@@ -227,11 +228,30 @@ const joinSubreddit = async (request, response, next) => {
 
   // add the subreddit to the user's list of joined subreddits
   try {
-    await User.findByIdAndUpdate(userId, {
-      $push: {
-        sub_ids: subreddit.id,
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          sub_ids: subreddit.id,
+        },
       },
-    });
+      {
+        session: session,
+      }
+    );
+    await Subreddit.findByIdAndUpdate(
+      subId,
+      {
+        num_members: subreddit.num_members + 1,
+      },
+      {
+        session: session,
+      }
+    );
+    session.commitTransaction();
   } catch {
     return next(errorMessages.joinSubFailed);
   }
@@ -289,13 +309,33 @@ const leaveSubreddit = async (request, response, next) => {
     return next(errorMessages.notInSubError);
   }
 
-  // add the subreddit to the user's list of joined subreddits
+  // remove the subreddit from the user's list of joined subreddits
   try {
-    await User.findByIdAndUpdate(userId, {
-      $pull: {
-        sub_ids: subreddit.id,
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $pull: {
+          sub_ids: subreddit.id,
+        },
+      },
+      {
+        session: session,
       }
-    });
+    );
+    if (subreddit.num_members > 0) {
+      await Subreddit.findByIdAndUpdate(
+        subId,
+        {
+          num_members: subreddit.num_members - 1,
+        },
+        {
+          session: session,
+        }
+      );
+    }
+    session.commitTransaction();
   } catch {
     return next(errorMessages.joinSubFailed);
   }
