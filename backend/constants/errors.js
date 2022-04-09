@@ -46,6 +46,10 @@ const requestTooLargeError = new HttpError(
 
 const searchFailedError = new HttpError("Search failed, please try again.");
 
+const getUserSubsFailed = new HttpError(
+  "Failed to retrieve user subreddits, please try again."
+);
+
 // subreddits
 
 const authTokenVerifyError = new HttpError(
@@ -98,6 +102,7 @@ module.exports = {
   failedToFindUserError,
   userIsVerifiedError,
   authTokenVerifyError,
+  getUserSubsFailed,
   loginFailedError,
   invalidPasswordError,
   passwordResetFailedError,
@@ -110,5 +115,5 @@ module.exports = {
   uniqueNameError,
   joinSubFailed,
   alreadyInSubError,
-  notInSubError
+  notInSubError,
 };

@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const errorMessages = require("../constants/errors");
+const verifyLoginToken = require("../helpers/jwt/verify-login-token");
 const User = require("../models/user");
 
 const getUserInformation = async (request, response, next) => {
@@ -48,11 +49,10 @@ const searchForUsers = async (request, response, next) => {
       },
       ["username", "num_upvotes"]
     )
-    .skip(page * numResults)
-    .limit(numResults);
+      .skip(page * numResults)
+      .limit(numResults);
   } catch (error) {
-    return next(errorMessages.userSearchFailed)
-    
+    return next(errorMessages.userSearchFailed);
   }
 
   return response.status(200).json({
@@ -61,10 +61,45 @@ const searchForUsers = async (request, response, next) => {
       searchResult.toObject({ getters: true })
     ),
   });
+};
 
+const getSubreddits = async (request, response, next) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(errorMessages.invalidInputsError);
+  }
 
-  
+  const { authToken } = request.body;
+
+  // check token
+  let userId;
+  try {
+    const decodedToken = await verifyLoginToken(authToken);
+    if (!decodedToken) {
+      return next(errorMessages.authTokenVerifyError);
+    }
+    userId = decodedToken.id;
+  } catch {
+    return next(errorMessages.getUserSubsFailed);
+  }
+
+  // find the current user & extract subreddits
+  let subreddits;
+  try {
+    const currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return next(errorMessages.failedToFindUserError);
+    }
+    subreddits = currentUser.sub_ids;
+  } catch {
+    return next(errorMessages.getUserSubsFailed);
+  }
+  return response.status(200).json({
+    subreddits: subreddits,
+    message: "Successfully retrieved user subreddits.",
+  });
 };
 
 exports.getUserInformation = getUserInformation;
 exports.searchForUsers = searchForUsers;
+exports.getSubreddits = getSubreddits;
