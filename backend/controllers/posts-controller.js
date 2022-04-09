@@ -111,25 +111,83 @@ const createNewPost = async (request, response, next) => {
 };
 
 const getAllPosts = async (request, response, next) => {
-  // needs: page, numResults (per page) (no auth)
+  // needs: query (optional), subId (optional), page, numResults, sortMode (per page) (no auth)
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(errorMessages.invalidInputsError);
+  }
+
+  const { query, subId, page, numResults, sortMode } = request.body;
 
   // pull all posts
 
+  let posts;
+  try {
+    // types of sortMode
+    // top -- sort by upvotes
+    // new -- sort by date (descending)
+    // old -- sort by date (ascending)
+    let sortFilter = {};
+    if (sortMode === "top") {
+      sortFilter = {
+        num_upvotes: 1,
+      };
+    } else if (sortMode === "new") {
+      sortFilter = {
+        post_time: -1,
+      };
+    } else if (sortMode === "old") {
+      sortFilter = {
+        post_time: 1,
+      };
+    }
+
+    let searchQuery;
+    if (query) {
+      searchQuery = {
+        $or: [
+          {
+            title: {
+              $regex: new RegExp(query.toLowerCase()),
+            },
+          },
+          {
+            text: {
+              $regex: new RegExp(query.toLowerCase()),
+            },
+          },
+        ],
+      };
+    }
+    if (subId) {
+      if (searchQuery) {
+        const oldSearchQuery = searchQuery;
+        searchQuery = {
+          $and: [
+            oldSearchQuery,
+            {
+              sub_id: subId,
+            },
+          ],
+        };
+      } else {
+        searchQuery = {
+          sub_id: subId,
+        };
+      }
+    }
+    console.log(searchQuery);
+    posts = await Post.find(searchQuery)
+      .sort(sortFilter)
+      .skip(page * numResults)
+      .limit(numResults);
+  } catch {
+    return next(errorMessages.postPullError);
+  }
+
   // return posts
-
   return response.status(200).json({
-    message: "(SAMPLE) Request successful.",
-  });
-};
-
-const getSubPosts = async (request, response, next) => {
-  // needs: query, page, numResults (per page) (no auth)
-
-  // pull posts given query, page, and results per page
-
-  // return results
-
-  return response.status(200).json({
+    posts: posts.map((post) => post.toObject({ getters: true })),
     message: "(SAMPLE) Request successful.",
   });
 };
@@ -233,7 +291,6 @@ const updatePostVote = async (request, response, next) => {
 
 exports.createNewPost = createNewPost;
 exports.getAllPosts = getAllPosts;
-exports.getSubPosts = getSubPosts;
 exports.getPost = getPost;
 exports.updatePost = updatePost;
 exports.deletePost = deletePost;

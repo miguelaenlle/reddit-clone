@@ -101,7 +101,7 @@ const postCreateError = new HttpError(
   500
 );
 
-
+const postPullError = new HttpError("Failed to pull all posts", 500);
 
 module.exports = {
   invalidInputsError,
@@ -125,5 +125,6 @@ module.exports = {
   joinSubFailed,
   alreadyInSubError,
   notInSubError,
-  postCreateError
+  postCreateError,
+  postPullError
 };
