@@ -2,15 +2,18 @@ const express = require("express");
 const { check } = require("express-validator");
 const router = express.Router();
 
-const authController = require("../controllers/auth-controller")
+const authController = require("../controllers/auth-controller");
 
 router.post(
   "/signup",
   [
-    check("username").isLength({
-      min: 3,
-      max: 20,
-    }),
+    check("username")
+      .isLength({
+        min: 3,
+        max: 20,
+      })
+      .toLowerCase()
+      .blacklist(" "),
     check("email").normalizeEmail().isEmail(),
     check("password").isLength({
       min: 6,
@@ -44,9 +47,7 @@ router.post(
 
 router.post(
   "/forgot-password",
-  [
-    check("email").normalizeEmail().isEmail()
-  ],
+  [check("email").normalizeEmail().isEmail()],
   authController.sendForgotPasswordEmail
 );
 
@@ -57,7 +58,7 @@ router.post(
     check("newPassword").isLength({
       min: 6,
     }),
-    check("forgotPasswordToken").not().isEmpty()
+    check("forgotPasswordToken").not().isEmpty(),
   ],
   authController.changePassword
 );

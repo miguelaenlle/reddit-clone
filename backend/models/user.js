@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
-const atlasPlugin = require("mongoose-atlas-search");
 
 const Schema = mongoose.Schema;
 
@@ -23,28 +22,46 @@ const userSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  pfp_url: {
+    type: String,
+    required: false,
+  },
+  num_upvotes: {
+    type: Number,
+    required: true
+  },
+  sub_ids: [
+    {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "subreddits",
+    },
+  ],
+  post_ids: [
+    {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "comments",
+    },
+  ],
+  comment_ids: [
+    {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "comments",
+    },
+  ],
+  vote_ids: [
+    {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "votes",
+    },
+  ],
 });
 
 userSchema.plugin(uniqueValidator);
 
 const UserModel = mongoose.model("users", userSchema);
-
-atlasPlugin.initialize({
-  model: UserModel,
-  overwriteFind: true,
-  searchKey: "search",
-  addFields: {
-    id: "$_id",
-  },
-  searchFunction: (query) => {
-    return {
-      wildcard: {
-        query: `${query}*`,
-        path: "_id",
-        allowAnalyzedField: true,
-      },
-    };
-  },
-});
 
 module.exports = UserModel;
