@@ -26,32 +26,22 @@ router.get(
   [
     check("page").trim().notEmpty().isInt({ min: 0 }),
     check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
-    check("sortMode").trim().notEmpty()
+    check("sortMode").trim().notEmpty(),
   ],
   postsController.getAllPosts
 );
 
-router.get(
-  "/all",
-  [
-    check("page").trim().notEmpty().isInt({ min: 0 }),
-    check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
-    check("sortMode").trim().notEmpty()
-  ],
-  postsController.getAllPosts
-);
-
-router.get(":postId", postsController.getPost);
+router.get("/:postId/", [], postsController.getPost);
 
 router.patch(
-  ":postId",
+  "/:postId/",
   [
     check("authToken").notEmpty(),
     check("newTitle").trim().notEmpty().isLength({
       min: 1,
       max: 40,
     }),
-    check("newDescription").isLength({
+    check("newText").isLength({
       min: 0,
       max: 300,
     }),
@@ -60,24 +50,24 @@ router.patch(
 );
 
 router.delete(
-  ":postId",
+  "/:postId/",
   [check("authToken").notEmpty()],
-  postsController.updatePost
+  postsController.deletePost
 );
 
 router.get(
-  ":postId/comments",
+  "/:postId/comments",
   [], // TODO: fill this up
-  postsController.updatePostVote
+  postsController.getPostComments
 ); // WIP
 
 router.post(
-  ":postId/vote",
+  "/:postId/vote",
   [
     check("authToken").notEmpty(),
     check("voteDirection").notEmpty().isInt({ min: -1, max: 1 }),
   ],
-  postsController.updatePostVote
+  postsController.voteOnPost
 );
 
 module.exports = router;
