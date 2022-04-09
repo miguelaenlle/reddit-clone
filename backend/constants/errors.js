@@ -94,6 +94,15 @@ const notInSubError = new HttpError(
   401
 );
 
+// posts
+
+const postCreateError = new HttpError(
+  "Failed to create the post, please try again.",
+  500
+);
+
+
+
 module.exports = {
   invalidInputsError,
   userExistsError,
@@ -116,4 +125,5 @@ module.exports = {
   joinSubFailed,
   alreadyInSubError,
   notInSubError,
+  postCreateError
 };
