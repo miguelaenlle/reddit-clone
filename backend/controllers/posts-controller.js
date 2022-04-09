@@ -180,7 +180,7 @@ const getAllPosts = async (request, response, next) => {
       }
     } else {
       searchQuery = {
-        $and: [oldSearchQuery, { deleted: false }],
+        $and: [searchQuery, { deleted: false }],
       };
     }
     console.log(searchQuery);
@@ -188,7 +188,8 @@ const getAllPosts = async (request, response, next) => {
       .sort(sortFilter)
       .skip(page * numResults)
       .limit(numResults);
-  } catch {
+  } catch (error) {
+    console.log(error);
     return next(errorMessages.getPostsError);
   }
 
@@ -440,7 +441,7 @@ const voteOnPost = async (request, response, next) => {
   // doesn't exist -> okay, just won't give OP karma
   let opUser;
   try {
-    if (post.user_id !== currentUser.user_id) {
+    if (post.user_id.toString() !== currentUser.id) {
       opUser = await User.findById(post.user_id);
     }
   } catch {}
@@ -462,23 +463,23 @@ const voteOnPost = async (request, response, next) => {
     if (matchingVotes.length > 0) {
       const vote = matchingVotes[0];
       const initialVoteValue = vote.vote_value;
-    //   voteChange = voteDirection - initialVoteValue;
-    if (initialVoteValue === voteDirection) {
+      //   voteChange = voteDirection - initialVoteValue;
+      if (initialVoteValue === voteDirection) {
         // no change
         voteChange = 0;
-    } else if (initialVoteValue === -1) {
+      } else if (initialVoteValue === -1) {
         // -1 -> 1 +2 0 - -2 = +2
         // -1 -> 0 +1 0 - -1 = +1
         voteChange = voteDirection - initialVoteValue;
-    } else if (initialVoteValue === 1) {
+      } else if (initialVoteValue === 1) {
         // 1 -> -1 -2   -1 - 1 = -2
         // 1 -> 0 -1    -1 - 0 = -1
         voteChange = voteDirection - initialVoteValue;
-    } else if (initialVoteValue === 0) {
+      } else if (initialVoteValue === 0) {
         // 0 -> 1 +1
         // 0 -> -1 -1
         voteChange = voteDirection;
-    }
+      }
       console.log("updating pre-existing vote");
       await Vote.findByIdAndUpdate(
         vote.id,
@@ -510,9 +511,9 @@ const voteOnPost = async (request, response, next) => {
     }
 
     // get/take karma from OP
-    console.log(`Give OP ${voteChange} karma`);
     if (voteChange !== 0) {
       if (opUser) {
+        console.log(`Give OP ${voteChange} karma`);
         await User.findByIdAndUpdate(
           opUser.id,
           {
