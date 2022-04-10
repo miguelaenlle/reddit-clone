@@ -149,6 +149,13 @@ const deleteCommentFailedError = new HttpError(
   500
 );
 
+// feed
+
+const fetchFeedFailedError = new HttpError(
+  "Failed to fetch the feed",
+  500
+)
+
 module.exports = {
   invalidInputsError,
   userExistsError,
@@ -187,5 +194,6 @@ module.exports = {
   updateCommentFailedError,
   notUserCommentError,
   deleteCommentFailedError,
-  voteFailedError
+  voteFailedError,
+  fetchFeedFailedError
 };
