@@ -114,6 +114,7 @@ const postUpdateFailedError = new HttpError(
   500
 );
 
+const voteFailedError = new HttpError("Vote failed.", 500);
 const postDeletedError = new HttpError("Post is deleted.", 401);
 
 const postDeleteFailedError = new HttpError(
@@ -133,6 +134,18 @@ const commentNotFoundError = new HttpError("Comment not found", 404);
 
 const getChildCommentsFailedError = new HttpError(
   "Failed to get child comments",
+  500
+);
+
+const updateCommentFailedError = new HttpError(
+  "Failed to update comment.",
+  500
+);
+
+const notUserCommentError = new HttpError("You do not own this comment.", 401);
+
+const deleteCommentFailedError = new HttpError(
+  "Failed to delete this comment.",
   500
 );
 
@@ -170,5 +183,9 @@ module.exports = {
   createCommentFailedError,
   getCommentFailedError,
   commentNotFoundError,
-  getChildCommentsFailedError
+  getChildCommentsFailedError,
+  updateCommentFailedError,
+  notUserCommentError,
+  deleteCommentFailedError,
+  voteFailedError
 };

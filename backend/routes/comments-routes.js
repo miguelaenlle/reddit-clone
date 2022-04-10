@@ -20,6 +20,11 @@ router.patch(
   [check("authToken").notEmpty(), check("newCommentContent").notEmpty()],
   commentsController.updateComment
 );
+router.delete(
+  "/:commentId",
+  [check("authToken").notEmpty()],
+  commentsController.deleteComment
+);
 
 router.get("/:commentId/comments", commentsController.getChildComments);
 router.post(
