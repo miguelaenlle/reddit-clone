@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
 const { validationResult } = require("express-validator");
 const Post = require("../models/post");
+const Comment = require("../models/comment")
 const Subreddit = require("../models/subreddit");
 const User = require("../models/user");
 const Vote = require("../models/vote");
@@ -363,9 +364,47 @@ const deletePost = async (request, response, next) => {
   });
 };
 const getPostComments = async (request, response, next) => {
-  // WIP, wait for me to make the Comments system
+  // takes postId via request.params
+  // params:
+  // none
+
+  const postId = request.params.postId;
+
+  let post;
+  try {
+    post = await Post.findById(postId);
+    if (!post) {
+      return next(errorMessages.postNotFoundError);
+    }
+  } catch {
+    return next(errorMessages.getPostError);
+  }
+
+  let commentsChain = [];
+  try {
+    let commentData = await post.populate("comment_ids");
+    for (const recursionLevel in [...Array(10).keys()]) {
+      let recursionQuery = "comment_ids"
+      const accurateRecursionLevel = parseInt(recursionLevel) + 1
+      console.log(accurateRecursionLevel);
+      
+      if (accurateRecursionLevel > 1) {
+
+        recursionQuery = `${recursionQuery}${`.${recursionQuery}`.repeat(accurateRecursionLevel-1)}`
+        console.log(recursionQuery);
+      }
+      console.log(commentData);
+      commentData = await commentData.populate(recursionQuery)
+    }
+    commentsChain = commentData;
+  } catch (error) {
+    console.log(error);
+    return next(errorMessages.getChildCommentsFailedError)
+  }
+
   return response.status(200).json({
-    message: "(SAMPLE) Request successful.",
+    commentsChain,
+    message: "Successfully retrieved child comments.",
   });
 };
 
