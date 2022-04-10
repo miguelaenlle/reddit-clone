@@ -33,11 +33,14 @@ const getFeedPosts = async (request, response, next) => {
     } catch {}
   }
 
-
   let sortFilter = {};
   if (sortMode === "top") {
     sortFilter = {
       num_upvotes: -1,
+    };
+  } else if (sortMode === "controversial") {
+    sortFilter = {
+      num_upvotes: 1,
     };
   } else if (sortMode === "new") {
     sortFilter = {
