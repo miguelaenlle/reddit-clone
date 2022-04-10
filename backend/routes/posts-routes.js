@@ -57,9 +57,8 @@ router.delete(
 
 router.get(
   "/:postId/comments",
-  [], // TODO: fill this up
   postsController.getPostComments
-); // WIP
+); 
 
 router.post(
   "/:postId/vote",

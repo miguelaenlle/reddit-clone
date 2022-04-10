@@ -125,11 +125,16 @@ const postVoteFailedError = new HttpError("Failed to vote on post", 500);
 
 // comments
 
-const createCommentFailedError = new HttpError("Failed to create comment", 500)
+const createCommentFailedError = new HttpError("Failed to create comment", 500);
 
-const getCommentFailedError = new HttpError("Failed to get comment", 500)
+const getCommentFailedError = new HttpError("Failed to get comment", 500);
 
-const commentNotFoundError = new HttpError("Failed to get comment", 404)
+const commentNotFoundError = new HttpError("Comment not found", 404);
+
+const getChildCommentsFailedError = new HttpError(
+  "Failed to get child comments",
+  500
+);
 
 module.exports = {
   invalidInputsError,
@@ -164,5 +169,6 @@ module.exports = {
   postVoteFailedError,
   createCommentFailedError,
   getCommentFailedError,
-  commentNotFoundError
+  commentNotFoundError,
+  getChildCommentsFailedError
 };
