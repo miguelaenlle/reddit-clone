@@ -48,9 +48,9 @@ const postSchema = new Schema({
     {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "comments",
-    },
-  ],
+      ref: "comments"
+    }
+  ]
 });
 
 postSchema.plugin(uniqueValidator);

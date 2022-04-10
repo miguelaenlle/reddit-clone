@@ -11,17 +11,21 @@ const commentSchema = new Schema({
   },
   parent_post_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    required: false,
     ref: "posts",
   },
   parent_comment_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    required: false,
     ref: "comments",
   },
   parent_is_post: {
     type: Boolean,
     required: true,
+  },
+  date: {
+    type: Date,
+    required: true
   },
   deleted: {
     type: Boolean,
@@ -35,13 +39,13 @@ const commentSchema = new Schema({
     type: String,
     required: true,
   },
-  child_comments: [
+  comment_ids: [
     {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "comments",
+      ref: "comments"
     }
-  ],
+  ]
 });
 
 commentSchema.plugin(uniqueValidator);
