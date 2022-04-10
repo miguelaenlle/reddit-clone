@@ -436,7 +436,7 @@ const voteOnPost = async (request, response, next) => {
       return next(errorMessages.authTokenVerifyError);
     }
   } catch {
-    return next(errorMessages.postCreateError);
+    return next(errorMessages.voteFailedError);
   }
 
   // pull the user data
@@ -451,7 +451,7 @@ const voteOnPost = async (request, response, next) => {
     }
   } catch (error) {
     console.log(error);
-    return next(errorMessages.postCreateError);
+    return next(errorMessages.voteFailedError);
   }
 
   // pull the post data
@@ -465,7 +465,7 @@ const voteOnPost = async (request, response, next) => {
       return next(errorMessages.postDeletedError);
     }
   } catch {
-    return next(errorMessages.getPostError);
+    return next(errorMessages.voteFailedError);
   }
 
   // pull the post's user data
