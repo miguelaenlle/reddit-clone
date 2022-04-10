@@ -205,6 +205,10 @@ const joinSubreddit = async (request, response, next) => {
     if (!loggedInUser) {
       return next(errorMessages.authTokenVerifyError);
     }
+    
+    if (!loggedInUser.isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
   } catch {
     return next(errorMessages.joinSubFailed);
   }
@@ -287,6 +291,9 @@ const leaveSubreddit = async (request, response, next) => {
     loggedInUser = await User.findById(userId);
     if (!loggedInUser) {
       return next(errorMessages.authTokenVerifyError);
+    }
+    if (!loggedInUser.isVerified) {
+      return next(errorMessages.notValidatedError);
     }
   } catch {
     return next(errorMessages.joinSubFailed);

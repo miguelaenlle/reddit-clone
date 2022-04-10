@@ -70,8 +70,7 @@ const createUser = async (request, response, next) => {
     num_upvotes: 0,
     sub_ids: [],
     post_ids: [],
-    comment_ids: [],
-    vote_ids: [],
+    comment_ids: []
   });
 
   try {

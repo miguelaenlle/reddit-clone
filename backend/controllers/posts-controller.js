@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
 const { validationResult } = require("express-validator");
 const Post = require("../models/post");
+const Comment = require("../models/comment")
 const Subreddit = require("../models/subreddit");
 const User = require("../models/user");
 const Vote = require("../models/vote");
@@ -10,7 +11,6 @@ const createNewPost = async (request, response, next) => {
   // needs:
   // authToken
   // subId
-  // title
   // text
   // images (array of urls)
 
@@ -33,7 +33,8 @@ const createNewPost = async (request, response, next) => {
     if (!userId) {
       return next(errorMessages.authTokenVerifyError);
     }
-  } catch {
+  } catch (error) {
+    console.log(error);
     return next(errorMessages.postCreateError);
   }
 
@@ -43,6 +44,9 @@ const createNewPost = async (request, response, next) => {
     currentUser = await User.findById(userId);
     if (!currentUser) {
       return next(errorMessages.authTokenVerifyError);
+    }
+    if (!currentUser.isVerified) {
+      return next(errorMessages.notValidatedError);
     }
   } catch (error) {
     console.log(error);
@@ -83,21 +87,7 @@ const createNewPost = async (request, response, next) => {
   // add the post to the user's list of posts
 
   try {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    await newPost.save({ session });
-    await User.findByIdAndUpdate(
-      currentUser.id,
-      {
-        $push: {
-          post_ids: newPost.id,
-        },
-      },
-      { session }
-    );
-
-    await session.commitTransaction();
+    await newPost.save();
   } catch (error) {
     console.log(error);
     return next(errorMessages.postCreateError);
@@ -253,19 +243,19 @@ const updatePost = async (request, response, next) => {
 
   // make sure the user exists
 
-  // pull the user's User object
-  let loggedInUser;
+  // pull the posts objects for the given user
+  let posts;
   try {
-    loggedInUser = await User.findById(userId);
-    if (!loggedInUser) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-  } catch {
+    posts = await Post.find({
+      user_id: userId,
+    });
+  } catch (error) {
+    console.log(error);
     return next(errorMessages.postUpdateFailedError);
   }
 
   // check if postId is actually the User's post
-  if (!loggedInUser.post_ids.includes(postId)) {
+  if (posts && !posts.map((post) => post.id.toString()).includes(postId)) {
     return next(errorMessages.notUserPostError);
   }
 
@@ -327,19 +317,19 @@ const deletePost = async (request, response, next) => {
     return next(errorMessages.postUpdateFailedError);
   }
   // pull the user's User object
-  let loggedInUser;
+
+  let posts;
   try {
-    loggedInUser = await User.findById(userId);
-    if (!loggedInUser) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-  } catch {
+    posts = await Post.find({
+      user_id: userId,
+    });
+  } catch (error) {
+    console.log(error);
     return next(errorMessages.postUpdateFailedError);
   }
 
   // check if postId is actually the User's post
-
-  if (!loggedInUser.post_ids.includes(postId)) {
+  if (posts && !posts.map((post) => post.id.toString()).includes(postId)) {
     return next(errorMessages.notUserPostError);
   }
 
@@ -374,9 +364,47 @@ const deletePost = async (request, response, next) => {
   });
 };
 const getPostComments = async (request, response, next) => {
-  // WIP, wait for me to make the Comments system
+  // takes postId via request.params
+  // params:
+  // none
+
+  const postId = request.params.postId;
+
+  let post;
+  try {
+    post = await Post.findById(postId);
+    if (!post) {
+      return next(errorMessages.postNotFoundError);
+    }
+  } catch {
+    return next(errorMessages.getPostError);
+  }
+
+  let commentsChain = [];
+  try {
+    let commentData = await post.populate("comment_ids");
+    for (const recursionLevel in [...Array(10).keys()]) {
+      let recursionQuery = "comment_ids"
+      const accurateRecursionLevel = parseInt(recursionLevel) + 1
+      console.log(accurateRecursionLevel);
+      
+      if (accurateRecursionLevel > 1) {
+
+        recursionQuery = `${recursionQuery}${`.${recursionQuery}`.repeat(accurateRecursionLevel-1)}`
+        console.log(recursionQuery);
+      }
+      console.log(commentData);
+      commentData = await commentData.populate(recursionQuery)
+    }
+    commentsChain = commentData;
+  } catch (error) {
+    console.log(error);
+    return next(errorMessages.getChildCommentsFailedError)
+  }
+
   return response.status(200).json({
-    message: "(SAMPLE) Request successful.",
+    commentsChain,
+    message: "Successfully retrieved child comments.",
   });
 };
 
@@ -408,19 +436,22 @@ const voteOnPost = async (request, response, next) => {
       return next(errorMessages.authTokenVerifyError);
     }
   } catch {
-    return next(errorMessages.postCreateError);
+    return next(errorMessages.voteFailedError);
   }
 
   // pull the user data
   let currentUser;
   try {
-    currentUser = await User.findById(userId).populate("vote_ids");
+    currentUser = await User.findById(userId);
     if (!currentUser) {
       return next(errorMessages.authTokenVerifyError);
     }
+    if (!currentUser.isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
   } catch (error) {
     console.log(error);
-    return next(errorMessages.postCreateError);
+    return next(errorMessages.voteFailedError);
   }
 
   // pull the post data
@@ -434,7 +465,7 @@ const voteOnPost = async (request, response, next) => {
       return next(errorMessages.postDeletedError);
     }
   } catch {
-    return next(errorMessages.getPostError);
+    return next(errorMessages.voteFailedError);
   }
 
   // pull the post's user data
@@ -443,6 +474,7 @@ const voteOnPost = async (request, response, next) => {
   try {
     if (post.user_id.toString() !== currentUser.id) {
       opUser = await User.findById(post.user_id);
+      
     }
   } catch {}
 
@@ -452,7 +484,10 @@ const voteOnPost = async (request, response, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     // console.log(currentUser);
-    const userVoteObjects = currentUser.vote_ids;
+    const userVoteObjects = await Vote.find({
+      user_id: currentUser.id,
+      parent_post_id: post.id,
+    });
     const matchingVotes = userVoteObjects.filter(
       (object) => object.parent_post_id.toString() === post.id
     );
@@ -497,15 +532,15 @@ const voteOnPost = async (request, response, next) => {
       });
       // add the vote to the user
       await vote.save({ session });
-      await User.findByIdAndUpdate(
-        currentUser.id,
-        {
-          $push: {
-            vote_ids: vote.id,
-          },
-        },
-        { session }
-      );
+      // await User.findByIdAndUpdate(
+      //   currentUser.id,
+      //   {
+      //     $push: {
+      //       vote_ids: vote.id,
+      //     },
+      //   },
+      //   { session }
+      // );
       console.log("Created a new vote for the user");
       voteChange = voteDirection;
     }
