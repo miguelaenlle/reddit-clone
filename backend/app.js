@@ -6,6 +6,7 @@ const userRoutes = require("./routes/user-routes");
 const subredditRoutes = require("./routes/subreddit-routes");
 const postRoutes = require("./routes/posts-routes");
 const commentRoutes = require("./routes/comments-routes")
+const feedRoutes = require("./routes/feed-routes")
 
 const HttpError = require("./models/http-error");
 
@@ -38,6 +39,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/subreddits", subredditRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes)
+app.use("/api/feed", feedRoutes)
 
 app.use((request, response, next) => {
   const error = new HttpError("Could not find this route.", 404);
