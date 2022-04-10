@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
 const { validationResult } = require("express-validator");
 const Post = require("../models/post");
-const Comment = require("../models/comment")
+const Comment = require("../models/comment");
 const Subreddit = require("../models/subreddit");
 const User = require("../models/user");
 const Vote = require("../models/vote");
@@ -120,6 +120,10 @@ const getAllPosts = async (request, response, next) => {
     // old -- sort by date (ascending)
     let sortFilter = {};
     if (sortMode === "top") {
+      sortFilter = {
+        num_upvotes: -1,
+      };
+    } else if (sortMode === "controversial") {
       sortFilter = {
         num_upvotes: 1,
       };
@@ -384,22 +388,23 @@ const getPostComments = async (request, response, next) => {
   try {
     let commentData = await post.populate("comment_ids");
     for (const recursionLevel in [...Array(10).keys()]) {
-      let recursionQuery = "comment_ids"
-      const accurateRecursionLevel = parseInt(recursionLevel) + 1
+      let recursionQuery = "comment_ids";
+      const accurateRecursionLevel = parseInt(recursionLevel) + 1;
       console.log(accurateRecursionLevel);
-      
-      if (accurateRecursionLevel > 1) {
 
-        recursionQuery = `${recursionQuery}${`.${recursionQuery}`.repeat(accurateRecursionLevel-1)}`
+      if (accurateRecursionLevel > 1) {
+        recursionQuery = `${recursionQuery}${`.${recursionQuery}`.repeat(
+          accurateRecursionLevel - 1
+        )}`;
         console.log(recursionQuery);
       }
       console.log(commentData);
-      commentData = await commentData.populate(recursionQuery)
+      commentData = await commentData.populate(recursionQuery);
     }
     commentsChain = commentData;
   } catch (error) {
     console.log(error);
-    return next(errorMessages.getChildCommentsFailedError)
+    return next(errorMessages.getChildCommentsFailedError);
   }
 
   return response.status(200).json({
@@ -474,7 +479,6 @@ const voteOnPost = async (request, response, next) => {
   try {
     if (post.user_id.toString() !== currentUser.id) {
       opUser = await User.findById(post.user_id);
-      
     }
   } catch {}
 
