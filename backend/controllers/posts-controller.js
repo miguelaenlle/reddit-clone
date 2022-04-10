@@ -403,7 +403,7 @@ const getPostComments = async (request, response, next) => {
   }
 
   return response.status(200).json({
-    commentsChain,
+    commentsChain: commentsChain.comment_ids,
     message: "Successfully retrieved child comments.",
   });
 };
