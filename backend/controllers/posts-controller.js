@@ -10,7 +10,6 @@ const createNewPost = async (request, response, next) => {
   // needs:
   // authToken
   // subId
-  // title
   // text
   // images (array of urls)
 
@@ -33,7 +32,8 @@ const createNewPost = async (request, response, next) => {
     if (!userId) {
       return next(errorMessages.authTokenVerifyError);
     }
-  } catch {
+  } catch (error) {
+    console.log(error);
     return next(errorMessages.postCreateError);
   }
 
@@ -43,6 +43,9 @@ const createNewPost = async (request, response, next) => {
     currentUser = await User.findById(userId);
     if (!currentUser) {
       return next(errorMessages.authTokenVerifyError);
+    }
+    if (!currentUser.isVerified) {
+      return next(errorMessages.notValidatedError);
     }
   } catch (error) {
     console.log(error);
@@ -83,21 +86,7 @@ const createNewPost = async (request, response, next) => {
   // add the post to the user's list of posts
 
   try {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    await newPost.save({ session });
-    await User.findByIdAndUpdate(
-      currentUser.id,
-      {
-        $push: {
-          post_ids: newPost.id,
-        },
-      },
-      { session }
-    );
-
-    await session.commitTransaction();
+    await newPost.save();
   } catch (error) {
     console.log(error);
     return next(errorMessages.postCreateError);
@@ -253,19 +242,19 @@ const updatePost = async (request, response, next) => {
 
   // make sure the user exists
 
-  // pull the user's User object
-  let loggedInUser;
+  // pull the posts objects for the given user
+  let posts;
   try {
-    loggedInUser = await User.findById(userId);
-    if (!loggedInUser) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-  } catch {
+    posts = await Post.find({
+      user_id: userId,
+    });
+  } catch (error) {
+    console.log(error);
     return next(errorMessages.postUpdateFailedError);
   }
 
   // check if postId is actually the User's post
-  if (!loggedInUser.post_ids.includes(postId)) {
+  if (posts && !posts.map((post) => post.id.toString()).includes(postId)) {
     return next(errorMessages.notUserPostError);
   }
 
@@ -327,19 +316,19 @@ const deletePost = async (request, response, next) => {
     return next(errorMessages.postUpdateFailedError);
   }
   // pull the user's User object
-  let loggedInUser;
+
+  let posts;
   try {
-    loggedInUser = await User.findById(userId);
-    if (!loggedInUser) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-  } catch {
+    posts = await Post.find({
+      user_id: userId,
+    });
+  } catch (error) {
+    console.log(error);
     return next(errorMessages.postUpdateFailedError);
   }
 
   // check if postId is actually the User's post
-
-  if (!loggedInUser.post_ids.includes(postId)) {
+  if (posts && !posts.map((post) => post.id.toString()).includes(postId)) {
     return next(errorMessages.notUserPostError);
   }
 
@@ -414,9 +403,12 @@ const voteOnPost = async (request, response, next) => {
   // pull the user data
   let currentUser;
   try {
-    currentUser = await User.findById(userId).populate("vote_ids");
+    currentUser = await User.findById(userId);
     if (!currentUser) {
       return next(errorMessages.authTokenVerifyError);
+    }
+    if (!currentUser.isVerified) {
+      return next(errorMessages.notValidatedError);
     }
   } catch (error) {
     console.log(error);
@@ -443,6 +435,7 @@ const voteOnPost = async (request, response, next) => {
   try {
     if (post.user_id.toString() !== currentUser.id) {
       opUser = await User.findById(post.user_id);
+      
     }
   } catch {}
 
@@ -452,7 +445,10 @@ const voteOnPost = async (request, response, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     // console.log(currentUser);
-    const userVoteObjects = currentUser.vote_ids;
+    const userVoteObjects = await Vote.find({
+      user_id: currentUser.id,
+      parent_post_id: post.id,
+    });
     const matchingVotes = userVoteObjects.filter(
       (object) => object.parent_post_id.toString() === post.id
     );
@@ -497,15 +493,15 @@ const voteOnPost = async (request, response, next) => {
       });
       // add the vote to the user
       await vote.save({ session });
-      await User.findByIdAndUpdate(
-        currentUser.id,
-        {
-          $push: {
-            vote_ids: vote.id,
-          },
-        },
-        { session }
-      );
+      // await User.findByIdAndUpdate(
+      //   currentUser.id,
+      //   {
+      //     $push: {
+      //       vote_ids: vote.id,
+      //     },
+      //   },
+      //   { session }
+      // );
       console.log("Created a new vote for the user");
       voteChange = voteDirection;
     }

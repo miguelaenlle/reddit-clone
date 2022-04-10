@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const errorMessages = require("../constants/errors");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
+const Post = require("../models/post");
 const User = require("../models/user");
 
 const getUserInformation = async (request, response, next) => {
@@ -16,15 +17,75 @@ const getUserInformation = async (request, response, next) => {
 
   const userData = {
     username: designatedUser.username,
-    sub_ids: designatedUser.sub_ids,
-    post_ids: designatedUser.post_ids,
-    comment_ids: designatedUser.comment_ids,
-    vote_ids: designatedUser.vote_ids,
+    num_upvotes: designatedUser.num_upvotes,
+    subreddits: designatedUser.sub_ids,
   };
 
   return response.status(200).json({
     message: "Succesfully retrieved user data",
     data: userData,
+  });
+};
+
+const getUserSubreddits = async (request, response, next) => {
+  const userId = request.params.uid;
+  let designatedUser;
+  try {
+    designatedUser = await User.findById(userId).exec();
+    if (!designatedUser) {
+      return next(errorMessages.failedToFindUserError)
+    }
+  } catch (error) {
+    return response.status(404).json({
+      message: "Failed to find the designated user.",
+    });
+  }
+
+  console.log(designatedUser);
+
+  const sub_ids = designatedUser.sub_ids;
+
+  return response.status(200).json({
+    message: "Succesfully retrieved user data",
+    sub_ids,
+  });
+};
+
+const getUserPosts = async (request, response, next) => {
+  const userId = request.params.uid;
+  let posts;
+  try {
+    posts = await Post.find({
+      user_id: userId,
+    }).sort({ post_time: -1 });
+  } catch (error) {
+    return response.status(404).json({
+      message: "Failed to find the designated user.",
+    });
+  }
+
+  return response.status(200).json({
+    message: "Succesfully retrieved user data",
+    posts: posts.map((post) => post.toObject({ getters: true })),
+  });
+};
+
+const getUserComments = async (request, response, next) => {
+  const userId = request.params.uid;
+  let comments;
+  try {
+    comments = await Comment.find({
+      user_id: userId,
+    });
+  } catch (error) {
+    return response.status(404).json({
+      message: "Failed to find the designated user.",
+    });
+  }
+
+  return response.status(200).json({
+    message: "Succesfully retrieved user data",
+    comments: comments.map((comment) => comment.toObject({ getters: true })),
   });
 };
 
@@ -63,43 +124,45 @@ const searchForUsers = async (request, response, next) => {
   });
 };
 
-const getSubreddits = async (request, response, next) => {
-  const errors = validationResult(request);
-  if (!errors.isEmpty()) {
-    return next(errorMessages.invalidInputsError);
-  }
+// const getSubreddits = async (request, response, next) => {
+//   const errors = validationResult(request);
+//   if (!errors.isEmpty()) {
+//     return next(errorMessages.invalidInputsError);
+//   }
 
-  const { authToken } = request.body;
+//   const { authToken } = request.body;
 
-  // check token
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-    userId = decodedToken.id;
-  } catch {
-    return next(errorMessages.getUserSubsFailed);
-  }
+//   // check token
+//   let userId;
+//   try {
+//     const decodedToken = await verifyLoginToken(authToken);
+//     if (!decodedToken) {
+//       return next(errorMessages.authTokenVerifyError);
+//     }
+//     userId = decodedToken.id;
+//   } catch {
+//     return next(errorMessages.getUserSubsFailed);
+//   }
 
-  // find the current user & extract subreddits
-  let subreddits;
-  try {
-    const currentUser = await User.findById(userId);
-    if (!currentUser) {
-      return next(errorMessages.failedToFindUserError);
-    }
-    subreddits = currentUser.sub_ids;
-  } catch {
-    return next(errorMessages.getUserSubsFailed);
-  }
-  return response.status(200).json({
-    subreddits: subreddits,
-    message: "Successfully retrieved user subreddits.",
-  });
-};
+//   // find the current user & extract subreddits
+//   let subreddits;
+//   try {
+//     const currentUser = await User.findById(userId);
+//     if (!currentUser) {
+//       return next(errorMessages.failedToFindUserError);
+//     }
+//     subreddits = currentUser.sub_ids;
+//   } catch {
+//     return next(errorMessages.getUserSubsFailed);
+//   }
+//   return response.status(200).json({
+//     subreddits: subreddits,
+//     message: "Successfully retrieved user subreddits.",
+//   });
+// };
 
 exports.getUserInformation = getUserInformation;
 exports.searchForUsers = searchForUsers;
-exports.getSubreddits = getSubreddits;
+exports.getUserSubreddits = getUserSubreddits;
+exports.getUserPosts = getUserPosts;
+exports.getUserComments = getUserComments;

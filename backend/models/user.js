@@ -36,28 +36,7 @@ const userSchema = new Schema({
       required: true,
       ref: "subreddits",
     },
-  ],
-  post_ids: [
-    {
-      type: mongoose.Types.ObjectId,
-      required: true,
-      ref: "comments",
-    },
-  ],
-  comment_ids: [
-    {
-      type: mongoose.Types.ObjectId,
-      required: true,
-      ref: "comments",
-    },
-  ],
-  vote_ids: [
-    {
-      type: mongoose.Types.ObjectId,
-      required: true,
-      ref: "votes",
-    },
-  ],
+  ]
 });
 
 userSchema.plugin(uniqueValidator);

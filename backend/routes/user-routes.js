@@ -4,13 +4,13 @@ const router = express.Router();
 
 const usersController = require("../controllers/users-controller");
 
-router.get(
-  "/subreddits",
-  [check("authToken").notEmpty()],
-  usersController.getSubreddits
-);
-
 router.get("/:uid", usersController.getUserInformation);
+
+router.get("/:uid/subreddits", usersController.getUserSubreddits);
+
+router.get("/:uid/posts", usersController.getUserPosts);
+
+router.get("/:uid/comments", usersController.getUserComments);
 
 router.get(
   "/",

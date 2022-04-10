@@ -123,6 +123,14 @@ const postDeleteFailedError = new HttpError(
 
 const postVoteFailedError = new HttpError("Failed to vote on post", 500);
 
+// comments
+
+const createCommentFailedError = new HttpError("Failed to create comment", 500)
+
+const getCommentFailedError = new HttpError("Failed to get comment", 500)
+
+const commentNotFoundError = new HttpError("Failed to get comment", 404)
+
 module.exports = {
   invalidInputsError,
   userExistsError,
@@ -153,5 +161,8 @@ module.exports = {
   postUpdateFailedError,
   postDeletedError,
   postDeleteFailedError,
-  postVoteFailedError
+  postVoteFailedError,
+  createCommentFailedError,
+  getCommentFailedError,
+  commentNotFoundError
 };
