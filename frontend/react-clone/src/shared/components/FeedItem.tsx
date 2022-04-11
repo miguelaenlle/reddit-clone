@@ -56,15 +56,15 @@ const FeedItem: React.FC<{
               <ArrowUpIcon
                 className={`h-4 ${
                   voteDirection === 1 ? "text-white" : "text-zinc-400"
-                } hover:text-white font-bold`}
+                } hover:text-white font-bold transition-colors`}
               />
             </div>
-            <p className="text-zinc-400 hover:cursor-default">{upvotes}</p>
+            <p className="text-zinc-400 hover:cursor-default transition-all">{upvotes}</p>
             <div onClick={handleDownvote} className="hover:cursor-pointer">
               <ArrowDownIcon
                 className={`h-4 ${
                   voteDirection === -1 ? "text-white" : "text-zinc-400"
-                } hover:text-white font-bold`}
+                } hover:text-white font-bold transition-colors`}
               />
             </div>
           </div>
