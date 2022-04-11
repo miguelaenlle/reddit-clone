@@ -5,8 +5,8 @@ const Button: React.FC<{
   buttonText: string;
 }> = (props) => {
   return (
-    <div className="w-56 hover:cursor-pointer items-center group flex bg-zinc-700 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 px-3 rounded-md transition-colors">
-      <p className="text-white grow transition-colors">
+    <div className="w-56 hover:cursor-pointer items-center group flex bg-zinc-900 hover:bg-zinc-900 border border-zinc-800 px-3 transition-colors">
+      <p className="text-zinc-400 group-hover:text-white grow transition-colors">
         {props.buttonText}
       </p>
       {props.buttonImage}

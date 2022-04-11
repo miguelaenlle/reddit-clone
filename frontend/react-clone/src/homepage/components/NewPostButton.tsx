@@ -5,7 +5,7 @@ const NewPostButton: React.FC<{}> = (props) => {
   return (
     <Button
       buttonImage={
-        <ChatAltIcon className="h-5 text-zinc-200 group-hover:text-white transition-colors" />
+        <ChatAltIcon className="h-5 text-zinc-400 group-hover:text-white transition-colors" />
       }
       buttonText="New Post"
     />
