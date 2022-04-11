@@ -1,6 +1,6 @@
 import { ChevronUpIcon } from "@heroicons/react/outline";
 import { useState } from "react";
-import DropdownOption from "./DropdownOption";
+import DropdownOption from "../../navbar/components/DropdownOption";
 
 const Dropdown: React.FC<{
   navbar?: boolean;
