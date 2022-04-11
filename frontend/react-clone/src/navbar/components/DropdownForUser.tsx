@@ -34,36 +34,29 @@ const DropdownForUser: React.FC<{
         <p className="grow text-zinc-400 group-hover:text-white pr-10 transition-colors">
           {`u/${props.username}`}
         </p>
-        {isOpen ? (
-          <ChevronDownIcon className="text-zinc-400 h-4 group-hover:text-white transition-colors" />
-        ) : (
-          <ChevronUpIcon className="text-zinc-400 h-4 group-hover:text-white transition-colors" />
-        )}
+        <ChevronUpIcon
+          className={`text-zinc-400 h-4 group-hover:text-white transition-colors ${
+            isOpen ? "rotate-180" : ""
+          } transition-transform`}
+        />
       </div>
       <div
         id="dropdown"
         className={`${
           !isOpen ? "hidden" : ""
-        } absolute z-10 w-60 border-b border-x rounded-b-md border-zinc-700 bg-zinc-800`}
-      ></div>
-
-      <div
-        id="dropdown"
-        className={`${
-          !isOpen ? "hidden" : ""
-        } absolute z-10 w-60 border-b border-x rounded-b-md border-zinc-700 bg-zinc-800`}
+        } absolute z-10 w-60 border-b border-x rounded-b-md border-zinc-700 bg-zinc-800 animate-fade`}
       >
         <ul className="py-1 " aria-labelledby="dropdownDefault">
-            {props.optionIds.map((optionId) => (
-              <DropdownOption
-                key={optionId}
-                optionId={optionId}
-                optionIcon={props.optionIcons[optionId]}
-                optionText={props.optionValues[optionId]}
-                selectedOption={props.selectedOption}
-                handleSelectedOption={handleSelectOption}
-              />
-            ))}
+          {props.optionIds.map((optionId) => (
+            <DropdownOption
+              key={optionId}
+              optionId={optionId}
+              optionIcon={props.optionIcons[optionId]}
+              optionText={props.optionValues[optionId]}
+              selectedOption={props.selectedOption}
+              handleSelectedOption={handleSelectOption}
+            />
+          ))}
           <div className="border-t my-1 border-zinc-700"></div>
 
           <DropdownOption
