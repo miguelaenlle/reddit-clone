@@ -4,7 +4,7 @@ import {
   pageOptionIcons,
   pageOptionValues,
 } from "../constants/page-options";
-import Dropdown from "./Dropdown";
+import Dropdown from "../../shared/components/Dropdown";
 
 const HomeDropdown: React.FC<{}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("home");

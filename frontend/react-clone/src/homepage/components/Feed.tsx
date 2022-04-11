@@ -1,5 +1,7 @@
 import { useState } from "react";
-import Dropdown from "../../navbar/components/Dropdown";
+import Dropdown from "../../shared/components/Dropdown";
+import NewPostButton from "./NewPostButton";
+import NewCommunityButton from "./NewCommunityButton";
 
 import {
   optionIds,
@@ -15,14 +17,18 @@ const Feed: React.FC<{}> = (props) => {
 
   return (
     <div className="pt-20 px-5">
-      <Dropdown
-        navbar={false}
-        optionIds={optionIds}
-        optionValues={sortOptionValues}
-        optionIcons={sortOptionIcons}
-        selectedOption={selectedOption}
-        handleSelectedOption={handleSelectedOption}
-      />
+      <div className="flex space-x-2">
+        <Dropdown
+          navbar={false}
+          optionIds={optionIds}
+          optionValues={sortOptionValues}
+          optionIcons={sortOptionIcons}
+          selectedOption={selectedOption}
+          handleSelectedOption={handleSelectedOption}
+        />
+        <NewPostButton />
+        <NewCommunityButton />
+      </div>
     </div>
   );
 };
