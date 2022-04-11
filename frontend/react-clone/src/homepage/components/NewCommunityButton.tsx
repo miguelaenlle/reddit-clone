@@ -5,7 +5,7 @@ const NewCommunityButton: React.FC<{}> = (props) => {
   return (
     <Button
       buttonImage={
-        <UserGroupIcon className="h-5 text-white transition-colors" />
+        <UserGroupIcon className="h-5 text-zinc-400 group-hover:text-white transition-colors" />
       }
       buttonText="New Subreddit"
     />

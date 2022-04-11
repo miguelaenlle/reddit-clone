@@ -19,14 +19,14 @@ const Dropdown: React.FC<{
         setIsOpen(false);
   }
 
-  const topBorderRadius = "rounded-t-md";
-  const bottomBorderRadius = "rounded-b-md";
+  const topBorderRadius = props.navbar ? "rounded-t-md" : "";
+  const bottomBorderRadius = props.navbar ? "rounded-b-md" : "";
 
   return (
     <div className = {isOpen ? "drop-shadow" : ""}>
       <div
         onClick={handleClickOpen}
-        className={`border border-zinc-700 group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
+        className={`border ${(isOpen || !props.navbar) ? ((isOpen) ? "border-zinc-700" : "border-zinc-800") : "border-0"} group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
           !isOpen && bottomBorderRadius
         }`}
       >
@@ -41,7 +41,7 @@ const Dropdown: React.FC<{
         id="dropdown"
         className={`${
           !isOpen ? "hidden" : ""
-        } absolute ${props.navbar ? "z-15" : "z-10"} w-60 border-b border-x rounded-b-md border-zinc-700 bg-zinc-800 animate-fade`}
+        } absolute ${props.navbar ? "z-15" : "z-10"} w-60 border-b border-x ${bottomBorderRadius} border-zinc-700 bg-zinc-800 animate-fade`}
       >
         <ul className="py-1 " aria-labelledby="dropdownDefault">
           {props.optionIds.map((optionId) => (

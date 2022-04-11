@@ -8,6 +8,7 @@ import {
   sortOptionIcons,
   sortOptionValues,
 } from "../constants/sort-modes";
+import FeedItem from "../../shared/components/FeedItem";
 
 const Feed: React.FC<{}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("top");
@@ -28,6 +29,11 @@ const Feed: React.FC<{}> = (props) => {
         />
         <NewPostButton />
         <NewCommunityButton />
+      </div>
+      <div className="columns-3 pt-5">
+        <FeedItem />
+        <FeedItem />
+        <FeedItem />
       </div>
     </div>
   );
