@@ -9,7 +9,39 @@ const FeedItem: React.FC<{
   numComments: number;
 }> = (props) => {
   const [upvotes, setUpvotes] = useState(props.initialUpvotes);
-  const handleVote = () => {};
+  const [voteDirection, setVoteDirection] = useState(0);
+  const handleUpvote = () => {
+    setVoteDirection((previousVote) => {
+      if (previousVote === 1) {
+        setUpvotes((previousVotes) => previousVotes - 1);
+        return 0;
+      } else if (previousVote === 0) {
+        setUpvotes((previousVotes) => previousVotes + 1);
+        return 1;
+      } else if (previousVote === -1) {
+        setUpvotes((previousVotes) => previousVotes + 2);
+        return 1;
+      } else {
+        return previousVote;
+      }
+    });
+  };
+  const handleDownvote = () => {
+    setVoteDirection((previousVote) => {
+      if (previousVote === -1) {
+        setUpvotes((previousVotes) => previousVotes + 1);
+        return 0;
+      } else if (previousVote === 0) {
+        setUpvotes((previousVotes) => previousVotes - 1);
+        return -1;
+      } else if (previousVote === 1) {
+        setUpvotes((previousVotes) => previousVotes - 2);
+        return -1;
+      } else {
+        return previousVote;
+      }
+    });
+  };
   return (
     <div className="w-1/3 p-1.5">
       <div className="bg-zinc-800 border border-zinc-700 p-3 max-h-fit">
@@ -20,12 +52,24 @@ const FeedItem: React.FC<{
         </p>
         <div className="flex">
           <div className="flex space-x-2 items-center">
-            <ArrowUpIcon className="h-4 text-white font-bold" />
-            <p className="text-zinc-400">{upvotes}</p>
-            <ArrowDownIcon className="h-4 text-zinc-400 font-bold" />
+            <div onClick={handleUpvote} className="hover:cursor-pointer">
+              <ArrowUpIcon
+                className={`h-4 ${
+                  voteDirection === 1 ? "text-white" : "text-zinc-400"
+                } hover:text-white font-bold`}
+              />
+            </div>
+            <p className="text-zinc-400 hover:cursor-default">{upvotes}</p>
+            <div onClick={handleDownvote} className="hover:cursor-pointer">
+              <ArrowDownIcon
+                className={`h-4 ${
+                  voteDirection === -1 ? "text-white" : "text-zinc-400"
+                } hover:text-white font-bold`}
+              />
+            </div>
           </div>
-          <div className = "flex-grow"></div>
-          <p className = "text-zinc-400">{props.numComments} comments</p>
+          <div className="flex-grow"></div>
+          <p className="text-zinc-400">{props.numComments} comments</p>
         </div>
       </div>
     </div>
