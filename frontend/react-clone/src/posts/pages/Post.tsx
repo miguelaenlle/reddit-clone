@@ -4,15 +4,14 @@ import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
 import Dropdown from "../../shared/components/Dropdown";
 import Modal from "../../shared/components/Modal";
-import VoteItem from "../../shared/components/VoteItem";
+import PostItem from "../components/PostItem";
 import PrimaryContent from "../components/PrimaryContent";
 import {
   sortOptionIcons,
   sortOptionIds,
-  sortOptionValues,
+  sortOptionValues
 } from "../constants/sort-options";
-import ButtonNoBorder from "../../shared/components/ButtonNoBorder";
-import PostItem from "../components/PostItem";
+import Comments from "../components/Comments";
 
 const PostPage: React.FC<{}> = (props) => {
   const params = useParams();
@@ -20,12 +19,6 @@ const PostPage: React.FC<{}> = (props) => {
   const httpClient = useHttpClient();
 
   const [post, setPost] = useState<Post | null>(null);
-  const [selectedOption, setSelectedOption] = useState("new");
-
-  const handleSelectedOption = (newSelectedOption: string) => {
-    setSelectedOption(newSelectedOption);
-  };
-
   const handleDismiss = () => {
     // navigate(-1);
   };
@@ -57,7 +50,6 @@ const PostPage: React.FC<{}> = (props) => {
   }, []);
 
   // pull the post information from the API
-  const imageCSS = "h-4 text-zinc-400 group-hover:text-white transition-colors";
   return (
     <Modal onDismiss={handleDismiss}>
       <div className="mt-20 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700">
@@ -67,31 +59,7 @@ const PostPage: React.FC<{}> = (props) => {
           <div>{post && <PrimaryContent post={post} />}</div>
         )}
       </div>
-      <div className="mt-5 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700 m-96">
-        <div className="flex items-center space-x-5">
-          <p className="text-white">579 comments</p>
-          <Dropdown
-            light={true}
-            navbar={false}
-            optionIds={sortOptionIds}
-            optionValues={sortOptionValues}
-            optionIcons={sortOptionIcons}
-            selectedOption={selectedOption}
-            handleSelectedOption={handleSelectedOption}
-          />
-        </div>
-        <PostItem>
-          <PostItem>
-            <PostItem>
-              <PostItem></PostItem>
-            </PostItem>
-          </PostItem>
-        </PostItem>
-
-        <PostItem>
-          <PostItem></PostItem>
-        </PostItem>
-      </div>
+      <Comments />
     </Modal>
   );
 };
