@@ -1,19 +1,18 @@
-import { PencilIcon, ReplyIcon, XIcon } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
-import Button from "../../shared/components/Button";
+import Dropdown from "../../shared/components/Dropdown";
 import Modal from "../../shared/components/Modal";
 import VoteItem from "../../shared/components/VoteItem";
-import LightButton from "../../shared/components/LightButton";
 import PrimaryContent from "../components/PrimaryContent";
-import Dropdown from "../../shared/components/Dropdown";
 import {
-  sortOptionIds,
   sortOptionIcons,
+  sortOptionIds,
   sortOptionValues,
 } from "../constants/sort-options";
+import ButtonNoBorder from "../../shared/components/ButtonNoBorder";
+import PostItem from "../components/PostItem";
 
 const PostPage: React.FC<{}> = (props) => {
   const params = useParams();
@@ -68,7 +67,7 @@ const PostPage: React.FC<{}> = (props) => {
           <div>{post && <PrimaryContent post={post} />}</div>
         )}
       </div>
-      <div className="mt-5 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700">
+      <div className="mt-5 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700 m-96">
         <div className="flex items-center space-x-5">
           <p className="text-white">579 comments</p>
           <Dropdown
@@ -81,6 +80,17 @@ const PostPage: React.FC<{}> = (props) => {
             handleSelectedOption={handleSelectedOption}
           />
         </div>
+        <PostItem>
+          <PostItem>
+            <PostItem>
+              <PostItem></PostItem>
+            </PostItem>
+          </PostItem>
+        </PostItem>
+
+        <PostItem>
+          <PostItem></PostItem>
+        </PostItem>
       </div>
     </Modal>
   );

@@ -48,7 +48,7 @@ const PrimaryContent: React.FC<{
   return (
     <div>
       <p>
-        <span className="text-white hover:underline hover:cursor-pointer">
+        <span className="text-sm text-white hover:underline hover:cursor-pointer">
           u/{props.post.opName}
         </span>{" "}
         <span className="text-zinc-400">
@@ -59,13 +59,13 @@ const PrimaryContent: React.FC<{
           3 hours ago
         </span>{" "}
       </p>
-      <h1 className="mt-3 text-3xl text-white">The best PC setup of 2022</h1>
-      <p className="mt-1 text-zinc-400">
+      <h1 className="mt-1.5 text-3xl text-white">The best PC setup of 2022</h1>
+      <p className="mt-3 text-zinc-200 text-lg">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
         euismod, urna eu tincidunt consectetur, nisl urna euismod nisi, eu
         porttitor nisl nisi euismod nisl.
       </p>
-      <div className="mt-5 space-x-2 flex">
+      <div className="mt-14 space-x-2 flex">
         <VoteItem
           voteDirection={voteDirection}
           numUpvotes={upvotes}
