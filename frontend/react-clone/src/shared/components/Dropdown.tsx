@@ -3,6 +3,7 @@ import { useState } from "react";
 import DropdownOption from "../../navbar/components/DropdownOption";
 
 const Dropdown: React.FC<{
+  light?: boolean;
   navbar?: boolean;
   optionIds: string[];
   optionValues: { [key: string]: string };
@@ -23,15 +24,15 @@ const Dropdown: React.FC<{
   const bottomBorderRadius = props.navbar ? "rounded-b-md" : "";
 
   return (
-    <div className = {isOpen ? "drop-shadow" : ""}>
+    <div className = {isOpen ? "relative drop-shadow" : "relative"}>
       <div
         onClick={handleClickOpen}
-        className={`border ${(isOpen || !props.navbar) ? ((isOpen) ? "border-zinc-700" : "border-zinc-800") : "border-0"} group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
+        className={`border ${(isOpen || !props.navbar) ? ((isOpen) ? "border-zinc-700" : "border-zinc-800") : "border-0"} group p-3 ${(isOpen || !props.light) ? "w-60" : ""} flex space-x-2 items-center hover:cursor-pointer ${props.light ? "py-1" : "h-10"} ${topBorderRadius} ${
           !isOpen && bottomBorderRadius
         }`}
       >
         {props.optionIcons[props.selectedOption]}
-        <p className="grow text-zinc-400 group-hover:text-white pr-10 transition-colors">
+        <p className="grow text-zinc-400 group-hover:text-white pr-5 transition-colors">
           {props.optionValues[props.selectedOption]}
         </p>
         <ChevronUpIcon className={`text-zinc-400 h-4 group-hover:text-white transition-colors ${isOpen ? "rotate-180" : ""} transition-transform`} />

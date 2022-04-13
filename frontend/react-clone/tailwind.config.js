@@ -2,11 +2,11 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {},
-    animation: {
-      
-      fade: "fadeIn 0.3s ease-in-out 1 forwards"
-    },
     extend: {
+      animation: {
+        
+        fade: "fadeIn 0.3s ease-in-out 1 forwards"
+      },
       keyframes: (theme) => ({
         fadeIn: {
           "0%": { opacity: 0 },

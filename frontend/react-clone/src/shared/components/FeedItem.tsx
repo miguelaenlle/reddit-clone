@@ -1,15 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/outline";
+import VoteItem from "./VoteItem";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const FeedItem: React.FC<{
+  postId: string;
   title: string;
   subName: string;
   opName: string;
   initialUpvotes: number;
   numComments: number;
+  date: Date | null;
 }> = (props) => {
+  const navigate = useNavigate();
   const [upvotes, setUpvotes] = useState(props.initialUpvotes);
+  const [timeAgo, setTimeAgo] = useState<string | null>(null);
   const [voteDirection, setVoteDirection] = useState(0);
+
+  const updateTimeAgo = () => {
+    try {
+      if (props.date) {
+        setTimeAgo(moment(props.date).fromNow());
+      }
+    } catch {}
+  };
+
   const handleUpvote = () => {
     setVoteDirection((previousVote) => {
       if (previousVote === 1) {
@@ -42,32 +58,38 @@ const FeedItem: React.FC<{
       }
     });
   };
+
+  useEffect(() => {
+    updateTimeAgo();
+  }, []);
+
+  const openPost = () => {
+    navigate(`/post/${props.postId}`);
+  };
+
   return (
     <div className="w-1/3 p-1.5">
-      <div className="bg-zinc-800 border border-zinc-700 p-3 max-h-fit">
-        <h1 className="text-2xl text-white">{props.title}</h1>
-        <p className="text-l text-white py-2">
-          r/{props.subName}{" "}
-          <span className="text-zinc-400">• u/{props.opName}</span>
+      <div className="hover:cursor-pointer group bg-zinc-800 border border-zinc-700 p-3 hover:border-zinc-400 max-h-fit transition-colors">
+        <h1
+          onClick={openPost}
+          className="text-2xl text-white group-hover:underline"
+        >
+          {props.title}
+        </h1>
+        <p className="text-l text-zinc-400 py-2">
+          <span className="hover:underline text-white">r/{props.subName}</span>
+          {" • "}
+          <span className="hover:underline">u/{props.opName}</span>
+          {" • "}
+          {timeAgo && <span>{timeAgo}</span>}
         </p>
         <div className="flex">
-          <div className="flex space-x-2 items-center">
-            <div onClick={handleUpvote} className="hover:cursor-pointer">
-              <ArrowUpIcon
-                className={`h-4 ${
-                  voteDirection === 1 ? "text-white" : "text-zinc-400"
-                } hover:text-white font-bold transition-colors`}
-              />
-            </div>
-            <p className="text-zinc-400 hover:cursor-default transition-all">{upvotes}</p>
-            <div onClick={handleDownvote} className="hover:cursor-pointer">
-              <ArrowDownIcon
-                className={`h-4 ${
-                  voteDirection === -1 ? "text-white" : "text-zinc-400"
-                } hover:text-white font-bold transition-colors`}
-              />
-            </div>
-          </div>
+          <VoteItem
+            voteDirection={voteDirection}
+            handleUpvote={handleUpvote}
+            handleDownvote={handleDownvote}
+            numUpvotes={upvotes}
+          />
           <div className="flex-grow"></div>
           <p className="text-zinc-400">{props.numComments} comments</p>
         </div>
