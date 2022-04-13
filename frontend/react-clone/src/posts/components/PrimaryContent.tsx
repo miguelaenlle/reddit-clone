@@ -5,6 +5,8 @@ import LightButton from "../../shared/components/LightButton";
 import VoteItem from "../../shared/components/VoteItem";
 import { ReplyIcon, PencilIcon, XIcon } from "@heroicons/react/outline";
 
+import { imageCSS } from "../../shared/constants/image-class";
+
 const PrimaryContent: React.FC<{
   post: Post;
 }> = (props) => {
@@ -44,7 +46,6 @@ const PrimaryContent: React.FC<{
     });
   };
 
-  const imageCSS = "h-4 text-zinc-400 group-hover:text-white transition-colors";
   return (
     <div>
       <p>

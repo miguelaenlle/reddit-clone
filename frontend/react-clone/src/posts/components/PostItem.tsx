@@ -1,9 +1,9 @@
 import VoteItem from "../../shared/components/VoteItem";
 import ButtonNoBorder from "../../shared/components/ButtonNoBorder";
 import { PencilIcon, ReplyIcon, TrashIcon } from "@heroicons/react/outline";
+import { imageCSS } from "../../shared/constants/image-class";
 
 const PostItem: React.FC<{}> = (props) => {
-  const imageCSS = "h-4 text-zinc-400 group-hover:text-white transition-colors";
   return (
     <div className="pt-5">
       <div className="border-l border-l-zinc-600 pl-3">
