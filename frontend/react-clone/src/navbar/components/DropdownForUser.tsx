@@ -26,7 +26,7 @@ const DropdownForUser: React.FC<{
     <div>
       <div
         onClick={handleClickOpen}
-        className={`border ${isOpen ? "border-zinc-700" : "border-0"} group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
+        className={`relative border ${isOpen ? "border-zinc-700" : "border-0"} group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
           !isOpen && bottomBorderRadius
         }`}
       >
