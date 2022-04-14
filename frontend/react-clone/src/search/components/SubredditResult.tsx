@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import LightButton from "../../shared/components/LightButton";
 
 const SubredditResult: React.FC<{}> = (props) => {
@@ -8,7 +9,11 @@ const SubredditResult: React.FC<{}> = (props) => {
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center space-x-2">
-          <h2 className="hover:cursor-pointer hover:text-white hover:underline text-zinc-200 text-xl">{"r/battlestations"}</h2>
+          <Link to={`/sub/sub1`}>
+            <h2 className="hover:cursor-pointer hover:text-white hover:underline text-zinc-200 text-xl">
+              {"r/battlestations"}
+            </h2>
+          </Link>
           <h2 className="text-zinc-400"> •</h2>
           <h2 className="text-zinc-400 text-md">{"23,000 members"}</h2>
           <div className="pl-2">

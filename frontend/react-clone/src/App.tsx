@@ -11,7 +11,7 @@ import Homepage from "./homepage/pages/Homepage";
 import HeaderWrapper from "./navbar/wrappers/HeaderWrapper";
 import Post from "./posts/pages/Post";
 import Search from "./search/pages/Search";
-
+import Subreddit from "./subreddit/pages/Subreddit";
 
 
 function App() {
@@ -40,6 +40,7 @@ function App() {
           />
         </Route>
         <Route path = "/search" element = {<Search />} />
+        <Route path = "/sub/:subId" element = {<Subreddit />} />
       </Routes>
     </HeaderWrapper>
   );
