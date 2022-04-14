@@ -1,4 +1,4 @@
-import LightButton from "../../shared/components/LightButton";
+import { Link } from "react-router-dom";
 
 const UserResult: React.FC<{}> = (props) => {
   return (
@@ -8,7 +8,11 @@ const UserResult: React.FC<{}> = (props) => {
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center space-x-2">
-          <h2 className="hover:cursor-pointer hover:text-white hover:underline text-zinc-200 text-xl">{"u/n_exus"}</h2>
+          <Link to = "/user/userID">
+            <h2 className="hover:cursor-pointer hover:text-white hover:underline text-zinc-200 text-xl">
+              {"u/n_exus"}
+            </h2>
+          </Link>
           <h2 className="text-zinc-400"> •</h2>
           <h2 className="text-zinc-400 text-md">{"5,000 upvotes"}</h2>
         </div>
