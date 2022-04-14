@@ -19,7 +19,21 @@ export const pageOptionIcons: { [key: string]: React.ReactElement } = {
 
 export const pageOptionValues: { [key: string]: string } = {
   home: "Home",
-  subreddits: "Subreddits",
+  subreddits: "All Subreddits",
   users: "All Users",
   posts: "All Posts",
+};
+
+export const urlValues: { [key: string]: string } = {
+  home: "/",
+  subreddits: "/all/subs",
+  users: "/all/users",
+  posts: "/all/posts",
+};
+
+export const urlToValue: { [key: string]: string } = {
+  "/": "home",
+  "/all/subs": "subreddits",
+  "/all/users": "users",
+  "/all/posts": "posts",
 };
