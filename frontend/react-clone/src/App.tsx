@@ -1,16 +1,18 @@
 import React from "react";
-import Homepage from "./homepage/pages/Homepage";
-import Post from "./posts/pages/Post";
-import HeaderWrapper from "./navbar/wrappers/HeaderWrapper";
-
-import { Routes, Route } from "react-router-dom";
-import Signup from "./account/pages/Signup";
-import Login from "./account/pages/Login";
-import RequestResetPassword from "./account/pages/ResetPassword/RequestResetPassword";
-import WaitResetPassword from "./account/pages/ResetPassword/WaitResetPassword";
-import ResetPassword from "./account/pages/ResetPassword/ResetPassword";
+import { Route, Routes } from "react-router-dom";
 import ConfirmEmail from "./account/pages/Confirmation/ConfirmEmail";
 import WaitConfirmEmail from "./account/pages/Confirmation/WaitConfirmEmail";
+import Login from "./account/pages/Login";
+import RequestResetPassword from "./account/pages/ResetPassword/RequestResetPassword";
+import ResetPassword from "./account/pages/ResetPassword/ResetPassword";
+import WaitResetPassword from "./account/pages/ResetPassword/WaitResetPassword";
+import Signup from "./account/pages/Signup";
+import Homepage from "./homepage/pages/Homepage";
+import HeaderWrapper from "./navbar/wrappers/HeaderWrapper";
+import Post from "./posts/pages/Post";
+import Search from "./search/pages/Search";
+
+
 
 function App() {
   return (
@@ -36,9 +38,8 @@ function App() {
             path={`/confirm-email/:passwordToken`}
             element={<ConfirmEmail />}
           />
-
-
         </Route>
+        <Route path = "/search" element = {<Search />} />
       </Routes>
     </HeaderWrapper>
   );
