@@ -16,6 +16,7 @@ import AllSubreddits from "./subreddit/pages/AllSubreddits";
 import Subreddit from "./subreddit/pages/Subreddit";
 import AllUsers from "./user/pages/AllUsers";
 import User from "./user/pages/UserPage";
+import CreateSubreddit from "./subreddit/pages/CreateSubreddit";
 
 function App() {
   return (
@@ -37,6 +38,12 @@ function App() {
           <Route
             path={`/confirm-email/:passwordToken`}
             element={<ConfirmEmail />}
+          />
+          {/* create post/subreddit */}
+          <Route path={`/create-post`} element={<WaitConfirmEmail />} />
+          <Route
+            path={`/create-sub`}
+            element={<CreateSubreddit />}
           />
         </Route>
         <Route path="/search" element={<Search />} />
