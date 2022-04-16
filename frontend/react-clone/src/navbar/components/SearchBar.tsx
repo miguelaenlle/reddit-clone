@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import SearchPopup from "../../search/components/SearchPopup";
-import { useNavigate } from "react-router-dom";
 
 const SearchBar: React.FC<{}> = (props) => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [popupDisplayed, setPopupDisplayed] = useState(false);
   const updateSearchResults = () => {};
@@ -13,7 +13,7 @@ const SearchBar: React.FC<{}> = (props) => {
 
   const handleConfirmSearch = () => {
     console.log("Search...")
-    navigate(`search?query=${searchQuery}`);
+    history.push(`search?query=${searchQuery}`);
     setPopupDisplayed(false);
   };
 

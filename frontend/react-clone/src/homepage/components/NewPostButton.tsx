@@ -1,11 +1,11 @@
 import Button from "../../shared/components/Button";
 import { ChatAltIcon } from "@heroicons/react/outline";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const NewPostButton: React.FC<{}> = (props) => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const handleClick = () => {
-    navigate("/create-post");
+    history.push("/create-post");
   };
   return (
     <Button

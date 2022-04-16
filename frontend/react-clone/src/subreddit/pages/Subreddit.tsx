@@ -2,16 +2,13 @@ import { useState } from "react";
 import NewPostButton from "../../homepage/components/NewPostButton";
 import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
 import {
-    optionIds,
-    sortOptionIcons,
-    sortOptionValues
+  optionIds,
+  sortOptionIcons,
+  sortOptionValues,
 } from "../../homepage/constants/sort-modes";
 import Dropdown from "../../shared/components/Dropdown";
 import FeedItem from "../../shared/components/FeedItem";
 import SubredditHeader from "../components/SubredditHeader";
-
-
-
 
 const Subreddit: React.FC<{}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("top");
@@ -37,16 +34,7 @@ const Subreddit: React.FC<{}> = (props) => {
         <div className="pt-10 z-0 animate-fade relative">
           <div className={`z-1 animate-fade flex flex-wrap`}>
             {DUMMY_POSTS.map((post) => (
-              <FeedItem
-                key={post.id}
-                postId={`${post.id}`}
-                title={post.title}
-                subName={post.subName}
-                opName={post.opName}
-                initialUpvotes={post.initialUpvotes}
-                numComments={post.numComments}
-                date={post.postDate}
-              />
+              <FeedItem post={post} />
             ))}
           </div>
         </div>

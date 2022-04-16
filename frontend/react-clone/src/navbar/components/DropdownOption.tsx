@@ -1,6 +1,6 @@
 const DropdownOption: React.FC<{
   optionId: string;
-  optionIcon: React.ReactElement;
+  optionIcon?: React.ReactElement;
   optionText: string;
   selectedOption: string;
   handleSelectedOption: (option: string) => void;
@@ -14,7 +14,7 @@ const DropdownOption: React.FC<{
       onClick={handleClick}
       className="group space-x-2 flex items-center py-1 px-3 hover:cursor-pointer"
     >
-      {props.optionIcon}
+      {props.optionIcon && props.optionIcon}
       <p
         className={`grow ${
           selected ? "text-white" : "text-zinc-400"

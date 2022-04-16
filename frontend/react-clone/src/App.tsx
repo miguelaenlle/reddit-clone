@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 import ConfirmEmail from "./account/pages/Confirmation/ConfirmEmail";
 import WaitConfirmEmail from "./account/pages/Confirmation/WaitConfirmEmail";
 import Login from "./account/pages/Login";
@@ -17,43 +17,55 @@ import Subreddit from "./subreddit/pages/Subreddit";
 import AllUsers from "./user/pages/AllUsers";
 import User from "./user/pages/UserPage";
 import CreateSubreddit from "./subreddit/pages/CreateSubreddit";
+import CreatePost from "./posts/pages/CreatePost";
 
 function App() {
   return (
     <HeaderWrapper>
-      <Routes>
-        <Route path="/" element={<Homepage />}>
-          <Route path={`/post/:postId`} element={<Post />} />
+      <Switch>
+        <Route path="/home">
+          <Homepage />
+        </Route>
+        {/* <Route path={`/post/:postId`} element={<Post />} />
           <Route path={`/signup`} element={<Signup />} />
           <Route path={`/login`} element={<Login />} />
-          {/* password reset */}
           <Route path={`/reset-password`} element={<RequestResetPassword />} />
           <Route
             path={`/wait-reset-password`}
             element={<WaitResetPassword />}
           />
           <Route path={`/reset-password-prompt`} element={<ResetPassword />} />
-          {/* confirm email */}
           <Route path={`/wait-confirm-email`} element={<WaitConfirmEmail />} />
           <Route
             path={`/confirm-email/:passwordToken`}
             element={<ConfirmEmail />}
           />
-          {/* create post/subreddit */}
-          <Route path={`/create-post`} element={<WaitConfirmEmail />} />
-          <Route
-            path={`/create-sub`}
-            element={<CreateSubreddit />}
-          />
+          <Route path={`/create-post`} element={<CreatePost />} />
+          <Route path={`/create-sub`} element={<CreateSubreddit />} /> */}
+        {/* </Route> */}
+        <Route exact path="/search">
+          <Search />
         </Route>
-        <Route path="/search" element={<Search />} />
-        <Route path="/sub/:subId" element={<Subreddit />} />
-        <Route path="/user/:userId" element={<User />} />
+        <Route exact path="/sub/:subId"> 
+          <Subreddit />
+        </Route>
+        <Route exact path="/user/:userId">
+          <User />
+        </Route>
 
-        <Route path="/all/subs" element={<AllSubreddits />} />
-        <Route path="/all/users" element={<AllUsers />} />
-        <Route path="/all/posts" element={<AllPosts />} />
-      </Routes>
+        <Route exact path="/all/subs">
+          <AllSubreddits />
+        </Route>
+        <Route exact path="/all/users">
+          <AllUsers />
+        </Route>
+        <Route exact path="/all/posts">
+          <AllPosts />
+        </Route>
+        <Route exact path = "/">
+          <Redirect to="/home" />
+        </Route>
+      </Switch>
     </HeaderWrapper>
   );
 }

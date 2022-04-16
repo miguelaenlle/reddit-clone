@@ -6,10 +6,13 @@ import VoteItem from "../../shared/components/VoteItem";
 import { ReplyIcon, PencilIcon, XIcon } from "@heroicons/react/outline";
 
 import { imageCSS } from "../../shared/constants/image-class";
+import { useHistory } from "react-router-dom";
+import moment from "moment";
 
 const PrimaryContent: React.FC<{
   post: Post;
 }> = (props) => {
+  const history = useHistory();
   const [upvotes, setUpvotes] = useState(0);
   const [voteDirection, setVoteDirection] = useState(0);
 
@@ -46,25 +49,31 @@ const PrimaryContent: React.FC<{
     });
   };
 
+  const openUser = () => {
+    history.push(`/user/${props.post.opId}`);
+  }
+
+  const openSubreddit = () => {
+    history.push(`/sub/${props.post.subId}`);
+  }
+
   return (
     <div>
       <p>
-        <span className="text-sm text-white hover:underline hover:cursor-pointer">
+        <span onClick = {openUser} className="text-sm text-white hover:underline hover:cursor-pointer">
           u/{props.post.opName}
         </span>{" "}
         <span className="text-zinc-400">
           on{" "}
-          <span className="hover:underline hover:cursor-pointer">
-            r/battlestations
+          <span onClick = {openSubreddit} className="hover:underline hover:cursor-pointer">
+            r/{props.post.subName}
           </span>{" "}
-          3 hours ago
+          {moment(props.post.postDate).fromNow()}
         </span>{" "}
       </p>
-      <h1 className="mt-1.5 text-3xl text-white">The best PC setup of 2022</h1>
+      <h1 className="mt-1.5 text-3xl text-white">{props.post.title}</h1>
       <p className="mt-3 text-zinc-200 text-lg">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
-        euismod, urna eu tincidunt consectetur, nisl urna euismod nisi, eu
-        porttitor nisl nisi euismod nisl.
+        {props.post.text}
       </p>
       <div className="mt-14 space-x-2 flex">
         <VoteItem
@@ -77,14 +86,14 @@ const PrimaryContent: React.FC<{
           buttonImage={<ReplyIcon className={imageCSS} />}
           buttonText="Reply"
         />
-        <LightButton
+        {/* <LightButton
           buttonImage={<PencilIcon className={imageCSS} />}
           buttonText="Edit"
         />
         <LightButton
           buttonImage={<XIcon className={imageCSS} />}
           buttonText="Delete"
-        />
+        /> */}
       </div>
     </div>
   );

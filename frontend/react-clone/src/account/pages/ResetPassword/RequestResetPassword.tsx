@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from "@heroicons/react/outline";
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import LightButton from "../../../shared/components/LightButton";
 import Modal from "../../../shared/components/Modal";
 import TextField from "../../../shared/components/TextField";
@@ -22,10 +22,10 @@ const validate = (values: { [key: string]: string }) => {
 };
 const RequestResetPassword: React.FC<{}> = (props) => {
   const handleDismiss = () => {};
-  const navigate = useNavigate();
+  const history = useHistory();
 
   const handleGoBack = () => {
-    navigate(-1);
+    history.goBack();
   };
 
   const formik = useFormik({

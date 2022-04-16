@@ -6,11 +6,11 @@ import {
   urlValues,
   urlToValue
 } from "../constants/page-options";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import Dropdown from "../../shared/components/Dropdown";
 
 const HomeDropdown: React.FC<{}> = (props) => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const location = useLocation();
   const [selectedOption, setSelectedOption] = useState("home");
 
@@ -29,7 +29,7 @@ const HomeDropdown: React.FC<{}> = (props) => {
 
   const handleSelectedOption = (option: string) => {
     setSelectedOption(option);
-    navigate(urlValues[option]);
+    history.push(urlValues[option]);
   };
 
   return (

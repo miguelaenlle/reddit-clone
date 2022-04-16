@@ -1,13 +1,11 @@
 import { ArrowRightIcon } from "@heroicons/react/outline";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import LightButton from "../../../shared/components/LightButton";
 import Modal from "../../../shared/components/Modal";
 import { imageCSS } from "../../../shared/constants/image-class";
 
 const WaitResetPassword: React.FC<{}> = (props) => {
   const handleDismiss = () => {};
-  const navigate = useNavigate();
-
   const resendEmail = () => {};
 
   return (

@@ -1,11 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import Button from "../../shared/components/Button";
 import { UserGroupIcon } from "@heroicons/react/outline";
+import { useHistory } from "react-router-dom";
+import Button from "../../shared/components/Button";
 
 const NewCommunityButton: React.FC<{}> = (props) => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const handleClick = () => {
-    navigate("/create-sub");
+    history.push("/create-sub");
   };
   return (
     <Button

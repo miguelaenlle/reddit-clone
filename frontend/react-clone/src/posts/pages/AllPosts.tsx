@@ -30,16 +30,7 @@ const AllPosts: React.FC<{}> = (props) => {
 
       <div className={`z-0 animate-fade flex flex-wrap`}>
         {DUMMY_POSTS.map((post) => (
-          <FeedItem
-            key={post.id}
-            postId={`${post.id}`}
-            title={post.title}
-            subName={post.subName}
-            opName={post.opName}
-            initialUpvotes={post.initialUpvotes}
-            numComments={post.numComments}
-            date={post.postDate}
-          />
+          <FeedItem post={post} />
         ))}
       </div>
     </div>
