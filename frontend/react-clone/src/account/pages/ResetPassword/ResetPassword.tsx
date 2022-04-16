@@ -1,11 +1,10 @@
 import { ArrowRightIcon } from "@heroicons/react/outline";
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import LightButton from "../../../shared/components/LightButton";
 import Modal from "../../../shared/components/Modal";
 import TextField from "../../../shared/components/TextField";
 import { imageCSS } from "../../../shared/constants/image-class";
-import { Link } from "react-router-dom";
 
 const validate = (values: { [key: string]: string }) => {
   console.log(values);
@@ -21,11 +20,6 @@ const validate = (values: { [key: string]: string }) => {
 };
 const ResetPassword: React.FC<{}> = (props) => {
   const handleDismiss = () => {};
-  const navigate = useNavigate();
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
 
   const formik = useFormik({
     initialValues: {

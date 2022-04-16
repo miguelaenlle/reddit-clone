@@ -6,21 +6,35 @@ import Modal from "../../shared/components/Modal";
 import TextField from "../../shared/components/TextField";
 import DragAndDrop from "../../shared/components/DragAndDrop";
 import { imageCSS } from "../../shared/constants/image-class";
+import { checkPrime } from "crypto";
 
 const validate = (values: { [key: string]: string }) => {
   console.log(values);
   const errors: { [key: string]: string } = {};
 
+  const validatorRegex = /^[a-zA-Z0-9-_]+$/;
+
   if (!values.name) {
     errors.name = "Required";
   } else if (values.name.length < 6) {
-    errors.name = "Name must be 6+ characters long";
+    errors.name = "Must be 6 characters or more";
+  } else if (values.name.length > 30) {
+    errors.name = "Must be 30 characters or less";
+  } else if (values.name.includes(" ")) {
+    errors.name = "Subreddit name must have no spaces";
+  } else if (`${values.name.toLowerCase()}` !== values.name) {
+    errors.name = "Subreddit name must be lowercase";
+  } else if (values.name.search(validatorRegex) === -1) {
+    errors.name = "Subreddit name must only contain letters, numbers, dashes, and/or underscores";
+
   }
 
   if (!values.description) {
     errors.description = "Required";
   } else if (values.description.length < 10) {
     errors.description = "Description must be 10+ characters long";
+  }else if (values.description.length > 300) {
+    errors.description = "Description must be under 300 characters long";
   }
 
   console.log(errors);
@@ -51,14 +65,13 @@ const CreateSubreddit: React.FC<{}> = (props) => {
             <TextField
               fieldType="name"
               name="name"
-              placeholder="Title"
+              placeholder="Subreddit Name"
               touched={formik.touched.name}
               error={formik.errors.name}
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               value={formik.values.name}
             />
-
             <InputField
               name="description"
               placeholder="Description"

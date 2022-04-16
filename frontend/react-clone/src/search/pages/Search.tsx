@@ -9,6 +9,8 @@ import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
 import { optionIds, optionValues } from "../constants/search-values";
 import FeedItem from "../../shared/components/FeedItem";
 
+import { Switch } from "react-router-dom";
+
 const Search: React.FC<{}> = (props) => {
   const [resultsMode, setResultsMode] = useState("subreddits");
   const handleSelectOption = (optionId: string) => {
@@ -44,14 +46,7 @@ const Search: React.FC<{}> = (props) => {
           >
             {DUMMY_POSTS.map((post) => (
               <FeedItem
-                key={post.id}
-                postId={`${post.id}`}
-                title={post.title}
-                subName={post.subName}
-                opName={post.opName}
-                initialUpvotes={post.initialUpvotes}
-                numComments={post.numComments}
-                date={post.postDate}
+                post={post}
               />
             ))}
           </div>

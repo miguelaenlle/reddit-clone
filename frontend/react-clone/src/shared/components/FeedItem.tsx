@@ -1,27 +1,21 @@
-import { useEffect, useState } from "react";
-import { ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/outline";
-import VoteItem from "./VoteItem";
-import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
+import VoteItem from "./VoteItem";
+import { Post } from "../../models/Post";
 
 const FeedItem: React.FC<{
-  postId: string;
-  title: string;
-  subName: string;
-  opName: string;
-  initialUpvotes: number;
-  numComments: number;
-  date: Date | null;
+  post: Post;
 }> = (props) => {
-  const navigate = useNavigate();
-  const [upvotes, setUpvotes] = useState(props.initialUpvotes);
+  const history = useHistory();
+  const [upvotes, setUpvotes] = useState(props.post.initialUpvotes);
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
   const [voteDirection, setVoteDirection] = useState(0);
 
   const updateTimeAgo = () => {
     try {
-      if (props.date) {
-        setTimeAgo(moment(props.date).fromNow());
+      if (props.post.postDate) {
+        setTimeAgo(moment(props.post.postDate).fromNow());
       }
     } catch {}
   };
@@ -62,24 +56,38 @@ const FeedItem: React.FC<{
   useEffect(() => {
     updateTimeAgo();
   }, []);
+  const feedItemDivRef = useRef<HTMLDivElement | null>(null);
 
-  const openPost = () => {
-    navigate(`/post/${props.postId}`);
+  const openPost = (e: React.MouseEvent<HTMLDivElement>) => {
+    history.push(`/home/post/${props.post.id}`);
+  };
+  const openSubreddit = () => {
+    history.push(`/sub/${props.post.subId}`); // fix
+  };
+  const openUser = () => {
+    history.push(`/user/${props.post.opId}`); // fix
   };
 
   return (
     <div className="w-1/3 p-1.5">
-      <div className="hover:cursor-pointer group bg-zinc-800 border border-zinc-700 p-3 hover:border-zinc-400 max-h-fit transition-colors">
+      <div
+        ref={feedItemDivRef}
+        className="z-10 hover:cursor-pointer group bg-zinc-800 border border-zinc-700 p-3 hover:border-zinc-400 max-h-fit transition-colors"
+      >
         <h1
           onClick={openPost}
           className="text-2xl text-white group-hover:underline"
         >
-          {props.title}
+          {props.post.title}
         </h1>
-        <p className="text-l text-zinc-400 py-2">
-          <span className="hover:underline text-white">r/{props.subName}</span>
+        <p className="z-50 text-l text-zinc-400 py-2">
+          <span onClick={openSubreddit} className="hover:underline text-white">
+            r/{props.post.subName}
+          </span>
           {" • "}
-          <span className="hover:underline">u/{props.opName}</span>
+          <span onClick={openUser} className="hover:underline">
+            u/{props.post.opName}
+          </span>
           {" • "}
           {timeAgo && <span>{timeAgo}</span>}
         </p>
@@ -91,7 +99,7 @@ const FeedItem: React.FC<{
             numUpvotes={upvotes}
           />
           <div className="flex-grow"></div>
-          <p className="text-zinc-400">{props.numComments} comments</p>
+          <p className="text-zinc-400">{props.post.numComments} comments</p>
         </div>
       </div>
     </div>
