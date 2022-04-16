@@ -19,24 +19,12 @@ const createNewPost = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { authToken, subId, title, text } = request.body;
+  const { subId, title, text } = request.body;
 
   // requires authentication
-  let userId;
-  try {
-    decodedAuthToken = await verifyLoginToken(authToken);
-    if (!decodedAuthToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedAuthToken.id;
-    if (!userId) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-  } catch (error) {
-    console.log(error);
-    return next(errorMessages.postCreateError);
-  }
+  console.log(request.userData);
+  const userData = request.userData;
+  const userId = userData.userId;
 
   // pull user object
   let currentUser;
@@ -202,7 +190,7 @@ const getPost = async (request, response, next) => {
   // pull the data for a single post
   let post;
   try {
-    post = await Post.findById(postId);
+    post = await Post.findById(postId).populate("user_id").populate("sub_id");
     if (!post) {
       return next(errorMessages.getPostError);
     }
@@ -227,23 +215,13 @@ const updatePost = async (request, response, next) => {
   if (!errors.isEmpty()) {
     return next(errorMessages.invalidInputsError);
   }
-  const { authToken, newTitle, newText } = request.body;
+  const { newTitle, newText } = request.body;
 
   // authToken (authorization required)
   // newTitle
   // newText
 
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedToken.id;
-  } catch {
-    return next(errorMessages.postUpdateFailedError);
-  }
+  const userId = request.userData.userId;
 
   // make sure the user exists
 
@@ -306,20 +284,7 @@ const deletePost = async (request, response, next) => {
   if (!errors.isEmpty()) {
     return next(errorMessages.invalidInputsError);
   }
-  const { authToken } = request.body;
-
-  // make sure the user exists
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedToken.id;
-  } catch {
-    return next(errorMessages.postUpdateFailedError);
-  }
+  const userId = request.userData.userId;
   // pull the user's User object
 
   let posts;
@@ -387,6 +352,7 @@ const getPostComments = async (request, response, next) => {
   let commentsChain = [];
   try {
     let commentData = await post.populate("comment_ids");
+    commentData = await post.populate("comment_ids.user_id");
     for (const recursionLevel in [...Array(10).keys()]) {
       let recursionQuery = "comment_ids";
       const accurateRecursionLevel = parseInt(recursionLevel) + 1;
@@ -400,6 +366,7 @@ const getPostComments = async (request, response, next) => {
       }
       console.log(commentData);
       commentData = await commentData.populate(recursionQuery);
+      commentData = await commentData.populate(`${recursionQuery}.user_id`);
     }
     commentsChain = commentData;
   } catch (error) {
@@ -425,24 +392,11 @@ const voteOnPost = async (request, response, next) => {
   // needs:
   // authToken: (authorization required)
   // voteDirection: 1 -> up, 0 -> neutral, -1 -> down
-  const { authToken, voteDirection } = request.body;
+  const { voteDirection } = request.body;
 
   // make sure the user exists
 
-  let userId;
-  try {
-    decodedAuthToken = await verifyLoginToken(authToken);
-    if (!decodedAuthToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedAuthToken.id;
-    if (!userId) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-  } catch {
-    return next(errorMessages.voteFailedError);
-  }
+  const userId = request.userData.userId;
 
   // pull the user data
   let currentUser;

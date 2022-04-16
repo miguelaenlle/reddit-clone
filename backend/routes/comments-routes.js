@@ -1,13 +1,14 @@
 const express = require("express");
 const { check } = require("express-validator");
 const router = express.Router();
+const checkAuth = require("../middleware/check-auth");
 
 const commentsController = require("../controllers/comments-controller");
 
 router.post(
   "/",
+  checkAuth,
   [
-    check("authToken").notEmpty(),
     check("parentIsPost").notEmpty().isBoolean(),
     check("text").notEmpty().isLength({ min: 1, max: 40 }),
   ],
@@ -17,22 +18,23 @@ router.post(
 router.get("/:commentId", commentsController.getComment);
 router.patch(
   "/:commentId",
-  [check("authToken").notEmpty(), check("newCommentContent").notEmpty()],
+  checkAuth,
+  check("newCommentContent").notEmpty(),
   commentsController.updateComment
 );
 router.delete(
   "/:commentId",
-  [check("authToken").notEmpty()],
+  checkAuth,
   commentsController.deleteComment
 );
 
 router.get("/:commentId/comments", commentsController.getChildComments);
 router.post(
   "/:commentId/vote",
-  [
-    check("authToken").notEmpty(),
-    check("voteDirection").notEmpty().isInt({ min: -1, max: 1 }),
-  ],
+  checkAuth,
+
+  check("voteDirection").notEmpty().isInt({ min: -1, max: 1 }),
+
   commentsController.voteComment
 );
 

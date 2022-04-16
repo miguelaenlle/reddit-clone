@@ -14,22 +14,16 @@ const createSubreddit = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { authToken, subName, description } = request.body;
+  const { subName, description } = request.body;
 
   // validate the auth token
-  let decodedAuthToken;
-  try {
-    decodedAuthToken = await verifyLoginToken(authToken); // contains id and email
-  } catch (error) {
-    return next(errorMessages.authTokenVerifyError);
-  }
-
+  const userId = request.userData.userId;
   // find the user
   // make sure they are validated
 
   let existingUser;
   try {
-    existingUser = await User.findById(decodedAuthToken.id);
+    existingUser = await User.findById(userId);
     const isVerified = existingUser.isVerified;
     if (!isVerified) {
       return next(errorMessages.notValidatedError);
@@ -67,7 +61,7 @@ const createSubreddit = async (request, response, next) => {
 
   // add the subreddit to the user's list of subscribed subreddits
   try {
-    await User.findByIdAndUpdate(decodedAuthToken.id, {
+    await User.findByIdAndUpdate(userId, {
       $push: {
         sub_ids: newSubreddit._id,
       },
@@ -94,7 +88,7 @@ const getAllSubreddits = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { page, numResults } = request.body;
+  const { page, numResults } = request.query;
 
   let subredditSearchResults;
 
@@ -123,7 +117,7 @@ const searchForSubreddits = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { query, page, numResults } = request.body;
+  const { query, page, numResults } = request.params;
 
   let subredditSearchResults;
 
@@ -167,18 +161,6 @@ const getSubreddit = async (request, response, next) => {
     message: "Successfully fetched the subreddit.",
   });
 };
-
-const getSubredditPosts = async (request, response, next) => {
-  // leave until you build the Post object
-  const subId = request.params.subId;
-  // inputs: query, page, numResults (per page)
-  const { query, page, numResults } = request.body;
-
-  return response.status(200).json({
-    message: "(PLACEHOLDER) request succeeded.",
-  });
-};
-
 const joinSubreddit = async (request, response, next) => {
   const subId = request.params.subId;
   // inputs: authToken
@@ -186,18 +168,9 @@ const joinSubreddit = async (request, response, next) => {
   if (!errors.isEmpty()) {
     return next(errorMessages.invalidInputsError);
   }
-  const { authToken } = request.body;
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
 
-    userId = decodedToken.id;
-  } catch {
-    return next(errorMessages.joinSubFailed);
-  }
+  const userId = request.userData.userId;
+
   // find the logged in user & verify it exists
   let loggedInUser;
   try {
@@ -205,7 +178,7 @@ const joinSubreddit = async (request, response, next) => {
     if (!loggedInUser) {
       return next(errorMessages.authTokenVerifyError);
     }
-    
+
     if (!loggedInUser.isVerified) {
       return next(errorMessages.notValidatedError);
     }
@@ -273,18 +246,9 @@ const leaveSubreddit = async (request, response, next) => {
   if (!errors.isEmpty()) {
     return next(errorMessages.invalidInputsError);
   }
-  const { authToken } = request.body;
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
 
-    userId = decodedToken.id;
-  } catch {
-    return next(errorMessages.joinSubFailed);
-  }
+  const userId = request.userData.userId;
+
   // find the logged in user & verify it exists
   let loggedInUser;
   try {
@@ -355,7 +319,6 @@ const leaveSubreddit = async (request, response, next) => {
 exports.createSubreddit = createSubreddit;
 exports.searchForSubreddits = searchForSubreddits;
 exports.getSubreddit = getSubreddit;
-exports.getSubredditPosts = getSubredditPosts;
 exports.getAllSubreddits = getAllSubreddits;
 exports.joinSubreddit = joinSubreddit;
 exports.leaveSubreddit = leaveSubreddit;
