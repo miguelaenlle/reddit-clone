@@ -55,7 +55,7 @@ const PostPage: React.FC<{}> = (props) => {
           <div>{post && <PrimaryContent post={post} />}</div>
         )}
       </div>
-      <Comments postId={params.postId} />
+      {post && <Comments post={post} />}
     </Modal>
   );
 };
