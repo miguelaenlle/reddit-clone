@@ -95,7 +95,7 @@ const searchForUsers = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { searchQuery, page, numResults } = request.body;
+  const { searchQuery, page, numResults } = request.query;
 
   // page starts at 0
   // e.g. page 1 -> skip first 50 results, then limit to 50

@@ -11,7 +11,7 @@ router.get(
     check("page").notEmpty().isInt({ min: 0 }),
     check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
   ],
-  feedController.getFeedPosts
+  feedController.getFeedPosts 
 );
 
 module.exports = router;

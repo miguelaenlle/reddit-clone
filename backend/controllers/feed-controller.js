@@ -9,7 +9,6 @@ const Vote = require("../models/vote");
 
 const getFeedPosts = async (request, response, next) => {
   // params:
-  // authToken (optional -- filters by subbed subreddits only)
   // sortMode -- the method of sorting: top, old, new
   // page -- current page
   // numResults (per page) -- num results per page
@@ -18,27 +17,15 @@ const getFeedPosts = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { authToken, sortMode, page, numResults } = request.body;
-  let subreddits = [];
-  if (authToken) {
-    // decrypt the token
-    try {
-      decodedAuthToken = await verifyLoginToken(authToken);
-      const userId = decodedAuthToken.id;
-      currentUser = await User.findById(userId);
-      console.log(currentUser);
-      if (currentUser) {
-        subreddits = currentUser.sub_ids;
-      }
-    } catch {}
-  }
-
+  const { sortMode, page, numResults } = request.query;
+  console.log(page, numResults)
   let sortFilter = {};
   if (sortMode === "top") {
     sortFilter = {
       num_upvotes: -1,
     };
   } else if (sortMode === "controversial") {
+    console.log("Controversial")
     sortFilter = {
       num_upvotes: 1,
     };
@@ -51,23 +38,14 @@ const getFeedPosts = async (request, response, next) => {
       post_time: 1,
     };
   }
-  let posts;
-  if (subreddits && subreddits.length > 0) {
-    // subreddit-filtered pull
-    const searchQuery = {
-      sub_id: { $in: subreddits },
-    };
-
-    posts = await Post.find(searchQuery)
-      .sort(sortFilter)
-      .skip(page * numResults)
-      .limit(numResults);
-  } else {
-    posts = await Post.find()
-      .sort(sortFilter)
-      .skip(page * numResults)
-      .limit(numResults);
-  }
+  
+  const posts = await Post.find()
+    .sort(sortFilter)
+    .skip(page * numResults)
+    .limit(numResults)
+    .populate("user_id")
+    .populate("sub_id")
+  // console.log(posts);
   // if subreddits
   // pull first N with subredditId in subreddit IDS
   // sort by date

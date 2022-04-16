@@ -3,11 +3,12 @@ const { check } = require("express-validator");
 const router = express.Router();
 
 const subredditsController = require("../controllers/subreddit-controller");
+const checkAuth = require("../middleware/check-auth");
 
 router.post(
   "/",
+  checkAuth,
   [
-    check("authToken").notEmpty(),
     check("subName")
       .notEmpty()
       .toLowerCase()
@@ -40,25 +41,15 @@ router.get(
 
 router.get("/:subId", subredditsController.getSubreddit);
 
-router.get(
-  "/:subId/posts",
-  [
-    check("query").notEmpty().isLength({ min: 1, max: 300 }),
-    check("page").notEmpty().isInt({ min: 0 }),
-    check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
-  ],
-  subredditsController.getSubredditPosts
-);
-
 router.post(
   "/:subId/join",
-  [check("authToken").notEmpty()],
+  checkAuth,
   subredditsController.joinSubreddit
 );
 
 router.post(
   "/:subId/leave",
-  [check("authToken").notEmpty()],
+  checkAuth,
   subredditsController.leaveSubreddit
 );
 
