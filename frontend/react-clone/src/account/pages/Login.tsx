@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 import { imageCSS } from "../../shared/constants/image-class";
 
 const validate = (values: { [key: string]: string }) => {
-  console.log(values);
   const errors: { [key: string]: string } = {};
 
   if (!values.password) {
@@ -37,7 +36,6 @@ const Login: React.FC<{}> = (props) => {
     },
     validate,
     onSubmit: (values) => {
-      console.log(values);
     },
   });
 

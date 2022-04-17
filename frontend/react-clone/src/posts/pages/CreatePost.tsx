@@ -10,7 +10,6 @@ import { imageCSS } from "../../shared/constants/image-class";
 import DropdownTextField from "../components/DropdownTextField";
 
 const validate = (values: { [key: string]: string }) => {
-  console.log(values);
   const errors: { [key: string]: string } = {};
 
   if (!values.title) {
@@ -28,7 +27,6 @@ const validate = (values: { [key: string]: string }) => {
     errors.subreddit = "Required";
   }
 
-  console.log(errors);
 
   return errors;
 };
@@ -37,7 +35,6 @@ const CreatePost: React.FC<{}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("");
   const handleDismiss = () => {};
   const handleSelectedOption = (option: string) => {
-    console.log(option);
     formik.setFieldValue("subreddit", option, true);
     setSelectedOption(option);
   };
@@ -50,7 +47,6 @@ const CreatePost: React.FC<{}> = (props) => {
     },
     validate,
     onSubmit: (values) => {
-      console.log(values);
     },
   });
 

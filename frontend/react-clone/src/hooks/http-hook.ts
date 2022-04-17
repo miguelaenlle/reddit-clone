@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { Post } from "../models/Post";
 
 export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -44,6 +45,45 @@ export const useHttpClient = () => {
     []
   );
 
+  const fetchPosts = useCallback(
+    async (
+      pageNumber: number,
+      selectedOption: string,
+      resultsPerPage: number,
+      subId?: string | null,
+      query?: string | null
+    ): Promise<Post[] | null> => {
+      try {
+        const url = `${
+          process.env.REACT_APP_BACKEND_URL
+        }/posts?page=${pageNumber}&numResults=${resultsPerPage}&sortMode=${selectedOption}${
+          subId ? `&subId=${subId}` : ""
+        }${query ? `&query=${query}` : ""}`;
+        const response = await sendRequest(url, "GET");
+        const rawPosts = response.posts;
+        const formattedPosts = rawPosts.map((post: { [key: string]: any }) => {
+          return new Post(
+            post.id,
+            post.title,
+            post.text,
+            post.sub_id.name, // add sub id
+            post.sub_id._id,
+            post.user_id.username, // add OP name
+            post.user_id._id,
+            post.post_time,
+            post.num_upvotes,
+            post.num_comments
+          );
+        });
+        console.log(formattedPosts);
+        return formattedPosts;
+      } catch (error) {
+        return null;
+      }
+    },
+    []
+  );
+
   const clearError = () => {
     setError(null);
   };
@@ -61,5 +101,6 @@ export const useHttpClient = () => {
     error,
     sendRequest,
     clearError,
+    fetchPosts,
   };
 };

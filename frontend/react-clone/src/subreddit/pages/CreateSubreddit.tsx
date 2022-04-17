@@ -9,7 +9,6 @@ import { imageCSS } from "../../shared/constants/image-class";
 import { checkPrime } from "crypto";
 
 const validate = (values: { [key: string]: string }) => {
-  console.log(values);
   const errors: { [key: string]: string } = {};
 
   const validatorRegex = /^[a-zA-Z0-9-_]+$/;
@@ -37,7 +36,6 @@ const validate = (values: { [key: string]: string }) => {
     errors.description = "Description must be under 300 characters long";
   }
 
-  console.log(errors);
 
   return errors;
 };
@@ -52,7 +50,6 @@ const CreateSubreddit: React.FC<{}> = (props) => {
     },
     validate,
     onSubmit: (values) => {
-      console.log(values);
     },
   });
 

@@ -7,7 +7,6 @@ import TextField from "../../../shared/components/TextField";
 import { imageCSS } from "../../../shared/constants/image-class";
 
 const validate = (values: { [key: string]: string }) => {
-  console.log(values);
   const errors: { [key: string]: string } = {};
 
   if (!values.newPassword) {
@@ -27,7 +26,6 @@ const ResetPassword: React.FC<{}> = (props) => {
     },
     validate,
     onSubmit: (values) => {
-      console.log(values);
     },
   });
 
