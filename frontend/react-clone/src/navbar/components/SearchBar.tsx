@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import SearchPopup from "../../search/components/SearchPopup";
 import { XIcon } from "@heroicons/react/outline";
 import { useHttpClient } from "../../hooks/http-hook";
@@ -9,6 +9,7 @@ const SearchBar: React.FC<{}> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const httpClient = useHttpClient();
   const history = useHistory();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [popupDisplayed, setPopupDisplayed] = useState(false);
 
@@ -43,7 +44,16 @@ const SearchBar: React.FC<{}> = (props) => {
 
   const handleConfirmSearch = () => {
     console.log("Search...");
-    history.push(`search?query=${searchQuery}`);
+
+    let pathExt = "subreddits";
+
+    for (const term of ["users", "posts"]) {
+      if (location.pathname.includes(term)) {
+        pathExt = term;
+      }
+    }
+
+    history.push(`/search/${pathExt}?query=${searchQuery}`);
     setPopupDisplayed(false);
   };
 

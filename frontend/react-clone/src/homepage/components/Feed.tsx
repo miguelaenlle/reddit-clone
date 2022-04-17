@@ -74,7 +74,7 @@ const Feed: React.FC<{}> = (props) => {
             } z-1 animate-fade flex flex-wrap`}
           >
             {posts.map((post) => (
-              <FeedItem key={`post-${post.id}`} post={post} />
+              <FeedItem key={`post-${post.id}`} baseRoute={"home"} post={post} />
             ))}
           </div>
         </div>
