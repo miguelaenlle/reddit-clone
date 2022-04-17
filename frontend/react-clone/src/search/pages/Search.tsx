@@ -1,15 +1,13 @@
 import { useState } from "react";
-import PostItem from "../../posts/components/PostItem";
-import LightButton from "../../shared/components/LightButton";
-import SearchTypeSelector from "../components/SearchTypeSelector";
-import SubredditResult from "../components/SubredditResult";
-import UserResult from "../components/UserResult";
 import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
-
-import { optionIds, optionValues } from "../constants/search-values";
+import { useHttpClient } from "../../hooks/http-hook";
 import FeedItem from "../../shared/components/FeedItem";
+import SearchTypeSelector from "../components/SearchTypeSelector";
+import SubredditResults from "../components/SubredditResults";
+import UserResult from "../components/UserResult";
+import { optionIds, optionValues } from "../constants/search-values";
 
-import { Switch } from "react-router-dom";
+const resultsPerPage = 1;
 
 const Search: React.FC<{}> = (props) => {
   const [resultsMode, setResultsMode] = useState("subreddits");
@@ -27,9 +25,7 @@ const Search: React.FC<{}> = (props) => {
       />
       {resultsMode === "subreddits" && (
         <div className="space-y-5 animate-fade">
-          <SubredditResult />
-          <SubredditResult />
-          <SubredditResult />
+          <SubredditResults />
         </div>
       )}
       {resultsMode === "users" && (
@@ -41,11 +37,10 @@ const Search: React.FC<{}> = (props) => {
       )}
       {resultsMode === "posts" && (
         <div className="z-0 animate-fade relative">
-          <div
-            className={`z-1 animate-fade flex flex-wrap`}
-          >
+          <div className={`z-1 animate-fade flex flex-wrap`}>
             {DUMMY_POSTS.map((post) => (
               <FeedItem
+                key={`dummy-feed-${Math.random().toString()}`}
                 post={post}
               />
             ))}
