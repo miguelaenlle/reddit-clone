@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import SearchPopup from "../../search/components/SearchPopup";
+import { XIcon } from "@heroicons/react/outline";
 
 const SearchBar: React.FC<{}> = (props) => {
   const history = useHistory();
@@ -12,17 +13,20 @@ const SearchBar: React.FC<{}> = (props) => {
   };
 
   const handleConfirmSearch = () => {
-    console.log("Search...")
+    console.log("Search...");
     history.push(`search?query=${searchQuery}`);
     setPopupDisplayed(false);
   };
 
-  const handleOpenInput = () => {
-    
-  };
+  const handleOpenInput = () => {};
 
   const handleCloseInput = () => {
+    console.log("Handle close input...");
     setPopupDisplayed(false);
+  };
+
+  const handleClickOutside = () => {
+    console.log("Clicked outside.");
   };
 
   useEffect(() => {
@@ -49,13 +53,15 @@ const SearchBar: React.FC<{}> = (props) => {
 
   return (
     <div className="relative flex-grow">
-      <input
-        onFocus={handleOpenInput}
-        // onBlur={handleCloseInput}
-        placeholder="Search"
-        className="relative w-full border border-zinc-700 space-x-2 h-10 rounded-md bg-transparent text-white placeholder-zinc-400 px-3 selected:border-1"
-        onChange={handleSearchQuery}
-      ></input>
+      <div className="relative">
+        <input
+          onFocus={handleOpenInput}
+          placeholder="Search"
+          className="z-10 relative w-full border border-zinc-700 space-x-2 h-10 rounded-md bg-transparent text-white placeholder-zinc-400 px-3 selected:border-1"
+          onBlur={handleCloseInput}
+          onChange={handleSearchQuery}
+        ></input>
+      </div>
       {popupDisplayed && (
         <SearchPopup
           query={searchQuery}

@@ -5,7 +5,10 @@ const SearchPrompt: React.FC<{ query: string; handleSearch: () => void }> = (
 ) => {
   return (
     <div
-      onClick={props.handleSearch}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        props.handleSearch();
+      }}
       className="flex hover:bg-zinc-700 p-3 items-center space-x-2"
     >
       <SearchIcon className="text-zinc-400 h-5" />

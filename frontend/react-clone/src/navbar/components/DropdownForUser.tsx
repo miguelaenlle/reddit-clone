@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/outline";
 import DropdownOption from "./DropdownOption";
 
@@ -19,14 +19,35 @@ const DropdownForUser: React.FC<{
     setIsOpen(false);
   };
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    /**
+     * Alert if clicked on outside of element
+     */
+    function handleClickOutside(event: any) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+
   const topBorderRadius = "rounded-t-md";
   const bottomBorderRadius = "rounded-b-md";
 
   return (
-    <div>
+    <div ref={dropdownRef}>
       <div
         onClick={handleClickOpen}
-        className={`relative border ${isOpen ? "border-zinc-700" : "border-0"} group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
+        className={`relative border ${
+          isOpen ? "border-zinc-700" : "border-0"
+        } group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
           !isOpen && bottomBorderRadius
         }`}
       >

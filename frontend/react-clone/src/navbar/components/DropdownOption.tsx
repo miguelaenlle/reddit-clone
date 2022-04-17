@@ -11,7 +11,7 @@ const DropdownOption: React.FC<{
   };
   return (
     <li
-      onClick={handleClick}
+      onMouseDown={handleClick}
       className="group space-x-2 flex items-center py-1 px-3 hover:cursor-pointer"
     >
       {props.optionIcon && props.optionIcon}
