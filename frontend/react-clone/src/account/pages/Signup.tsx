@@ -11,7 +11,6 @@ import { imageCSS } from "../../shared/constants/image-class";
 
 
 const validate = (values: { [key: string]: string }) => {
-  console.log(values);
   const errors: { [key: string]: string } = {};
 
   if (!values.username) {
@@ -52,7 +51,6 @@ const Signup: React.FC<{}> = (props) => {
     },
     validate,
     onSubmit: (values) => {
-      console.log(values);
     },
   });
   return (

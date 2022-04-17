@@ -17,6 +17,7 @@ import {
 
 import Dropdown from "../../shared/components/Dropdown";
 import FeedItemLoader from "../../shared/components/FeedItemLoader";
+const RESULTS_PER_PAGE = 25;
 
 const PostResults: React.FC<{}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("top");
@@ -26,7 +27,6 @@ const PostResults: React.FC<{}> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const location = useLocation();
-  const resultsPerPage = 25;
   const httpClient = useHttpClient();
 
   const handleSelectedOption = (option: string) => {
@@ -37,47 +37,42 @@ const PostResults: React.FC<{}> = (props) => {
     const searchQuery = location.search;
     const searchParams = new URLSearchParams(searchQuery);
     const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/posts?query=${query}&page=${pageNumber}&numResults=${resultsPerPage}&sortMode=${sortMode}`;
-    const searchResults = await httpClient.sendRequest(url, "GET");
-    const searchResultsFormatted = searchResults.posts.map(
-      (post: { [key: string]: any }) => {
-        return new Post(
-          post.id,
-          post.title,
-          post.text,
-          post.sub_id.name, // add sub id
-          post.sub_id._id,
-          post.user_id.username, // add OP name
-          post.user_id._id,
-          post.post_time,
-          post.num_upvotes,
-          post.num_comments
-        );
-      }
+
+    const formattedPosts: Post[] | null = await httpClient.fetchPosts(
+      pageNumber,
+      sortMode,
+      RESULTS_PER_PAGE,
+      undefined,
+      query
     );
-    return searchResultsFormatted;
+
+    return formattedPosts;
   };
 
   const updatePostData = async () => {
     try {
       const searchResults = await pullPostData(page, selectedOption);
-      setResults(searchResults);
-    } catch (error) {
-      console.log(error);
-    }
+      if (searchResults) {
+        setResults(searchResults);
+      }
+    } catch (error) {}
   };
 
   const expandResults = async () => {
     setIsLoading(true);
     const newPage = page + 1;
-    console.log(newPage);
     setPage(newPage);
     try {
       const additionalSearchResults = await pullPostData(
         newPage,
         selectedOption
       );
-      setResults((prevResults) => [...prevResults, ...additionalSearchResults]);
+      if (additionalSearchResults) {
+        setResults((prevResults) => [
+          ...prevResults,
+          ...additionalSearchResults,
+        ]);
+      }
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -131,7 +126,7 @@ const PostResults: React.FC<{}> = (props) => {
         <h1 className="text-zinc-400 text-xl">No results found.</h1>
       )}
 
-      {resultsPerPage * (page + 1) === results.length && !isLoading && (
+      {RESULTS_PER_PAGE * (page + 1) === results.length && !isLoading && (
         <p
           onClick={expandResults}
           className="my-5 text-zinc-400 hover:cursor-pointer hover:text-zinc-200"
@@ -139,7 +134,6 @@ const PostResults: React.FC<{}> = (props) => {
           Load more results
         </p>
       )}
-
     </div>
   );
 };

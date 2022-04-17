@@ -21,7 +21,6 @@ const PostPage: React.FC<{}> = (props) => {
       const url = `${process.env.REACT_APP_BACKEND_URL}/posts/${params.postId}`;
       const data = await httpClient.sendRequest(url, "GET");
       const postData = data.post;
-      console.log(data);
       const post = new Post(
         postData.id,
         postData.title,
@@ -35,10 +34,7 @@ const PostPage: React.FC<{}> = (props) => {
         postData.num_comments
       );
       setPost(post);
-      console.log(post);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {

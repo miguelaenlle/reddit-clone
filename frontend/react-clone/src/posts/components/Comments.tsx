@@ -21,7 +21,6 @@ const Comments: React.FC<{ post: Post }> = (props) => {
   const [comments, setComments] = useState<{ [key: string]: any }[]>([]);
 
   const sortComments = (selectedOption: string) => {
-    console.log(selectedOption);
     if (selectedOption === "new") {
       setComments((previousComments) => {
         return [...previousComments].sort((a, b) => {
@@ -52,7 +51,6 @@ const Comments: React.FC<{ post: Post }> = (props) => {
   const pullComments = async () => {
     try {
       const url = `${process.env.REACT_APP_BACKEND_URL}/posts/${props.post.id}/comments`;
-      console.log(url);
       const result = await httpClient.sendRequest(url, "GET");
       const commentChain = result.commentsChain;
       const sortedComments = commentChain.sort(
@@ -64,10 +62,8 @@ const Comments: React.FC<{ post: Post }> = (props) => {
         }
       );
 
-      console.log("Pull comments", commentChain);
       setComments(sortedComments);
     } catch (error) {
-      console.log(error);
     }
   };
 

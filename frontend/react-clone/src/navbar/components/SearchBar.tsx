@@ -43,7 +43,6 @@ const SearchBar: React.FC<{}> = (props) => {
   };
 
   const handleConfirmSearch = () => {
-    console.log("Search...");
 
     let pathExt = "subreddits";
 
@@ -58,20 +57,17 @@ const SearchBar: React.FC<{}> = (props) => {
   };
 
   const handleChooseItem = (subId: string) => {
-    console.log("Search...");
-    history.push(`sub/${subId}`);
+    history.push(`/sub/${subId}`);
     setPopupDisplayed(false);
   };
 
   const handleOpenInput = () => {};
 
   const handleCloseInput = () => {
-    console.log("Handle close input...");
     setPopupDisplayed(false);
   };
 
   const handleClickOutside = () => {
-    console.log("Clicked outside.");
   };
 
   useEffect(() => {
