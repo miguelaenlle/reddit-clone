@@ -1,14 +1,9 @@
 import { useState } from "react";
-import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
-import { useHttpClient } from "../../hooks/http-hook";
-import FeedItem from "../../shared/components/FeedItem";
+import PostResults from "../components/PostResults";
 import SearchTypeSelector from "../components/SearchTypeSelector";
 import SubredditResults from "../components/SubredditResults";
-import UserResult from "../components/UserResult";
 import UserResults from "../components/UserResults";
 import { optionIds, optionValues } from "../constants/search-values";
-
-const resultsPerPage = 1;
 
 const Search: React.FC<{}> = (props) => {
   const [resultsMode, setResultsMode] = useState("subreddits");
@@ -34,18 +29,7 @@ const Search: React.FC<{}> = (props) => {
           <UserResults />
         </div>
       )}
-      {resultsMode === "posts" && (
-        <div className="z-0 animate-fade relative">
-          <div className={`z-1 animate-fade flex flex-wrap`}>
-            {DUMMY_POSTS.map((post) => (
-              <FeedItem
-                key={`dummy-feed-${Math.random().toString()}`}
-                post={post}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      {resultsMode === "posts" && <PostResults />}
     </div>
   );
 };

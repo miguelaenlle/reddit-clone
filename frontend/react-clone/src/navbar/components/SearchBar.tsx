@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import SearchPopup from "../../search/components/SearchPopup";
 import { XIcon } from "@heroicons/react/outline";
 import { useHttpClient } from "../../hooks/http-hook";
+import { Subreddit } from "../../models/Subreddit";
 
 const SearchBar: React.FC<{}> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,18 +12,28 @@ const SearchBar: React.FC<{}> = (props) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [popupDisplayed, setPopupDisplayed] = useState(false);
 
-  const [results, setResults] = useState<{ [key: string]: any }[]>([]);
+  const [results, setResults] = useState<Subreddit[]>([]);
 
   useEffect(() => {
-    setIsLoading(httpClient.isLoading)
-  }, [httpClient.isLoading])
+    setIsLoading(httpClient.isLoading);
+  }, [httpClient.isLoading]);
 
   const updateSearchResults = async (searchQuery: string) => {
     try {
       const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?page=0&numResults=7&query=${searchQuery}`;
       const searchResults = await httpClient.sendRequest(url, "GET");
-      console.log(searchResults.results);
-      setResults(searchResults.results);
+      const searchResultsFormatted = searchResults.results.map(
+        (result: { [key: string]: any }) => {
+          return new Subreddit(
+            result.name,
+            result.id,
+            result.num_members,
+            result.description
+          );
+        }
+      );
+
+      setResults(searchResultsFormatted);
     } catch (error) {}
   };
 
@@ -51,7 +62,6 @@ const SearchBar: React.FC<{}> = (props) => {
 
   const handleClickOutside = () => {
     console.log("Clicked outside.");
-    
   };
 
   useEffect(() => {
@@ -60,9 +70,9 @@ const SearchBar: React.FC<{}> = (props) => {
         setPopupDisplayed(true);
       }
     }
-    setIsLoading(true)
+    setIsLoading(true);
     const timeout = setTimeout(() => {
-      setIsLoading(false)
+      setIsLoading(false);
       if (searchQuery.length > 0) {
         if (!popupDisplayed) {
           setPopupDisplayed(true);
