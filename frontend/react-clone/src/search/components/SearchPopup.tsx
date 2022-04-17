@@ -1,3 +1,4 @@
+import { Subreddit } from "../../models/Subreddit";
 import SearchItem from "./SearchItem";
 import SearchLoader from "./SearchLoader";
 import SearchPrompt from "./SearchPrompt";
@@ -5,7 +6,7 @@ import SearchPrompt from "./SearchPrompt";
 const SearchPopup: React.FC<{
   loading: boolean;
   query: string;
-  results: { [key: string]: any }[];
+  results: Subreddit[];
   handleConfirmSearch: () => void;
   handleChooseItem: (subId: string) => void;
 }> = (props) => {
@@ -23,10 +24,10 @@ const SearchPopup: React.FC<{
           props.results.map((result) => {
             return (
               <SearchItem
-                key={`subreddit-${result.id}-result`}
-                subName={result.name}
-                subId={result.id}
-                members={result.num_members}
+                key={`subreddit-${result.subId}-result`}
+                subName={result.subName}
+                subId={result.subId}
+                members={result.members}
                 handleClick={props.handleChooseItem}
               />
             );

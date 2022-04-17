@@ -16,18 +16,20 @@ const UserResults: React.FC<{}> = (props) => {
   const httpClient = useHttpClient();
 
   const pullResultData = async (pageNumber: number) => {
-    const searchQuery = location.search;
-    const searchParams = new URLSearchParams(searchQuery);
-    const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${pageNumber}&numResults=${resultsPerPage}`;
-    const searchResults = await httpClient.sendRequest(url, "GET");
-    console.log(searchResults);
-    const searchResultsFormatted = searchResults.data.map(
-      (result: { [key: string]: any }) => {
-        return new User(result.id, result.username, result.num_upvotes);
-      }
-    );
-    return searchResultsFormatted;
+    try {
+      const searchQuery = location.search;
+      const searchParams = new URLSearchParams(searchQuery);
+      const query = searchParams.get("query");
+      const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${pageNumber}&numResults=${resultsPerPage}`;
+      const searchResults = await httpClient.sendRequest(url, "GET");
+      console.log(searchResults);
+      const searchResultsFormatted = searchResults.data.map(
+        (result: { [key: string]: any }) => {
+          return new User(result.id, result.username, result.num_upvotes);
+        }
+      );
+      return searchResultsFormatted;
+    } catch (error) {}
   };
 
   const pullResults = async () => {
