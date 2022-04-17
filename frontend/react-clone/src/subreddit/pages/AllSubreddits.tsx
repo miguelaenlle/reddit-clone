@@ -6,15 +6,9 @@ const AllSubreddits: React.FC<{}> = (props) => {
         <div className="pt-10 z-0 animate-fade relative">
           <div className="space-y-5 animate-fade mb-20">
             <h1 className="text-white">My Subreddits</h1>
-            <SubredditResult />
-            <SubredditResult />
-            <SubredditResult />
           </div>
           <div className="space-y-5 animate-fade">
             <h1 className="text-white">All Subreddits</h1>
-            <SubredditResult />
-            <SubredditResult />
-            <SubredditResult />
           </div>
         </div>
       </div>

@@ -16,8 +16,10 @@ const SearchPopup: React.FC<{
           query={props.query}
           handleSearch={props.handleConfirmSearch}
         />
-        {props.loading && <SearchLoader />}
-        {props.results.length > 0 &&
+        {props.loading ? (
+          <SearchLoader />
+        ) : (
+          props.results.length > 0 &&
           props.results.map((result) => {
             return (
               <SearchItem
@@ -28,7 +30,8 @@ const SearchPopup: React.FC<{
                 handleClick={props.handleChooseItem}
               />
             );
-          })}
+          })
+        )}
       </div>
     </div>
   );

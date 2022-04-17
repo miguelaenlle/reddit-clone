@@ -5,12 +5,17 @@ import { XIcon } from "@heroicons/react/outline";
 import { useHttpClient } from "../../hooks/http-hook";
 
 const SearchBar: React.FC<{}> = (props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const httpClient = useHttpClient();
   const history = useHistory();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [popupDisplayed, setPopupDisplayed] = useState(false);
 
   const [results, setResults] = useState<{ [key: string]: any }[]>([]);
+
+  useEffect(() => {
+    setIsLoading(httpClient.isLoading)
+  }, [httpClient.isLoading])
 
   const updateSearchResults = async (searchQuery: string) => {
     try {
@@ -46,6 +51,7 @@ const SearchBar: React.FC<{}> = (props) => {
 
   const handleClickOutside = () => {
     console.log("Clicked outside.");
+    
   };
 
   useEffect(() => {
@@ -54,7 +60,9 @@ const SearchBar: React.FC<{}> = (props) => {
         setPopupDisplayed(true);
       }
     }
+    setIsLoading(true)
     const timeout = setTimeout(() => {
+      setIsLoading(false)
       if (searchQuery.length > 0) {
         if (!popupDisplayed) {
           setPopupDisplayed(true);
@@ -84,7 +92,7 @@ const SearchBar: React.FC<{}> = (props) => {
       </div>
       {popupDisplayed && (
         <SearchPopup
-          loading={httpClient.isLoading}
+          loading={isLoading}
           query={searchQuery}
           results={results}
           handleConfirmSearch={handleConfirmSearch}
