@@ -92,27 +92,22 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
                 <div className="flex space-x-4">
                   <VoteItem
                     voteDirection={voteDirection}
-                    numUpvotes={upvotes}
+                    numUpvotes={commentData.upvotes}
                     handleUpvote={handleUpvote}
                     handleDownvote={handleDownvote}
                   />
                   <ButtonNoBorder
                     buttonImage={<ReplyIcon className={imageCSS} />}
                     buttonText={"Reply"}
-                  />
-                  {/* <ButtonNoBorder
-                    buttonImage={<PencilIcon className={imageCSS} />}
-                    buttonText={"Edit"}
-                  />
-                  <ButtonNoBorder
-                    buttonImage={<TrashIcon className={imageCSS} />}
-                    buttonText={"Delete"}
-                  /> */}
+                  />=
                 </div>
                 {props.comment.comment_ids && (
                   <React.Fragment>
                     {/* <div>{props.comment.comment_ids.length}</div> */}
-                    {props.comment.comment_ids.map(
+                    
+                    {props.comment.comment_ids.sort((comment1: any, comment2: any) => {
+                      return comment1.date < comment2.date ? 1 : -1
+                    }).map(
                       (commentData: { [key: string]: any }) => {
                         return (
                           <PostItem
