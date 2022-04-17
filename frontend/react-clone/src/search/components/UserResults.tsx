@@ -20,12 +20,10 @@ const UserResults: React.FC<{}> = (props) => {
       const searchQuery = location.search;
       const searchParams = new URLSearchParams(searchQuery);
       const query = searchParams.get("query");
-      const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${pageNumber}&numResults=${resultsPerPage}`;
-      const searchResults = await httpClient.sendRequest(url, "GET");
-      const searchResultsFormatted = searchResults.data.map(
-        (result: { [key: string]: any }) => {
-          return new User(result.id, result.username, result.num_upvotes);
-        }
+      const searchResultsFormatted = await httpClient.fetchUsers(
+        query,
+        pageNumber,
+        resultsPerPage
       );
       return searchResultsFormatted;
     } catch (error) {}
@@ -35,8 +33,7 @@ const UserResults: React.FC<{}> = (props) => {
     try {
       const searchResults = await pullResultData(0);
       setResults(searchResults);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const expandResults = async () => {

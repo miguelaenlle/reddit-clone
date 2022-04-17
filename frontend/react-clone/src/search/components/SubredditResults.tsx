@@ -19,17 +19,11 @@ const SubredditResults: React.FC<{}> = (props) => {
     const searchQuery = location.search;
     const searchParams = new URLSearchParams(searchQuery);
     const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?query=${query}&page=${pageNumber}&numResults=${resultsPerPage}`;
-    const searchResults = await httpClient.sendRequest(url, "GET");
-    const searchResultsFormatted = searchResults.results.map(
-      (result: { [key: string]: any }) => {
-        return new Subreddit(
-          result.name,
-          result.id,
-          result.num_members,
-          result.description
-        );
-      }
+
+    const searchResultsFormatted = await httpClient.fetchSubreddits(
+      query,
+      pageNumber,
+      resultsPerPage
     );
     return searchResultsFormatted;
   };

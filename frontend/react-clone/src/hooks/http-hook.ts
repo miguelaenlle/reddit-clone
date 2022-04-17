@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Post } from "../models/Post";
+import { Subreddit } from "../models/Subreddit";
+import { User } from "../models/User";
 
 export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -84,6 +86,51 @@ export const useHttpClient = () => {
     []
   );
 
+  const fetchSubreddits = useCallback(
+    async (query: string | null, pageNumber: number, numResults: number) => {
+      try {
+        const url = `${
+          process.env.REACT_APP_BACKEND_URL
+        }/subreddits?page=${pageNumber}&numResults=${numResults}${
+          query ? `&query=${query}` : ""
+        }`;
+        const searchResults = await sendRequest(url, "GET");
+        const searchResultsFormatted = searchResults.results.map(
+          (result: { [key: string]: any }) => {
+            return new Subreddit(
+              result.name,
+              result.id,
+              result.num_members,
+              result.description
+            );
+          }
+        );
+        return searchResultsFormatted;
+      } catch (error) {
+        return null;
+      }
+    },
+    []
+  );
+
+  const fetchUsers = useCallback(
+    async (query: string | null, pageNumber: number, numResults: number) => {
+      try {
+        const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${pageNumber}&numResults=${numResults}`;
+        const searchResults = await sendRequest(url, "GET");
+        const searchResultsFormatted = searchResults.data.map(
+          (result: { [key: string]: any }) => {
+            return new User(result.id, result.username, result.num_upvotes);
+          }
+        );
+        return searchResultsFormatted;
+      } catch (error) {
+        return null;
+      }
+    },
+    []
+  );
+
   const clearError = () => {
     setError(null);
   };
@@ -102,5 +149,7 @@ export const useHttpClient = () => {
     sendRequest,
     clearError,
     fetchPosts,
+    fetchSubreddits,
+    fetchUsers,
   };
 };
