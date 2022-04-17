@@ -2,12 +2,25 @@ import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import SearchPopup from "../../search/components/SearchPopup";
 import { XIcon } from "@heroicons/react/outline";
+import { useHttpClient } from "../../hooks/http-hook";
 
 const SearchBar: React.FC<{}> = (props) => {
+  const httpClient = useHttpClient();
   const history = useHistory();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [popupDisplayed, setPopupDisplayed] = useState(false);
-  const updateSearchResults = () => {};
+
+  const [results, setResults] = useState<{ [key: string]: any }[]>([]);
+
+  const updateSearchResults = async (searchQuery: string) => {
+    try {
+      const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?page=0&numResults=7&query=${searchQuery}`;
+      const searchResults = await httpClient.sendRequest(url, "GET");
+      console.log(searchResults.results);
+      setResults(searchResults.results);
+    } catch (error) {}
+  };
+
   const handleSearchQuery = (e: React.FormEvent<HTMLInputElement>) => {
     setSearchQuery(e.currentTarget.value);
   };
@@ -15,6 +28,12 @@ const SearchBar: React.FC<{}> = (props) => {
   const handleConfirmSearch = () => {
     console.log("Search...");
     history.push(`search?query=${searchQuery}`);
+    setPopupDisplayed(false);
+  };
+
+  const handleChooseItem = (subId: string) => {
+    console.log("Search...");
+    history.push(`sub/${subId}`);
     setPopupDisplayed(false);
   };
 
@@ -40,6 +59,7 @@ const SearchBar: React.FC<{}> = (props) => {
         if (!popupDisplayed) {
           setPopupDisplayed(true);
         }
+        updateSearchResults(searchQuery);
         setSearchQuery(searchQuery);
       } else {
         if (popupDisplayed) {
@@ -64,8 +84,11 @@ const SearchBar: React.FC<{}> = (props) => {
       </div>
       {popupDisplayed && (
         <SearchPopup
+          loading={httpClient.isLoading}
           query={searchQuery}
+          results={results}
           handleConfirmSearch={handleConfirmSearch}
+          handleChooseItem={handleChooseItem}
         />
       )}
     </div>
