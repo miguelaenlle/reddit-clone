@@ -5,6 +5,7 @@ import FeedItem from "../../shared/components/FeedItem";
 import SearchTypeSelector from "../components/SearchTypeSelector";
 import SubredditResults from "../components/SubredditResults";
 import UserResult from "../components/UserResult";
+import UserResults from "../components/UserResults";
 import { optionIds, optionValues } from "../constants/search-values";
 
 const resultsPerPage = 1;
@@ -30,9 +31,7 @@ const Search: React.FC<{}> = (props) => {
       )}
       {resultsMode === "users" && (
         <div className="space-y-5 animate-fade">
-          <UserResult />
-          <UserResult />
-          <UserResult />
+          <UserResults />
         </div>
       )}
       {resultsMode === "posts" && (

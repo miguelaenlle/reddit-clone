@@ -1,11 +1,12 @@
-import React from "react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useHttpClient } from "../../hooks/http-hook";
 import SubredditResult from "./SubredditResult";
 import SubredditResultLoader from "./SubredditResultLoader";
+import UserResult from "./UserResult";
+import React from "react";
 
-const SubredditResults: React.FC<{}> = (props) => {
+const UserResults: React.FC<{}> = (props) => {
   const [page, setPage] = useState(0);
   const [results, setResults] = useState<{ [key: string]: any }[]>([]);
   const [resultsExpandable, setResultsExpandable] = useState(true);
@@ -18,10 +19,10 @@ const SubredditResults: React.FC<{}> = (props) => {
     const searchQuery = location.search;
     const searchParams = new URLSearchParams(searchQuery);
     const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?query=${query}&page=0&numResults=${resultsPerPage}`;
+    const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=0&numResults=${resultsPerPage}`;
     const searchResults = await httpClient.sendRequest(url, "GET");
     console.log(searchResults);
-    setResults(searchResults.results);
+    setResults(searchResults.data);
   };
 
   const expandResults = async () => {
@@ -30,12 +31,13 @@ const SubredditResults: React.FC<{}> = (props) => {
     const searchQuery = location.search;
     const searchParams = new URLSearchParams(searchQuery);
     const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?query=${query}&page=${newPage}&numResults=${resultsPerPage}`;
+    const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${newPage}&numResults=${resultsPerPage}`;
     const searchResults = await httpClient.sendRequest(url, "GET");
+    console.log(searchResults);
     if (searchResults.length === resultsPerPage) {
       setResultsExpandable(true);
     }
-    setResults((prevResults) => [...prevResults, ...searchResults.results]);
+    setResults((prevResults) => [...prevResults, ...searchResults.data]);
 
     console.log(searchResults);
   };
@@ -52,12 +54,11 @@ const SubredditResults: React.FC<{}> = (props) => {
     <div className="space-y-5">
       {results.map((result) => {
         return (
-          <SubredditResult
+          <UserResult
             key={result.id}
-            subName={result.name}
-            subId={result.id}
-            members={result.num_members}
-            description={result.description}
+            username={result.username}
+            userId={result.id}
+            upvotes={result.num_upvotes}
           />
         );
       })}
@@ -79,4 +80,4 @@ const SubredditResults: React.FC<{}> = (props) => {
     </div>
   );
 };
-export default React.memo(SubredditResults);
+export default React.memo(UserResults);
