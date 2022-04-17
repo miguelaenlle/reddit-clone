@@ -1,10 +1,13 @@
+import SearchItem from "./SearchItem";
 import SearchLoader from "./SearchLoader";
 import SearchPrompt from "./SearchPrompt";
 
-
 const SearchPopup: React.FC<{
+  loading: boolean;
   query: string;
+  results: { [key: string]: any }[];
   handleConfirmSearch: () => void;
+  handleChooseItem: (subId: string) => void;
 }> = (props) => {
   return (
     <div>
@@ -13,7 +16,19 @@ const SearchPopup: React.FC<{
           query={props.query}
           handleSearch={props.handleConfirmSearch}
         />
-        <SearchLoader />
+        {props.loading && <SearchLoader />}
+        {props.results.length > 0 &&
+          props.results.map((result) => {
+            return (
+              <SearchItem
+                key={`subreddit-${result.id}-result`}
+                subName={result.name}
+                subId={result.id}
+                members={result.num_members}
+                handleClick={props.handleChooseItem}
+              />
+            );
+          })}
       </div>
     </div>
   );

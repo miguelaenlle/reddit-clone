@@ -83,11 +83,15 @@ const DropdownTextField: React.FC<{
           {popupDisplayed && (
             <div className="absolute w-full mt-1 py-1 hover:cursor-pointer bg-zinc-800 border border-white rounded-md">
               <SearchItem
+                subId={"sub-gaming-temp"}
                 subName={"gaming"}
+                members={0}
                 handleClick={handleConfirmSearch}
               />
               <SearchItem
+                subId={"sub-battlestations-temp"}
                 subName={"battlestations"}
+                members={0}
                 handleClick={handleConfirmSearch}
               />
               <SearchLoader />
