@@ -18,6 +18,7 @@ import AllUsers from "./user/pages/AllUsers";
 import User from "./user/pages/UserPage";
 import CreateSubreddit from "./subreddit/pages/CreateSubreddit";
 import CreatePost from "./posts/pages/CreatePost";
+import PostPage from "./posts/pages/Post";
 
 function App() {
   return (
@@ -43,10 +44,15 @@ function App() {
           <Route path={`/create-post`} element={<CreatePost />} />
           <Route path={`/create-sub`} element={<CreateSubreddit />} /> */}
         {/* </Route> */}
-        <Route exact path="/search">
+        <Route exact path="/search/*">
           <Search />
         </Route>
-        <Route exact path="/sub/:subId"> 
+        <Route exact path="/post/:postId">
+          <div className="w-screen h-screen bg-zinc-800">
+            <PostPage />
+          </div>
+        </Route>
+        <Route exact path="/sub/:subId">
           <Subreddit />
         </Route>
         <Route exact path="/user/:userId">
@@ -62,7 +68,7 @@ function App() {
         <Route exact path="/all/posts">
           <AllPosts />
         </Route>
-        <Route exact path = "/">
+        <Route exact path="/">
           <Redirect to="/home" />
         </Route>
       </Switch>

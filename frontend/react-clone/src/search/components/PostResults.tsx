@@ -6,6 +6,8 @@ import { useLocation } from "react-router-dom";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
 import FeedItem from "../../shared/components/FeedItem";
+import { Route } from "react-router-dom";
+import PostPage from "../../posts/pages/Post";
 
 import {
   optionIds,
@@ -137,6 +139,7 @@ const PostResults: React.FC<{}> = (props) => {
           Load more results
         </p>
       )}
+
     </div>
   );
 };

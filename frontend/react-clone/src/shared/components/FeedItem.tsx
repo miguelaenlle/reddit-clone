@@ -5,6 +5,7 @@ import VoteItem from "./VoteItem";
 import { Post } from "../../models/Post";
 
 const FeedItem: React.FC<{
+  baseRoute?: string;
   post: Post;
 }> = (props) => {
   const history = useHistory();
@@ -59,7 +60,9 @@ const FeedItem: React.FC<{
   const feedItemDivRef = useRef<HTMLDivElement | null>(null);
 
   const openPost = (e: React.MouseEvent<HTMLDivElement>) => {
-    history.push(`/home/post/${props.post.id}`);
+    history.push(
+      `${props.baseRoute ? props.baseRoute : ""}/post/${props.post.id}`
+    );
   };
   const openSubreddit = () => {
     history.push(`/sub/${props.post.subId}`); // fix

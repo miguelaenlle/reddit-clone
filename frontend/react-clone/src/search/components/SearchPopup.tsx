@@ -17,10 +17,9 @@ const SearchPopup: React.FC<{
           query={props.query}
           handleSearch={props.handleConfirmSearch}
         />
-        {props.loading ? (
+        {props.loading || props.results.length === 0 ? (
           <SearchLoader />
         ) : (
-          props.results.length > 0 &&
           props.results.map((result) => {
             return (
               <SearchItem

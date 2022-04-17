@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Route, Switch, useHistory, useLocation } from "react-router-dom";
 import PostResults from "../components/PostResults";
 import SearchTypeSelector from "../components/SearchTypeSelector";
 import SubredditResults from "../components/SubredditResults";
@@ -6,10 +7,33 @@ import UserResults from "../components/UserResults";
 import { optionIds, optionValues } from "../constants/search-values";
 
 const Search: React.FC<{}> = (props) => {
+  const location = useLocation();
+  const history = useHistory();
   const [resultsMode, setResultsMode] = useState("subreddits");
   const handleSelectOption = (optionId: string) => {
-    setResultsMode(optionId);
+    try {
+      const queryParams = new URLSearchParams(location.search);
+      const searchQuery = queryParams.get("query");
+      history.push(`/search/${optionId}?query=${searchQuery}`);
+      setResultsMode(optionId);
+    } catch {}
   };
+
+  const initializeOption = () => {
+    try {
+      const pathname = location.pathname;
+      for (const term of ["subreddits", "users", "posts"]) {
+        if (pathname.includes(term)) {
+          setResultsMode(term);
+          return;
+        }
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    initializeOption();
+  }, []);
 
   return (
     <div className="pt-28 px-10 bg-zinc-900 min-h-screen">
@@ -19,17 +43,15 @@ const Search: React.FC<{}> = (props) => {
         optionIds={optionIds}
         optionValues={optionValues}
       />
-      {resultsMode === "subreddits" && (
-        <div className="space-y-5 animate-fade">
-          <SubredditResults />
-        </div>
-      )}
-      {resultsMode === "users" && (
-        <div className="space-y-5 animate-fade">
-          <UserResults />
-        </div>
-      )}
-      {resultsMode === "posts" && <PostResults />}
+      <Route exact path="/search/subreddits">
+        <SubredditResults />
+      </Route>
+      <Route exact path="/search/users">
+        <UserResults />
+      </Route>
+      <Route exact path="/search/posts">
+        <PostResults />
+      </Route>
     </div>
   );
 };
