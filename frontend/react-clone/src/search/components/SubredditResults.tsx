@@ -5,45 +5,54 @@ import { useHttpClient } from "../../hooks/http-hook";
 import SubredditResult from "./SubredditResult";
 import SubredditResultLoader from "./SubredditResultLoader";
 
+import { Subreddit } from "../../models/Subreddit";
+
 const SubredditResults: React.FC<{}> = (props) => {
   const [page, setPage] = useState(0);
-  const [results, setResults] = useState<{ [key: string]: any }[]>([]);
-  const [resultsExpandable, setResultsExpandable] = useState(true);
+  const [results, setResults] = useState<Subreddit[]>([]);
 
   const location = useLocation();
   const resultsPerPage = 25;
   const httpClient = useHttpClient();
 
-  const pullResults = async () => {
+  const pullResultData = async (pageNumber: number) => {
     const searchQuery = location.search;
     const searchParams = new URLSearchParams(searchQuery);
     const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?query=${query}&page=0&numResults=${resultsPerPage}`;
+    const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?query=${query}&page=${pageNumber}&numResults=${resultsPerPage}`;
     const searchResults = await httpClient.sendRequest(url, "GET");
-    console.log(searchResults);
-    setResults(searchResults.results);
+    const searchResultsFormatted = searchResults.results.map(
+      (result: { [key: string]: any }) => {
+        return new Subreddit(
+          result.name,
+          result.id,
+          result.num_members,
+          result.description
+        );
+      }
+    );
+    return searchResultsFormatted;
+  };
+
+  const pullResults = async () => {
+    try {
+      const searchResults = await pullResultData(0);
+      setResults(searchResults);
+    } catch (error) {}
   };
 
   const expandResults = async () => {
     const newPage = page + 1;
     setPage(newPage);
-    const searchQuery = location.search;
-    const searchParams = new URLSearchParams(searchQuery);
-    const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?query=${query}&page=${newPage}&numResults=${resultsPerPage}`;
-    const searchResults = await httpClient.sendRequest(url, "GET");
-    if (searchResults.length === resultsPerPage) {
-      setResultsExpandable(true);
-    }
-    setResults((prevResults) => [...prevResults, ...searchResults.results]);
-
-    console.log(searchResults);
+    try {
+      const additionalSearchResults = await pullResultData(newPage);
+      setResults((prevResults) => [...prevResults, ...additionalSearchResults]);
+    } catch (error) {}
   };
 
   useEffect(() => {
     setPage(0);
     setResults([]);
-    setResultsExpandable(true);
 
     pullResults();
   }, [location.search]);
@@ -53,10 +62,10 @@ const SubredditResults: React.FC<{}> = (props) => {
       {results.map((result) => {
         return (
           <SubredditResult
-            key={result.id}
-            subName={result.name}
-            subId={result.id}
-            members={result.num_members}
+            key={`sub-result-${result.subId}-${Math.random().toString()}`}
+            subName={result.subName}
+            subId={result.subId}
+            members={result.members}
             description={result.description}
           />
         );
@@ -64,16 +73,14 @@ const SubredditResults: React.FC<{}> = (props) => {
       {results.length === 0 && !httpClient.isLoading && (
         <h1 className="text-zinc-400 text-xl">No results found.</h1>
       )}
-      {resultsPerPage * (page + 1) === results.length &&
-        resultsExpandable &&
-        !httpClient.isLoading && (
-          <p
-            onClick={expandResults}
-            className=" text-zinc-400 hover:cursor-pointer hover:text-zinc-200"
-          >
-            Load more results
-          </p>
-        )}
+      {resultsPerPage * (page + 1) === results.length && (
+        <p
+          onClick={expandResults}
+          className=" text-zinc-400 hover:cursor-pointer hover:text-zinc-200"
+        >
+          Load more results
+        </p>
+      )}
 
       {httpClient.isLoading && <SubredditResultLoader />}
     </div>

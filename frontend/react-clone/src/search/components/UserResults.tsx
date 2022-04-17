@@ -5,47 +5,52 @@ import SubredditResult from "./SubredditResult";
 import SubredditResultLoader from "./SubredditResultLoader";
 import UserResult from "./UserResult";
 import React from "react";
+import { User } from "../../models/User";
 
 const UserResults: React.FC<{}> = (props) => {
   const [page, setPage] = useState(0);
-  const [results, setResults] = useState<{ [key: string]: any }[]>([]);
-  const [resultsExpandable, setResultsExpandable] = useState(true);
+  const [results, setResults] = useState<User[]>([]);
 
   const location = useLocation();
   const resultsPerPage = 25;
   const httpClient = useHttpClient();
 
-  const pullResults = async () => {
+  const pullResultData = async (pageNumber: number) => {
     const searchQuery = location.search;
     const searchParams = new URLSearchParams(searchQuery);
     const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=0&numResults=${resultsPerPage}`;
+    const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${pageNumber}&numResults=${resultsPerPage}`;
     const searchResults = await httpClient.sendRequest(url, "GET");
     console.log(searchResults);
-    setResults(searchResults.data);
+    const searchResultsFormatted = searchResults.data.map(
+      (result: { [key: string]: any }) => {
+        return new User(result.id, result.username, result.num_upvotes);
+      }
+    );
+    return searchResultsFormatted;
+  };
+
+  const pullResults = async () => {
+    try {
+      const searchResults = await pullResultData(0);
+      setResults(searchResults);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const expandResults = async () => {
     const newPage = page + 1;
     setPage(newPage);
-    const searchQuery = location.search;
-    const searchParams = new URLSearchParams(searchQuery);
-    const query = searchParams.get("query");
-    const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${newPage}&numResults=${resultsPerPage}`;
-    const searchResults = await httpClient.sendRequest(url, "GET");
-    console.log(searchResults);
-    if (searchResults.length === resultsPerPage) {
-      setResultsExpandable(true);
-    }
-    setResults((prevResults) => [...prevResults, ...searchResults.data]);
-
-    console.log(searchResults);
+    try {
+      const additionalSearchResults = await pullResultData(newPage);
+      setResults((prevResults) => [...prevResults, ...additionalSearchResults]);
+    } catch (error) {}
   };
 
   useEffect(() => {
     setPage(0);
     setResults([]);
-    setResultsExpandable(true);
 
     pullResults();
   }, [location.search]);
@@ -55,26 +60,24 @@ const UserResults: React.FC<{}> = (props) => {
       {results.map((result) => {
         return (
           <UserResult
-            key={result.id}
+            key={`user-result-${result.userId}-${Math.random().toString()}`}
             username={result.username}
-            userId={result.id}
-            upvotes={result.num_upvotes}
+            userId={result.userId}
+            upvotes={result.upvotes}
           />
         );
       })}
       {results.length === 0 && !httpClient.isLoading && (
         <h1 className="text-zinc-400 text-xl">No results found.</h1>
       )}
-      {resultsPerPage * (page + 1) === results.length &&
-        resultsExpandable &&
-        !httpClient.isLoading && (
-          <p
-            onClick={expandResults}
-            className=" text-zinc-400 hover:cursor-pointer hover:text-zinc-200"
-          >
-            Load more results
-          </p>
-        )}
+      {resultsPerPage * (page + 1) === results.length && (
+        <p
+          onClick={expandResults}
+          className=" text-zinc-400 hover:cursor-pointer hover:text-zinc-200"
+        >
+          Load more results
+        </p>
+      )}
 
       {httpClient.isLoading && <SubredditResultLoader />}
     </div>
