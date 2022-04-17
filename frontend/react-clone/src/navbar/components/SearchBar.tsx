@@ -21,19 +21,11 @@ const SearchBar: React.FC<{}> = (props) => {
 
   const updateSearchResults = async (searchQuery: string) => {
     try {
-      const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits?page=0&numResults=7&query=${searchQuery}`;
-      const searchResults = await httpClient.sendRequest(url, "GET");
-      const searchResultsFormatted = searchResults.results.map(
-        (result: { [key: string]: any }) => {
-          return new Subreddit(
-            result.name,
-            result.id,
-            result.num_members,
-            result.description
-          );
-        }
+      const searchResultsFormatted = await httpClient.fetchSubreddits(
+        searchQuery,
+        0,
+        7
       );
-
       setResults(searchResultsFormatted);
     } catch (error) {}
   };
@@ -43,7 +35,6 @@ const SearchBar: React.FC<{}> = (props) => {
   };
 
   const handleConfirmSearch = () => {
-
     let pathExt = "subreddits";
 
     for (const term of ["users", "posts"]) {
@@ -54,6 +45,11 @@ const SearchBar: React.FC<{}> = (props) => {
 
     history.push(`/search/${pathExt}?query=${searchQuery}`);
     setPopupDisplayed(false);
+  };
+  const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleConfirmSearch();
+    }
   };
 
   const handleChooseItem = (subId: string) => {
@@ -67,8 +63,7 @@ const SearchBar: React.FC<{}> = (props) => {
     setPopupDisplayed(false);
   };
 
-  const handleClickOutside = () => {
-  };
+  const handleClickOutside = () => {};
 
   useEffect(() => {
     if (searchQuery.length > 0) {
@@ -104,6 +99,7 @@ const SearchBar: React.FC<{}> = (props) => {
           className="z-10 relative w-full border border-zinc-700 space-x-2 h-10 rounded-md bg-transparent text-white placeholder-zinc-400 px-3 selected:border-1"
           onBlur={handleCloseInput}
           onChange={handleSearchQuery}
+          onKeyDown={handleEnter}
         ></input>
       </div>
       {popupDisplayed && (
