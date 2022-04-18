@@ -1,5 +1,5 @@
-import React from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Redirect, Route, Switch, useLocation } from "react-router-dom";
 import ConfirmEmail from "./account/pages/Confirmation/ConfirmEmail";
 import WaitConfirmEmail from "./account/pages/Confirmation/WaitConfirmEmail";
 import Login from "./account/pages/Login";
@@ -21,36 +21,19 @@ import CreatePost from "./posts/pages/CreatePost";
 import PostPage from "./posts/pages/Post";
 
 function App() {
+  const location = useLocation();
+
+  const state: any = location.state;
+  const background = state && state.background;
+
   return (
     <HeaderWrapper>
-      <Switch>
+      <Switch location={background || location}>
         <Route path="/home">
           <Homepage />
         </Route>
-        {/* <Route path={`/post/:postId`} element={<Post />} />
-          <Route path={`/signup`} element={<Signup />} />
-          <Route path={`/login`} element={<Login />} />
-          <Route path={`/reset-password`} element={<RequestResetPassword />} />
-          <Route
-            path={`/wait-reset-password`}
-            element={<WaitResetPassword />}
-          />
-          <Route path={`/reset-password-prompt`} element={<ResetPassword />} />
-          <Route path={`/wait-confirm-email`} element={<WaitConfirmEmail />} />
-          <Route
-            path={`/confirm-email/:passwordToken`}
-            element={<ConfirmEmail />}
-          />
-          <Route path={`/create-post`} element={<CreatePost />} />
-          <Route path={`/create-sub`} element={<CreateSubreddit />} /> */}
-        {/* </Route> */}
         <Route exact path="/search/*">
           <Search />
-        </Route>
-        <Route exact path="/post/:postId">
-          <div className="w-screen h-screen bg-zinc-800">
-            <PostPage />
-          </div>
         </Route>
         <Route exact path="/sub/:subId">
           <Subreddit />
@@ -72,6 +55,12 @@ function App() {
           <Redirect to="/home" />
         </Route>
       </Switch>
+
+      {background && (
+        <Route exact path="/post/:postId">
+          <PostPage />
+        </Route>
+      )}
     </HeaderWrapper>
   );
 }

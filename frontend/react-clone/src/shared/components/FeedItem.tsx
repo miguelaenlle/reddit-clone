@@ -1,13 +1,13 @@
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import VoteItem from "./VoteItem";
 import { Post } from "../../models/Post";
 
 const FeedItem: React.FC<{
-  baseRoute?: string;
   post: Post;
 }> = (props) => {
+  const location = useLocation();
   const history = useHistory();
   const [upvotes, setUpvotes] = useState(props.post.initialUpvotes);
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
@@ -60,9 +60,12 @@ const FeedItem: React.FC<{
   const feedItemDivRef = useRef<HTMLDivElement | null>(null);
 
   const openPost = (e: React.MouseEvent<HTMLDivElement>) => {
-    history.push(
-      `${props.baseRoute ? props.baseRoute : ""}/post/${props.post.id}`
-    );
+    history.push({
+      pathname: `/post/${props.post.id}`,
+      state: {
+        background: location,
+      },
+    });
   };
   const openSubreddit = () => {
     history.push(`/sub/${props.post.subId}`); // fix
