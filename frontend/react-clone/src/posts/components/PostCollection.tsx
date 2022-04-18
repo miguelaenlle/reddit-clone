@@ -16,7 +16,7 @@ const PostCollection: React.FC<{
 }> = (props) => {
   return (
     <React.Fragment>
-      <div className="pt-10 z-0 animate-fade relative">
+      <div className="-mx-1.5 pt-4 z-0 animate-fade relative">
         <div className={`z-1 animate-fade flex flex-wrap`}>
           {props.posts.length > 0 ? (
             props.posts.map((post) => (

@@ -4,12 +4,10 @@ import { useHttpClient } from "./http-hook";
 
 export const useSubredditsClient = (
   initialQuery: string | undefined,
-  initialUserId: string | undefined,
   resultsPerPage: number
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState(initialQuery);
-  const [userId, setUserId] = useState(initialUserId);
 
   const [page, setPage] = useState(0);
   const [subreddits, setSubreddits] = useState<Subreddit[]>([]);
@@ -25,15 +23,11 @@ export const useSubredditsClient = (
     setQuery(newQuery);
   };
 
-  const updateUserId = (newUserId: string) => {
-    setUserId(newUserId);
-  };
-
   useEffect(() => {
     console.log(query);
     resetData();
     initializeSubreddits();
-  }, [query, userId]);
+  }, [query]);
 
   const fetchSubreddits = async (pageNumber: number) => {
     if (query) {
@@ -84,7 +78,6 @@ export const useSubredditsClient = (
     fetchSubreddits,
     initializeSubreddits,
     expandSubreddits,
-    updateQuery,
-    updateUserId,
+    updateQuery
   };
 };
