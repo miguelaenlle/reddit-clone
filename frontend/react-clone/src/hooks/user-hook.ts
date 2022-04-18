@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { isPropertySignature } from "typescript";
 import { User } from "../models/User";
 
 import { useHttpClient } from "./http-hook";
 
 export const useUsersClient = (
-  initialQuery: string | undefined,
+  search: boolean,
+  initialQuery: string | null,
   numResultsPerPage: number
 ) => {
   const [query, setQuery] = useState(initialQuery);
@@ -32,16 +34,16 @@ export const useUsersClient = (
   }, [query]);
 
   const fetchUsers = async (pageNumber: number): Promise<User[] | null> => {
-    if (query) {
-      const formattedUsers: User[] | null = await httpClient.fetchUsers(
-        query,
-        pageNumber,
-        numResultsPerPage
-      );
-      return formattedUsers;
-    } else {
+    console.log(query, pageNumber, numResultsPerPage);
+    if (search && !query) {
       return null;
     }
+    const formattedUsers: User[] | null = await httpClient.fetchUsers(
+      query,
+      pageNumber,
+      numResultsPerPage
+    );
+    return formattedUsers;
   };
 
   const initializeUsers = async () => {
@@ -49,8 +51,12 @@ export const useUsersClient = (
       const users = await fetchUsers(0);
       if (users) {
         setUsers(users);
+      } else {
+        setUsers([]);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const expandResults = async () => {

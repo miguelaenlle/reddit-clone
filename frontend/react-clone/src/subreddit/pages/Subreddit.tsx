@@ -18,6 +18,7 @@ const RESULTS_PER_PAGE = 25;
 const Subreddit: React.FC<{}> = (props) => {
   const params = useParams<{ subId: string }>();
   const postClient = usePostsClient(
+    false,
     undefined,
     undefined,
     params.subId,

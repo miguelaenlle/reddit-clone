@@ -3,9 +3,6 @@ import { Post } from "../../models/Post";
 import FeedItem from "../../shared/components/FeedItem";
 import FeedItemLoader from "../../shared/components/FeedItemLoader";
 
-
-
-
 const PostCollection: React.FC<{
   posts: Post[];
   isLoading: boolean;
@@ -17,16 +14,15 @@ const PostCollection: React.FC<{
   return (
     <React.Fragment>
       <div className="-mx-1.5 pt-4 z-0 animate-fade relative">
+        {!props.httpIsLoading && props.posts.length === 0 && (
+          <p className="text-zinc-200 text-xl">
+            No posts yet. Be the first one to post!
+          </p>
+        )}
         <div className={`z-1 animate-fade flex flex-wrap`}>
-          {props.posts.length > 0 ? (
-            props.posts.map((post) => (
-              <FeedItem key={`post-${post.id}`} post={post} />
-            ))
-          ) : (
-            <p className="text-zinc-200 text-xl">
-              No posts yet. Be the first one to post!
-            </p>
-          )}
+          {props.posts.map((post) => (
+            <FeedItem key={`post-${post.id}`} post={post} />
+          ))}
           {props.httpIsLoading && (
             <React.Fragment>
               {[...Array(5)].map(() => {

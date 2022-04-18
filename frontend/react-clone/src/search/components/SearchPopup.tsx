@@ -1,3 +1,4 @@
+import { queryByTitle } from "@testing-library/react";
 import { Subreddit } from "../../models/Subreddit";
 import SearchItem from "./SearchItem";
 import SearchLoader from "./SearchLoader";
@@ -17,7 +18,7 @@ const SearchPopup: React.FC<{
           query={props.query}
           handleSearch={props.handleConfirmSearch}
         />
-        {props.loading || props.results.length === 0 ? (
+        {(props.loading || props.results.length === 0) ? (
           <SearchLoader />
         ) : (
           props.results.map((result) => {

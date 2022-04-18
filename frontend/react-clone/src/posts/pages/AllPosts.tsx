@@ -8,12 +8,19 @@ import {
   sortOptionValues,
   sortOptionIcons,
 } from "../../homepage/constants/sort-modes";
+import { usePostsClient } from "../../hooks/post-hook";
+import PostCollection from "../components/PostCollection";
+
+const NUM_RESULTS_PER_PAGE = 25;
 
 const AllPosts: React.FC<{}> = (props) => {
-  const [selectedOption, setSelectedOption] = useState("top");
-  const handleSelectedOption = (option: string) => {
-    setSelectedOption(option);
-  };
+  const postsClient = usePostsClient(
+    false,
+    undefined,
+    undefined,
+    undefined,
+    NUM_RESULTS_PER_PAGE
+  );
 
   return (
     <div className="pt-28 px-5 bg-zinc-900 min-h-screen">
@@ -23,16 +30,19 @@ const AllPosts: React.FC<{}> = (props) => {
           optionIds={optionIds}
           optionValues={sortOptionValues}
           optionIcons={sortOptionIcons}
-          selectedOption={selectedOption}
-          handleSelectedOption={handleSelectedOption}
+          selectedOption={postsClient.selectedOption}
+          handleSelectedOption={postsClient.handleSelectedOption}
         />
       </div>
 
-      <div className={`z-0 animate-fade flex flex-wrap`}>
-        {DUMMY_POSTS.map((post) => (
-          <FeedItem post={post} />
-        ))}
-      </div>
+      <PostCollection
+        posts={postsClient.posts}
+        isLoading={postsClient.isLoading}
+        httpIsLoading={postsClient.httpIsLoading}
+        numResultsPerPage={NUM_RESULTS_PER_PAGE}
+        page={postsClient.page}
+        expandResults={postsClient.expandResults}
+      />
     </div>
   );
 };

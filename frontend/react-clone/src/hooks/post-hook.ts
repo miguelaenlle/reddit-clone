@@ -3,6 +3,7 @@ import { Post } from "../models/Post";
 import { useHttpClient } from "./http-hook";
 
 export const usePostsClient = (
+  search: boolean,
   initialQuery: string | undefined,
   initialUserId: string | undefined,
   initialSubId: string | undefined,
@@ -53,6 +54,10 @@ export const usePostsClient = (
     pageNumber: number,
     selectedOption: string
   ): Promise<Post[] | null> => {
+    if (search && !query) {
+      return null;
+    }
+
     const formattedPosts: Post[] | null = await httpClient.fetchPosts(
       pageNumber,
       selectedOption,
@@ -61,6 +66,7 @@ export const usePostsClient = (
       subId,
       query
     );
+    console.log(formattedPosts);
     return formattedPosts;
   };
 
@@ -78,7 +84,12 @@ export const usePostsClient = (
     try {
       const additionalSearchResults = await fetchPosts(newPage, selectedOption);
       if (additionalSearchResults) {
-        setPosts((prevResults) => [...prevResults, ...additionalSearchResults]);
+        console.log(newPage, additionalSearchResults[0]);
+        setPosts((prevResults) => {
+          const newResults = [...prevResults, ...additionalSearchResults];
+          console.log(newResults);
+          return newResults;
+        });
         setIsLoading(false);
       }
     } catch (error) {

@@ -17,6 +17,7 @@ const RESULTS_PER_PAGE = 25;
 const User: React.FC<{}> = (props) => {
   const params = useParams<{ userId: string }>();
   const postClient = usePostsClient(
+    false,
     undefined,
     params.userId,
     undefined,
