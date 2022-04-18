@@ -72,14 +72,11 @@ const Feed: React.FC<{}> = (props) => {
             } z-1 animate-fade flex flex-wrap`}
           >
             {posts.map((post) => (
-              <FeedItem key={`post-${post.id}`} baseRoute={"home"} post={post} />
+              <FeedItem key={`post-${post.id}`} post={post} />
             ))}
           </div>
         </div>
       </div>
-      <Route exact path="/home/post/:postId">
-        <PostPage />
-      </Route>
     </React.Fragment>
   );
 };
