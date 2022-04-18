@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useHttpClient } from "../../hooks/http-hook";
 import { useUsersClient } from "../../hooks/user-hook";
-import { User } from "../../models/User";
 import SubredditResultLoader from "./SubredditResultLoader";
 import UserResult from "./UserResult";
 

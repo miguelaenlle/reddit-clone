@@ -12,7 +12,6 @@ const SubredditResults: React.FC<{}> = (props) => {
 
   const subredditsClient = useSubredditsClient(
     undefined,
-    undefined,
     RESULTS_PER_PAGE
   );
 

@@ -47,6 +47,30 @@ export const useHttpClient = () => {
     []
   );
 
+  const fetchUserSubreddits = useCallback(
+    async (userId: string): Promise<Subreddit[] | null> => {
+      try {
+        const url = `${process.env.REACT_APP_BACKEND_URL}/users/${userId}/subreddits`;
+        const responseData = await sendRequest(url, "GET");
+        const subreddits = responseData.sub_ids;
+        const formattedSubreddits = subreddits.map(
+          (subredditData: { [key: string]: any }) => {
+            return new Subreddit(
+              subredditData.name,
+              subredditData._id,
+              subredditData.num_members,
+              subredditData.description
+            );
+          }
+        );
+        return formattedSubreddits;
+      } catch (error) {
+        return null;
+      }
+    },
+    []
+  );
+
   const fetchPosts = useCallback(
     async (
       pageNumber: number,
@@ -161,6 +185,7 @@ export const useHttpClient = () => {
     clearError,
     fetchPosts,
     fetchSubreddits,
+    fetchUserSubreddits,
     fetchUsers,
     fetchUser,
   };

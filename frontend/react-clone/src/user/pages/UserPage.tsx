@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
-import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
+import { useParams } from "react-router-dom";
 import {
   optionIds,
   sortOptionIcons,
   sortOptionValues,
 } from "../../homepage/constants/sort-modes";
-import Dropdown from "../../shared/components/Dropdown";
-import { useLocation, useParams } from "react-router-dom";
 import { useHttpClient } from "../../hooks/http-hook";
-
-import FeedItem from "../../shared/components/FeedItem";
-import UserHeader from "../components/UserHeader";
-import { Post } from "../../models/Post";
 import { usePostsClient } from "../../hooks/post-hook";
+import { Subreddit } from "../../models/Subreddit";
 import PostCollection from "../../posts/components/PostCollection";
+import Dropdown from "../../shared/components/Dropdown";
+import UserHeader from "../components/UserHeader";
+import UserSubreddits from "../components/UserSubreddits";
 
 const RESULTS_PER_PAGE = 25;
 const User: React.FC<{}> = (props) => {
@@ -24,14 +22,14 @@ const User: React.FC<{}> = (props) => {
     undefined,
     RESULTS_PER_PAGE
   );
-  useEffect(() => {
-    postClient.updateUserId(params.userId);
-  }, [params.userId]);
-
   return (
     <div className="pt-14 bg-zinc-900 min-h-screen">
       <UserHeader />
       <div className="p-5">
+        <h1 className="text-white text-xl pb-5">Subreddits</h1>
+        <UserSubreddits userId={params.userId} />
+        <div className = "pb-20"></div>
+        <h1 className="text-white text-xl pb-5">Posts</h1>
         <div className="z-10 flex space-x-2 relative">
           <Dropdown
             navbar={false}
@@ -42,7 +40,6 @@ const User: React.FC<{}> = (props) => {
             handleSelectedOption={postClient.handleSelectedOption}
           />
         </div>
-
         <PostCollection
           posts={postClient.posts}
           isLoading={postClient.httpIsLoading}
