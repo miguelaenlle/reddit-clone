@@ -111,6 +111,29 @@ export const useHttpClient = () => {
     []
   );
 
+  const fetchAllSubreddits = useCallback(
+    async (pageNumber: number, numResults: number) => {
+      try {
+        const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits/all?page=${pageNumber}&numResults=${numResults}`;
+        const allResults = await sendRequest(url, "GET");
+
+        const allResultsFormatted = allResults.results.map(
+          (result: { [key: string]: any }) => {
+            return new Subreddit(
+              result.name,
+              result.id,
+              result.num_members,
+              result.description
+            );
+          }
+        );
+
+        return allResultsFormatted;
+      } catch (error) {}
+    },
+    []
+  );
+
   const fetchSubreddits = useCallback(
     async (query: string | null, pageNumber: number, numResults: number) => {
       try {
@@ -187,6 +210,7 @@ export const useHttpClient = () => {
     clearError,
     fetchPosts,
     fetchSubreddits,
+    fetchAllSubreddits,
     fetchUserSubreddits,
     fetchUsers,
     fetchUser,
