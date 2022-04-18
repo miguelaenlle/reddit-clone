@@ -57,7 +57,9 @@ const SearchBar: React.FC<{}> = (props) => {
     setPopupDisplayed(false);
   };
 
-  const handleOpenInput = () => {};
+  const handleOpenInput = () => {
+    setPopupDisplayed(true);
+  };
 
   const handleCloseInput = () => {
     setPopupDisplayed(false);

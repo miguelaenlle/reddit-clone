@@ -52,6 +52,7 @@ export const useHttpClient = () => {
       pageNumber: number,
       selectedOption: string,
       resultsPerPage: number,
+      userId?: string | null,
       subId?: string | null,
       query?: string | null
     ): Promise<Post[] | null> => {
@@ -60,7 +61,7 @@ export const useHttpClient = () => {
           process.env.REACT_APP_BACKEND_URL
         }/posts?page=${pageNumber}&numResults=${resultsPerPage}&sortMode=${selectedOption}${
           subId ? `&subId=${subId}` : ""
-        }${query ? `&query=${query}` : ""}`;
+        }${query ? `&query=${query}` : ""}${userId ? `&userId=${userId}` : ""}`;
         const response = await sendRequest(url, "GET");
         const rawPosts = response.posts;
         const formattedPosts = rawPosts.map((post: { [key: string]: any }) => {
@@ -131,6 +132,16 @@ export const useHttpClient = () => {
     []
   );
 
+  const fetchUser = useCallback(async (userId: string) => {
+    try {
+      const url = `${process.env.REACT_APP_BACKEND_URL}/users/${userId}`;
+      const user = await sendRequest(url, "GET");
+      return user;
+    } catch (error) {
+      return null;
+    }
+  }, []);
+
   const clearError = () => {
     setError(null);
   };
@@ -151,5 +162,6 @@ export const useHttpClient = () => {
     fetchPosts,
     fetchSubreddits,
     fetchUsers,
+    fetchUser,
   };
 };
