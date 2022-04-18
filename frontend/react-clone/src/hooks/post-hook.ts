@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Post } from "../models/Post";
 import { useHttpClient } from "./http-hook";
 
-export const usePostHook = (
+export const usePostsClient = (
   initialQuery: string | undefined,
   initialUserId: string | undefined,
   initialSubId: string | undefined,

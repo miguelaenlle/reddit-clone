@@ -12,13 +12,13 @@ import { useHttpClient } from "../../hooks/http-hook";
 import FeedItem from "../../shared/components/FeedItem";
 import UserHeader from "../components/UserHeader";
 import { Post } from "../../models/Post";
-import { usePostHook } from "../../hooks/post-hook";
+import { usePostsClient } from "../../hooks/post-hook";
 import PostCollection from "../../posts/components/PostCollection";
 
 const RESULTS_PER_PAGE = 25;
 const User: React.FC<{}> = (props) => {
   const params = useParams<{ userId: string }>();
-  const postClient = usePostHook(
+  const postClient = usePostsClient(
     undefined,
     params.userId,
     undefined,

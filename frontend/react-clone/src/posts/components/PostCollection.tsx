@@ -1,11 +1,10 @@
 import React from "react";
-
-import FeedItem from "../../shared/components/FeedItem";
-
-import { usePostHook } from "../../hooks/post-hook";
 import { Post } from "../../models/Post";
-
+import FeedItem from "../../shared/components/FeedItem";
 import FeedItemLoader from "../../shared/components/FeedItemLoader";
+
+
+
 
 const PostCollection: React.FC<{
   posts: Post[];
