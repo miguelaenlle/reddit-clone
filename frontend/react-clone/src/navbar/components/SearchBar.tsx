@@ -21,12 +21,14 @@ const SearchBar: React.FC<{}> = (props) => {
 
   const updateSearchResults = async (searchQuery: string) => {
     try {
-      const searchResultsFormatted = await httpClient.fetchSubreddits(
-        searchQuery,
-        0,
-        7
-      );
-      setResults(searchResultsFormatted);
+      if (searchQuery && searchQuery.length > 0) {
+        const searchResultsFormatted = await httpClient.fetchSubreddits(
+          searchQuery,
+          0,
+          7
+        );
+        setResults(searchResultsFormatted);
+      }
     } catch (error) {}
   };
 
@@ -35,16 +37,18 @@ const SearchBar: React.FC<{}> = (props) => {
   };
 
   const handleConfirmSearch = () => {
-    let pathExt = "subreddits";
+    if (searchQuery.length > 0) {
+      let pathExt = "subreddits";
 
-    for (const term of ["users", "posts"]) {
-      if (location.pathname.includes(term)) {
-        pathExt = term;
+      for (const term of ["users", "posts"]) {
+        if (location.pathname.includes(term)) {
+          pathExt = term;
+        }
       }
-    }
 
-    history.push(`/search/${pathExt}?query=${searchQuery}`);
-    setPopupDisplayed(false);
+      history.push(`/search/${pathExt}?query=${searchQuery}`);
+      setPopupDisplayed(false);
+    }
   };
   const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -104,7 +108,7 @@ const SearchBar: React.FC<{}> = (props) => {
           onKeyDown={handleEnter}
         ></input>
       </div>
-      {popupDisplayed && (
+      {popupDisplayed && searchQuery.length > 0 && (
         <SearchPopup
           loading={isLoading}
           query={searchQuery}

@@ -10,7 +10,6 @@ const UserSubreddits: React.FC<{ userId: string }> = (props) => {
   const initializeUserSubreddits = async () => {
     try {
       const subreddits = await httpClient.fetchUserSubreddits(props.userId);
-      console.log(subreddits);
       if (subreddits) {
         setUserSubreddits(subreddits);
       }

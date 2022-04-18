@@ -86,6 +86,7 @@ export const useHttpClient = () => {
         }/posts?page=${pageNumber}&numResults=${resultsPerPage}&sortMode=${selectedOption}${
           subId ? `&subId=${subId}` : ""
         }${query ? `&query=${query}` : ""}${userId ? `&userId=${userId}` : ""}`;
+        console.log(url);
         const response = await sendRequest(url, "GET");
         const rawPosts = response.posts;
         const formattedPosts = rawPosts.map((post: { [key: string]: any }) => {
@@ -102,7 +103,6 @@ export const useHttpClient = () => {
             post.num_comments
           );
         });
-        console.log(formattedPosts);
         return formattedPosts;
       } catch (error) {
         return null;
@@ -141,7 +141,9 @@ export const useHttpClient = () => {
   const fetchUsers = useCallback(
     async (query: string | null, pageNumber: number, numResults: number) => {
       try {
-        const url = `${process.env.REACT_APP_BACKEND_URL}/users?searchQuery=${query}&page=${pageNumber}&numResults=${numResults}`;
+        const url = `${process.env.REACT_APP_BACKEND_URL}/users?${
+          query ? `searchQuery=${query}` : ""
+        }&page=${pageNumber}&numResults=${numResults}`;
         const searchResults = await sendRequest(url, "GET");
         const searchResultsFormatted = searchResults.data.map(
           (result: { [key: string]: any }) => {

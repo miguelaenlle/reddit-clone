@@ -24,7 +24,6 @@ export const useSubredditsClient = (
   };
 
   useEffect(() => {
-    console.log(query);
     resetData();
     initializeSubreddits();
   }, [query]);
@@ -46,7 +45,6 @@ export const useSubredditsClient = (
     try {
       const searchResults = await fetchSubreddits(0);
       if (searchResults) {
-        console.log(searchResults);
         setSubreddits(searchResults);
       }
     } catch (error) {}

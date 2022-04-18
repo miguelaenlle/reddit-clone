@@ -14,7 +14,7 @@ const RESULTS_PER_PAGE = 25;
 const PostResults: React.FC<{}> = (props) => {
   const location = useLocation();
 
-  const postClient = usePostsClient("", undefined, undefined, RESULTS_PER_PAGE);
+  const postClient = usePostsClient(true, "", undefined, undefined, RESULTS_PER_PAGE);
 
   const updateQuery = () => {
     const searchQuery = location.search;
