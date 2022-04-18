@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
 import {
   optionIds,
@@ -6,14 +6,28 @@ import {
   sortOptionValues,
 } from "../../homepage/constants/sort-modes";
 import Dropdown from "../../shared/components/Dropdown";
+import { useLocation, useParams } from "react-router-dom";
+import { useHttpClient } from "../../hooks/http-hook";
+
 import FeedItem from "../../shared/components/FeedItem";
 import UserHeader from "../components/UserHeader";
+import { Post } from "../../models/Post";
+import { usePostHook } from "../../hooks/post-hook";
+import PostCollection from "../../posts/components/PostCollection";
 
+const RESULTS_PER_PAGE = 25;
 const User: React.FC<{}> = (props) => {
-  const [selectedOption, setSelectedOption] = useState("top");
-  const handleSelectedOption = (option: string) => {
-    setSelectedOption(option);
-  };
+  const params = useParams<{ userId: string }>();
+  const postClient = usePostHook(
+    undefined,
+    params.userId,
+    undefined,
+    RESULTS_PER_PAGE
+  );
+  useEffect(() => {
+    postClient.updateUserId(params.userId);
+  }, [params.userId]);
+
   return (
     <div className="pt-14 bg-zinc-900 min-h-screen">
       <UserHeader />
@@ -24,18 +38,19 @@ const User: React.FC<{}> = (props) => {
             optionIds={optionIds}
             optionValues={sortOptionValues}
             optionIcons={sortOptionIcons}
-            selectedOption={selectedOption}
-            handleSelectedOption={handleSelectedOption}
+            selectedOption={postClient.selectedOption}
+            handleSelectedOption={postClient.handleSelectedOption}
           />
         </div>
 
-        <div className="pt-10 z-0 animate-fade relative">
-          <div className={`z-1 animate-fade flex flex-wrap`}>
-            {DUMMY_POSTS.map((post) => (
-              <FeedItem post={post} />
-            ))}
-          </div>
-        </div>
+        <PostCollection
+          posts={postClient.posts}
+          isLoading={postClient.httpIsLoading}
+          httpIsLoading={postClient.httpIsLoading}
+          numResultsPerPage={RESULTS_PER_PAGE}
+          page={postClient.page}
+          expandResults={postClient.expandResults}
+        />
       </div>
     </div>
   );
