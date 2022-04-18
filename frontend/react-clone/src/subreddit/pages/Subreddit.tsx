@@ -6,7 +6,7 @@ import {
   sortOptionIcons,
   sortOptionValues,
 } from "../../homepage/constants/sort-modes";
-import { usePostHook } from "../../hooks/post-hook";
+import { usePostsClient } from "../../hooks/post-hook";
 import PostCollection from "../../posts/components/PostCollection";
 import Dropdown from "../../shared/components/Dropdown";
 import FeedItem from "../../shared/components/FeedItem";
@@ -17,7 +17,7 @@ const RESULTS_PER_PAGE = 25;
 
 const Subreddit: React.FC<{}> = (props) => {
   const params = useParams<{ subId: string }>();
-  const postClient = usePostHook(
+  const postClient = usePostsClient(
     undefined,
     undefined,
     params.subId,

@@ -3,20 +3,18 @@ import { useLocation } from "react-router-dom";
 import {
   optionIds,
   sortOptionIcons,
-  sortOptionValues
+  sortOptionValues,
 } from "../../homepage/constants/sort-modes";
-import { usePostHook } from "../../hooks/post-hook";
+import { usePostsClient } from "../../hooks/post-hook";
 import PostCollection from "../../posts/components/PostCollection";
 import Dropdown from "../../shared/components/Dropdown";
-
-
 
 const RESULTS_PER_PAGE = 25;
 
 const PostResults: React.FC<{}> = (props) => {
   const location = useLocation();
 
-  const postClient = usePostHook("", undefined, undefined, RESULTS_PER_PAGE);
+  const postClient = usePostsClient("", undefined, undefined, RESULTS_PER_PAGE);
 
   const updateQuery = () => {
     const searchQuery = location.search;
