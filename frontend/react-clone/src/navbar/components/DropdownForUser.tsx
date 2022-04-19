@@ -8,6 +8,7 @@ const DropdownForUser: React.FC<{
   optionValues: { [key: string]: string };
   optionIcons: { [key: string]: React.ReactElement };
   selectedOption: string;
+  handleLogout: () => void;
   handleSelectedOption: (option: string) => void;
 }> = (props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,7 +87,7 @@ const DropdownForUser: React.FC<{
             optionIcon={props.optionIcons["logout"]}
             optionText={props.optionValues["logout"]}
             selectedOption={props.selectedOption}
-            handleSelectedOption={handleSelectOption}
+            handleSelectedOption={props.handleLogout}
           />
         </ul>
       </div>

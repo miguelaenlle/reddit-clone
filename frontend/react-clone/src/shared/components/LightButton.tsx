@@ -13,11 +13,11 @@ const LightButton: React.FC<{
       type={props.submit ? "submit" : "button"}
       disabled={props.loading}
       onClick={props.onClick}
-      className={`p-3 space-x-3 items-center group flex bg-zinc-800 ${
+      className={`group p-3 space-x-3 items-center flex bg-zinc-800 ${
         !props.loading
-          ? "hover:cursor-pointer hover:bg-zinc-900"
-          : "hover:cursor-not-allowed hover:bg-zinc-700"
-      } border border-zinc-700 py-1 transition-colors`}
+          ? "group-hover:cursor-pointer group-hover:bg-zinc-900 text-zinc-400 hover:text-white"
+          : "group-hover:cursor-not-allowed group-hover:bg-zinc-700 text-zinc-500"
+      } border border-zinc-700 py-1`}
     >
       <p
         className={`${!props.loading ? "text-zinc-400" : "text-zinc-500"}${
