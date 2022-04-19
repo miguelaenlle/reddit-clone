@@ -9,7 +9,7 @@ const WaitConfirmEmail: React.FC<{}> = (props) => {
   const resendEmail = () => {};
 
   return (
-    <Modal onDismiss={handleDismiss}>
+    <Modal>
       <div className="mt-20 p-5 mx-auto max-w-4xl w/80 bg-zinc-800 border border-zinc-700 text-white">
         <h1 className="text-2xl text-white">Verify your email</h1>
         <p className="text-lg text-zinc-300">

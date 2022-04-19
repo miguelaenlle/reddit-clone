@@ -4,7 +4,7 @@ import { Subreddit } from "../models/Subreddit";
 import { User } from "../models/User";
 
 export const useHttpClient = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const activeHttpRequests = useRef<any[]>([]);
 
@@ -18,15 +18,20 @@ export const useHttpClient = () => {
       setIsLoading(true);
       const httpAbortController = new AbortController();
       activeHttpRequests.current.push(httpAbortController);
-      const headers = {
-        Authorization: `Bearer ${authToken}`,
+
+      let headers: { [key: string]: string } = {
+        "Content-Type": "application/json",
       };
+      if (authToken) {
+        headers["Authorization"] = `Bearer ${authToken}`;
+      }
 
       try {
         setIsLoading(true);
+        console.log(JSON.stringify(body));
         const response = await fetch(url, {
           method,
-          headers: authToken ? headers : undefined,
+          headers: headers,
           body: body ? JSON.stringify(body) : undefined,
           signal: httpAbortController.signal,
         });
@@ -86,7 +91,6 @@ export const useHttpClient = () => {
         }/posts?page=${pageNumber}&numResults=${resultsPerPage}&sortMode=${selectedOption}${
           subId ? `&subId=${subId}` : ""
         }${query ? `&query=${query}` : ""}${userId ? `&userId=${userId}` : ""}`;
-        console.log(url);
         const response = await sendRequest(url, "GET");
         const rawPosts = response.posts;
         const formattedPosts = rawPosts.map((post: { [key: string]: any }) => {

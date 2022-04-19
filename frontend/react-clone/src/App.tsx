@@ -1,24 +1,19 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Redirect, Route, Switch, useLocation } from "react-router-dom";
 import ConfirmEmail from "./account/pages/Confirmation/ConfirmEmail";
 import WaitConfirmEmail from "./account/pages/Confirmation/WaitConfirmEmail";
 import Login from "./account/pages/Login";
-import RequestResetPassword from "./account/pages/ResetPassword/RequestResetPassword";
 import ResetPassword from "./account/pages/ResetPassword/ResetPassword";
-import WaitResetPassword from "./account/pages/ResetPassword/WaitResetPassword";
 import Signup from "./account/pages/Signup";
 import Homepage from "./homepage/pages/Homepage";
 import HeaderWrapper from "./navbar/wrappers/HeaderWrapper";
 import AllPosts from "./posts/pages/AllPosts";
-import Post from "./posts/pages/Post";
+import PostPage from "./posts/pages/Post";
 import Search from "./search/pages/Search";
 import AllSubreddits from "./subreddit/pages/AllSubreddits";
 import Subreddit from "./subreddit/pages/Subreddit";
 import AllUsers from "./user/pages/AllUsers";
 import User from "./user/pages/UserPage";
-import CreateSubreddit from "./subreddit/pages/CreateSubreddit";
-import CreatePost from "./posts/pages/CreatePost";
-import PostPage from "./posts/pages/Post";
 
 function App() {
   const location = useLocation();
@@ -51,15 +46,27 @@ function App() {
         <Route exact path="/all/posts">
           <AllPosts />
         </Route>
-        <Route exact path="/">
+        <Route path="*">
           <Redirect to="/home" />
         </Route>
       </Switch>
 
       {background && (
-        <Route exact path="/post/:postId">
-          <PostPage />
-        </Route>
+        <Switch>
+          <Route exact path="/post/:postId">
+            <PostPage />
+          </Route>
+          <Route exact path="/login">
+            <Login />
+          </Route>
+          <Route exact path="/signup">
+            <Signup />
+          </Route>
+
+          <Route exact path="/reset-password">
+            <ResetPassword />
+          </Route>
+        </Switch>
       )}
     </HeaderWrapper>
   );

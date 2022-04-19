@@ -34,7 +34,6 @@ export const useUsersClient = (
   }, [query]);
 
   const fetchUsers = async (pageNumber: number): Promise<User[] | null> => {
-    console.log(query, pageNumber, numResultsPerPage);
     if (search && !query) {
       return null;
     }
@@ -55,7 +54,6 @@ export const useUsersClient = (
         setUsers([]);
       }
     } catch (error) {
-      console.log(error);
     }
   };
 
