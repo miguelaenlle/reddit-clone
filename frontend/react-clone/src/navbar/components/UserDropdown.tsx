@@ -1,5 +1,5 @@
 import { UserIcon } from "@heroicons/react/outline";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import {
   optionIds,
@@ -7,16 +7,20 @@ import {
   userOptionValues,
 } from "../constants/user-options";
 import DropdownForUser from "./DropdownForUser";
+import { AuthContext } from "../../context/auth-context";
 
 const UserDropdown: React.FC<{}> = (props) => {
+  const authContext = useContext(AuthContext);
   const history = useHistory();
+
+  useEffect(() => {
+    console.log(authContext?.isLoggedIn);
+  }, [authContext?.isLoggedIn]);
 
   const location = useLocation();
 
   const [selectedOption, setSelectedOption] = useState("user");
   const [storedLocation, setStoredLocation] = useState(location);
-
-  const signedIn = false;
 
   const modalRoutes = ["/login", "/signup"];
 
@@ -52,19 +56,25 @@ const UserDropdown: React.FC<{}> = (props) => {
     handleChangeRoute("/login");
   };
 
+  const handleLogout = () => {
+    authContext?.logout();
+    history.push("/home");
+  };
+
   const handleSignup = () => {
     handleChangeRoute("/signup");
   };
 
   return (
     <React.Fragment>
-      {signedIn ? (
+      {authContext?.isLoggedIn ? (
         <DropdownForUser
           username={"nexus"}
           optionIds={optionIds}
           optionValues={userOptionValues}
           optionIcons={userOptionIcons}
           selectedOption={selectedOption}
+          handleLogout={handleLogout}
           handleSelectedOption={handleSelectedOption}
         />
       ) : (
