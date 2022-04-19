@@ -66,7 +66,6 @@ export const usePostsClient = (
       subId,
       query
     );
-    console.log(formattedPosts);
     return formattedPosts;
   };
 
@@ -84,10 +83,8 @@ export const usePostsClient = (
     try {
       const additionalSearchResults = await fetchPosts(newPage, selectedOption);
       if (additionalSearchResults) {
-        console.log(newPage, additionalSearchResults[0]);
         setPosts((prevResults) => {
           const newResults = [...prevResults, ...additionalSearchResults];
-          console.log(newResults);
           return newResults;
         });
         setIsLoading(false);

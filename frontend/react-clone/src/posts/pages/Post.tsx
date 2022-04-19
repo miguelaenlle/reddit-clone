@@ -43,7 +43,7 @@ const PostPage: React.FC<{}> = (props) => {
 
   // pull the post information from the API
   return (
-    <Modal onDismiss={handleDismiss}>
+    <Modal >
       <div className="z-50 mt-20 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700">
         {httpClient.isLoading ? (
           <p className="text-white">Loading...</p>

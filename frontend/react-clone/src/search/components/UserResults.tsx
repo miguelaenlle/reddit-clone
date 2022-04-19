@@ -17,7 +17,6 @@ const UserResults: React.FC<{}> = (props) => {
     const query = searchParams.get("query");
     
     if (query) {
-      console.log(query);
       usersClient.updateQuery(query);
     }
   };

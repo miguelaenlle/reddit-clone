@@ -25,8 +25,7 @@ const ResetPassword: React.FC<{}> = (props) => {
       newPassword: "",
     },
     validate,
-    onSubmit: (values) => {
-    },
+    onSubmit: (values) => {},
   });
 
   const handleSubmit = () => {
@@ -34,7 +33,7 @@ const ResetPassword: React.FC<{}> = (props) => {
   };
 
   return (
-    <Modal onDismiss={handleDismiss}>
+    <Modal>
       <div className="mt-20 p-5 mx-auto max-w-4xl w/80 bg-zinc-800 border border-zinc-700 text-white">
         <h1 className="text-2xl text-white">Reset Password</h1>
 

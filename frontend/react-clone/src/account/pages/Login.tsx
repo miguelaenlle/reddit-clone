@@ -1,11 +1,9 @@
 import { ArrowRightIcon } from "@heroicons/react/outline";
 import { useFormik } from "formik";
-import { useState } from "react";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import LightButton from "../../shared/components/LightButton";
 import Modal from "../../shared/components/Modal";
 import TextField from "../../shared/components/TextField";
-import { Link } from "react-router-dom";
-
 import { imageCSS } from "../../shared/constants/image-class";
 
 const validate = (values: { [key: string]: string }) => {
@@ -27,20 +25,39 @@ const validate = (values: { [key: string]: string }) => {
 };
 
 const Login: React.FC<{}> = (props) => {
-  const handleDismiss = () => {};
-
+  const location = useLocation();
+  const history = useHistory();
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
     validate,
-    onSubmit: (values) => {
-    },
+    onSubmit: (values) => {},
   });
 
+  const state: any = location.state;
+  const background = state && state.background;
+
+  const handleCreateAccount = () => {
+    history.push({
+      pathname: "/signup",
+      state: {
+        background: background,
+      },
+    });
+  };
+
+  const handleResetPassword = () => {
+    history.push({
+      pathname: "/reset-password",
+      state: {
+        background: background,
+      },
+    });
+  };
   return (
-    <Modal onDismiss={handleDismiss}>
+    <Modal>
       <div className="mt-20 p-5 mx-auto max-w-4xl w/80 bg-zinc-800 border border-zinc-700 text-white">
         <h1 className="text-2xl text-white">Log In</h1>
         <div className="mt-5 relative">
@@ -68,18 +85,18 @@ const Login: React.FC<{}> = (props) => {
             />
 
             <br />
-            <Link to="/signup">
-              <p className="group hover:text-white text-zinc-400 hover:cursor-pointer">
-                Create account instead
-              </p>
-            </Link>
-
-            <Link to="/reset-password">
-              <p className="group hover:text-white text-zinc-400 hover:cursor-pointer">
-                Reset password
-              </p>
-            </Link>
-
+            <p
+              onClick={handleCreateAccount}
+              className="group hover:text-white text-zinc-400 hover:cursor-pointer"
+            >
+              Create account instead
+            </p>
+            <p
+              onClick={handleResetPassword}
+              className="group hover:text-white text-zinc-400 hover:cursor-pointer"
+            >
+              Reset password
+            </p>
             <br />
             <LightButton
               buttonImage={<ArrowRightIcon className={imageCSS} />}

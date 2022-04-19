@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
+import { createNoSubstitutionTemplateLiteral } from "typescript";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
 import PostPage from "../../posts/pages/Post";
@@ -27,6 +28,7 @@ const Feed: React.FC<{}> = (props) => {
       process.env.REACT_APP_BACKEND_URL
     }/feed?sortMode=${selectedOption}&page=${0}&numResults=${10}`;
     const data = await httpClient.sendRequest(url, "GET");
+    console.log(data);
     const formattedPosts = data.posts.map(
       (post: { [key: string]: any }) =>
         new Post(
