@@ -1,6 +1,8 @@
-import { ArrowRightIcon } from "@heroicons/react/outline";
+import { ArrowRightIcon, RefreshIcon } from "@heroicons/react/outline";
 import { useFormik } from "formik";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useHttpClient } from "../../../hooks/http-hook";
 import LightButton from "../../../shared/components/LightButton";
 import Modal from "../../../shared/components/Modal";
 import TextField from "../../../shared/components/TextField";
@@ -18,11 +20,65 @@ const validate = (values: { [key: string]: string }) => {
   return errors;
 };
 const RequestResetPassword: React.FC<{}> = (props) => {
-  const handleDismiss = () => {};
+  const httpClient = useHttpClient();
   const history = useHistory();
 
+  const [error, setError] = useState<string | null>(null);
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
+  const [lastPasswordReset, setLastPasswordReset] = useState<Date | null>(null);
   const handleGoBack = () => {
     history.goBack();
+  };
+
+  const sendPasswordReset = async () => {
+    setError(null);
+    const email = formik.values.email;
+
+    const requestBody = {
+      email,
+    };
+
+    try {
+      if (
+        !lastPasswordReset ||
+        lastPasswordReset < new Date(Date.now() - 60 * 1000)
+      ) {
+        const url = `${process.env.REACT_APP_BACKEND_URL}/auth/forgot-password`;
+        const result = await httpClient.sendRequest(url, "POST", requestBody);
+        console.log(result);
+        setEmailSentTo(email);
+      } else {
+        setError("Please wait a minute before trying again.");
+      }
+    } catch (error: any) {
+      if (error) {
+        setError(error.message);
+      }
+    }
+  };
+
+  const resendResetPassword = async () => {
+    setError(null);
+    const requestBody = {
+      email: emailSentTo,
+    };
+    try {
+      if (
+        !lastPasswordReset ||
+        lastPasswordReset < new Date(Date.now() - 60 * 1000)
+      ) {
+        const url = `${process.env.REACT_APP_BACKEND_URL}/auth/forgot-password`;
+        const result = await httpClient.sendRequest(url, "POST", requestBody);
+        console.log(result);
+        setLastPasswordReset(new Date());
+      } else {
+        setError("Please wait a minute before trying again.");
+      }
+    } catch (error: any) {
+      if (error) {
+        setError(error.message);
+      }
+    }
   };
 
   const formik = useFormik({
@@ -30,7 +86,9 @@ const RequestResetPassword: React.FC<{}> = (props) => {
       email: "",
     },
     validate,
-    onSubmit: (values) => {},
+    onSubmit: (values) => {
+      sendPasswordReset();
+    },
   });
 
   return (
@@ -50,20 +108,38 @@ const RequestResetPassword: React.FC<{}> = (props) => {
               onChange={formik.handleChange}
               value={formik.values.email}
             />
-            <div className="h-6"></div>
-            <p
-              className="group hover:text-white text-zinc-400 hover:cursor-pointer"
-              onClick={handleGoBack}
-            >
-              Go back
-            </p>
+            {error && <div className="text-red-500 text-md pt-4">{error}</div>}
+            {emailSentTo ? (
+              <React.Fragment>
+                <p className="text-zinc-200 pt-2">
+                  A password reset email has been sent to{" "}
+                  <span className="text-zinc-400">{emailSentTo}</span>
+                </p>
 
-            <LightButton
-              buttonImage={<ArrowRightIcon className={imageCSS} />}
-              buttonText="Send Reset Email"
-            />
+                <LightButton
+                  onClick={resendResetPassword}
+                  loading={httpClient.isLoading}
+                  buttonImage={<RefreshIcon className={imageCSS} />}
+                  buttonText="Resend Reset Email"
+                />
+              </React.Fragment>
+            ) : (
+              <LightButton
+                submit={true}
+                loading={httpClient.isLoading}
+                buttonImage={<ArrowRightIcon className={imageCSS} />}
+                buttonText="Send Reset Email"
+              />
+            )}
           </form>
         </div>
+
+        <p
+          className="mt-5 group hover:text-white text-zinc-400 hover:cursor-pointer"
+          onClick={handleGoBack}
+        >
+          Go back to login
+        </p>
       </div>
     </Modal>
   );

@@ -84,7 +84,7 @@ const ConfirmEmail: React.FC<{}> = (props) => {
         </p>
       )}
       {error && (
-        <p className="text-lg text-zinc-300">
+        <p className="text-lg text-red-500">
           {error}
           <br />
         </p>
