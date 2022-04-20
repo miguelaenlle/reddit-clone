@@ -15,6 +15,8 @@ import AllUsers from "./user/pages/AllUsers";
 import User from "./user/pages/UserPage";
 import { useAuth } from "./hooks/auth-hook";
 import { AuthContext } from "./context/auth-context";
+import RequestResetPassword from "./account/pages/ResetPassword/RequestResetPassword";
+import SetNewPassword from "./account/pages/Confirmation/ConfirmEmail";
 
 function App() {
   const auth = useAuth();
@@ -61,6 +63,10 @@ function App() {
           <Route exact path="/verify-email">
             <ConfirmEmail />
           </Route>
+
+          <Route exact path="/new-password">
+            <ResetPassword />
+          </Route>
           <Route path="*">
             <Redirect to="/home" />
           </Route>
@@ -79,7 +85,7 @@ function App() {
             </Route>
 
             <Route exact path="/reset-password">
-              <ResetPassword />
+              <RequestResetPassword />
             </Route>
           </Switch>
         )}

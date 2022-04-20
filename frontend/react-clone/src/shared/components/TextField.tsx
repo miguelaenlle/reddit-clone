@@ -1,4 +1,3 @@
-
 const TextField: React.FC<{
   fieldType: string;
   name: string;
@@ -12,7 +11,9 @@ const TextField: React.FC<{
   return (
     <div>
       <input
-        className={`w-full px-3 py-1.5 bg-zinc-700 border ${(props.error && props.touched) ? "border-red-500" : "border-zinc-600"}`}
+        className={`text-white w-full px-3 py-1.5 bg-zinc-700 border ${
+          props.error && props.touched ? "border-red-500" : "border-zinc-600"
+        }`}
         placeholder={props.placeholder}
         id={props.name}
         name={props.name}
