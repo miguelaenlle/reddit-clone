@@ -82,7 +82,7 @@ const CreatePost: React.FC<{}> = (props) => {
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
             />
-            <DragAndDrop dragText={"Drag & drop post images or"} />
+            {/* <DragAndDrop id = "banner-icon" dragText={"Add images"} /> */}
             <br />
             <div className="flex">
               <div className="grow"></div>

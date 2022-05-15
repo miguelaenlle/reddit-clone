@@ -4,13 +4,11 @@ import NewPostButton from "../../homepage/components/NewPostButton";
 import {
   optionIds,
   sortOptionIcons,
-  sortOptionValues,
+  sortOptionValues
 } from "../../homepage/constants/sort-modes";
 import { usePostsClient } from "../../hooks/post-hook";
 import PostCollection from "../../posts/components/PostCollection";
 import Dropdown from "../../shared/components/Dropdown";
-import FeedItem from "../../shared/components/FeedItem";
-import FeedItemLoader from "../../shared/components/FeedItemLoader";
 import SubredditHeader from "../components/SubredditHeader";
 
 const RESULTS_PER_PAGE = 25;

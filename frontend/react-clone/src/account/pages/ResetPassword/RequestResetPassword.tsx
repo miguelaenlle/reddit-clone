@@ -1,6 +1,6 @@
 import { ArrowRightIcon, RefreshIcon } from "@heroicons/react/outline";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useHttpClient } from "../../../hooks/http-hook";
 import LightButton from "../../../shared/components/LightButton";
@@ -26,6 +26,17 @@ const RequestResetPassword: React.FC<{}> = (props) => {
   const [error, setError] = useState<string | null>(null);
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
   const [lastPasswordReset, setLastPasswordReset] = useState<Date | null>(null);
+  const [resent, setResent] = useState(false);
+
+  useEffect(() => {
+    if (resent) {
+      const timeout = setTimeout(() => {
+        setResent(false);
+      }, 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [resent]);
+
   const handleGoBack = () => {
     history.goBack();
   };
@@ -45,7 +56,6 @@ const RequestResetPassword: React.FC<{}> = (props) => {
       ) {
         const url = `${process.env.REACT_APP_BACKEND_URL}/auth/forgot-password`;
         const result = await httpClient.sendRequest(url, "POST", requestBody);
-        console.log(result);
         setEmailSentTo(email);
       } else {
         setError("Please wait a minute before trying again.");
@@ -69,8 +79,8 @@ const RequestResetPassword: React.FC<{}> = (props) => {
       ) {
         const url = `${process.env.REACT_APP_BACKEND_URL}/auth/forgot-password`;
         const result = await httpClient.sendRequest(url, "POST", requestBody);
-        console.log(result);
         setLastPasswordReset(new Date());
+        setResent(true);
       } else {
         setError("Please wait a minute before trying again.");
       }
@@ -111,11 +121,18 @@ const RequestResetPassword: React.FC<{}> = (props) => {
             {error && <div className="text-red-500 text-md pt-4">{error}</div>}
             {emailSentTo ? (
               <React.Fragment>
-                <p className="text-zinc-200 pt-2">
-                  A password reset email has been sent to{" "}
-                  <span className="text-zinc-400">{emailSentTo}</span>
-                </p>
-
+                {resent ? (
+                  <p className="animate-fade text-zinc-200">
+                    An email was successfully resent to{" "}
+                    <span className="text-zinc-400">{emailSentTo}</span>
+                  </p>
+                ) : (
+                  <p className="animate-fade text-zinc-200">
+                    Click the link sent to{" "}
+                    <span className="text-zinc-400">{emailSentTo}</span> to
+                    verify your email.
+                  </p>
+                )}
                 <LightButton
                   onClick={resendResetPassword}
                   loading={httpClient.isLoading}

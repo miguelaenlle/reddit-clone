@@ -17,6 +17,7 @@ import { useAuth } from "./hooks/auth-hook";
 import { AuthContext } from "./context/auth-context";
 import RequestResetPassword from "./account/pages/ResetPassword/RequestResetPassword";
 import SetNewPassword from "./account/pages/Confirmation/ConfirmEmail";
+import CreateSubreddit from "./subreddit/pages/CreateSubreddit";
 
 function App() {
   const auth = useAuth();
@@ -28,6 +29,7 @@ function App() {
   return (
     <AuthContext.Provider
       value={{
+        username: auth.username,
         isLoggedIn: auth.isLoggedIn,
         userId: auth.userId,
         token: auth.token,
@@ -83,9 +85,11 @@ function App() {
             <Route exact path="/signup">
               <Signup />
             </Route>
-
             <Route exact path="/reset-password">
               <RequestResetPassword />
+            </Route>
+            <Route exact path="/create-sub">
+              <CreateSubreddit />
             </Route>
           </Switch>
         )}

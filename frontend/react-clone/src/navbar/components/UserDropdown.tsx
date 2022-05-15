@@ -12,11 +12,6 @@ import { AuthContext } from "../../context/auth-context";
 const UserDropdown: React.FC<{}> = (props) => {
   const authContext = useContext(AuthContext);
   const history = useHistory();
-
-  useEffect(() => {
-    console.log(authContext?.isLoggedIn);
-  }, [authContext?.isLoggedIn]);
-
   const location = useLocation();
 
   const [selectedOption, setSelectedOption] = useState("user");
@@ -69,7 +64,7 @@ const UserDropdown: React.FC<{}> = (props) => {
     <React.Fragment>
       {authContext?.isLoggedIn ? (
         <DropdownForUser
-          username={"nexus"}
+          username={authContext.username}
           optionIds={optionIds}
           optionValues={userOptionValues}
           optionIcons={userOptionIcons}

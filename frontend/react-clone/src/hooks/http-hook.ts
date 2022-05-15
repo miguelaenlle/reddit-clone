@@ -8,27 +8,61 @@ export const useHttpClient = () => {
   const [error, setError] = useState<string | null>(null);
   const activeHttpRequests = useRef<any[]>([]);
 
+  const sendFormDataRequest = useCallback(
+    async (
+      url: string,
+      method: string,
+      formData: FormData,
+      authToken: string
+    ) => {
+      const httpAbortController = new AbortController();
+      activeHttpRequests.current.push(httpAbortController);
+      let headers: { [key: string]: string } = {
+        Authorization: "Bearer " + authToken,
+      };
+      try {
+        setIsLoading(true);
+        const response = await fetch(url, {
+          method,
+          headers,
+          body: formData,
+          signal: httpAbortController.signal,
+        });
+        const responseData = await response.json();
+        activeHttpRequests.current = activeHttpRequests.current.filter(
+          (reqCtrl) => reqCtrl !== httpAbortController
+        );
+        if (!response.ok) {
+          throw new Error(responseData.message);
+        }
+        setIsLoading(false);
+        return responseData;
+      } catch (error) {
+        setIsLoading(false);
+        throw error;
+      }
+    },
+    []
+  );
+
   const sendRequest = useCallback(
     async (
       url: string,
       method: string,
       body?: { [key: string]: any },
-      authToken?: string
+      authToken?: string | null
     ) => {
       setIsLoading(true);
       const httpAbortController = new AbortController();
       activeHttpRequests.current.push(httpAbortController);
-
-      let headers: { [key: string]: string } = {
-        "Content-Type": "application/json",
-      };
+      let headers: { [key: string]: string } = {};
+      headers["Content-Type"] = "application/json";
       if (authToken) {
         headers["Authorization"] = `Bearer ${authToken}`;
       }
 
       try {
         setIsLoading(true);
-        console.log(JSON.stringify(body));
         const response = await fetch(url, {
           method,
           headers: headers,
@@ -63,6 +97,7 @@ export const useHttpClient = () => {
             return new Subreddit(
               subredditData.name,
               subredditData._id,
+              subredditData.sub_owner,
               subredditData.num_members,
               subredditData.description
             );
@@ -126,6 +161,7 @@ export const useHttpClient = () => {
             return new Subreddit(
               result.name,
               result.id,
+              result.sub_owner,
               result.num_members,
               result.description
             );
@@ -152,6 +188,7 @@ export const useHttpClient = () => {
             return new Subreddit(
               result.name,
               result.id,
+              result.sub_owner,
               result.num_members,
               result.description
             );
@@ -211,6 +248,7 @@ export const useHttpClient = () => {
     isLoading,
     error,
     sendRequest,
+    sendFormDataRequest,
     clearError,
     fetchPosts,
     fetchSubreddits,

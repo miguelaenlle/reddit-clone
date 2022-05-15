@@ -1,13 +1,14 @@
 import { ArrowRightIcon } from "@heroicons/react/outline";
 import { useFormik } from "formik";
-import { useContext, useState } from "react";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { AuthContext } from "../../context/auth-context";
 import { useHttpClient } from "../../hooks/http-hook";
 import LightButton from "../../shared/components/LightButton";
 import Modal from "../../shared/components/Modal";
 import TextField from "../../shared/components/TextField";
 import { imageCSS } from "../../shared/constants/image-class";
-import { AuthContext } from "../../context/auth-context";
+import EmailVerification from "../components/EmailVerification";
 
 const validate = (values: { [key: string]: string }) => {
   const errors: { [key: string]: string } = {};
@@ -27,6 +28,8 @@ const validate = (values: { [key: string]: string }) => {
   return errors;
 };
 
+const INVALID_EMAIL_ERROR_MESSAGE = "Please validate your email.";
+
 const Login: React.FC<{}> = (props) => {
   const authContext = useContext(AuthContext);
   const location = useLocation();
@@ -34,6 +37,12 @@ const Login: React.FC<{}> = (props) => {
   const httpClient = useHttpClient();
 
   const [displayedError, setDisplayedError] = useState<string | null>(null);
+
+  const updateDisplayedError = (error: string | null) => {
+    setDisplayedError(error);
+  };
+
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -64,15 +73,20 @@ const Login: React.FC<{}> = (props) => {
         "POST",
         requestBody
       );
-      // store user data in context
+      // check if the user is not verified
+
       authContext?.login(
-        signinResponse.userId,
+        signinResponse.username,
+        signinResponse.id,
         signinResponse.token,
         null
-      )
+      );
       history.push("/home");
     } catch (error: any) {
       if (error) {
+        if (error.message === INVALID_EMAIL_ERROR_MESSAGE) {
+          setEmailSentTo(requestBody.email);
+        }
         setDisplayedError(error.message);
       }
     }
@@ -97,6 +111,11 @@ const Login: React.FC<{}> = (props) => {
         background: background,
       },
     });
+  };
+
+  const handleEndConfirm = () => {
+    setDisplayedError(null);
+    setEmailSentTo(null);
   };
 
   return (
@@ -132,13 +151,27 @@ const Login: React.FC<{}> = (props) => {
             {displayedError && (
               <p className="text-red-500 text-md">{displayedError}</p>
             )}
-
-            <LightButton
-              submit={true}
-              loading={httpClient.isLoading}
-              buttonImage={<ArrowRightIcon className={imageCSS} />}
-              buttonText="Log in"
-            />
+            {emailSentTo ? (
+              <React.Fragment>
+                <EmailVerification
+                  emailSentTo={emailSentTo}
+                  updateDisplayedError={updateDisplayedError}
+                />
+                <p
+                  onClick={handleEndConfirm}
+                  className="group hover:text-white text-zinc-400 hover:cursor-pointer"
+                >
+                  Cancel
+                </p>
+              </React.Fragment>
+            ) : (
+              <LightButton
+                submit={true}
+                loading={httpClient.isLoading}
+                buttonImage={<ArrowRightIcon className={imageCSS} />}
+                buttonText="Log in"
+              />
+            )}
             <br />
 
             <br />
@@ -160,4 +193,4 @@ const Login: React.FC<{}> = (props) => {
     </Modal>
   );
 };
-export default Login;
+export default Login; //

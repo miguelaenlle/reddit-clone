@@ -72,10 +72,8 @@ const ResetPassword: React.FC<{}> = (props) => {
         "POST",
         requestBody
       );
-      console.log(responseData.ok);
       setIsLoading(false);
       setVerified(true);
-      console.log(responseData);
     } catch (error: any) {
       if (error.message) {
         handleError(error.message);

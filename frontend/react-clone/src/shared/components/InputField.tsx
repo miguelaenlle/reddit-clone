@@ -11,7 +11,7 @@ const InputField: React.FC<{
     return (
       <div>
         <textarea
-          className={`w-full px-3 py-1.5 bg-zinc-700 border ${(props.error && props.touched) ? "border-red-500" : "border-zinc-600"}`}
+          className={`w-full px-3 py-1.5 bg-zinc-700 text-zinc-200 border ${(props.error && props.touched) ? "border-red-500" : "border-zinc-600"}`}
           placeholder={props.placeholder}
           id={props.name}
           name={props.name}

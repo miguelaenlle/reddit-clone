@@ -34,11 +34,8 @@ const ConfirmEmail: React.FC<{}> = (props) => {
       };
 
       const response = await httpClient.sendRequest(url, "POST", requestBody);
-      if (response.ok) {
-        setVerified(true);
-      } else {
-        handleError(response.error);
-      }
+      setIsLoading(false);
+      setVerified(true);
     } catch (error: any) {
       if (error.message as string) {
         handleError(error.message);
