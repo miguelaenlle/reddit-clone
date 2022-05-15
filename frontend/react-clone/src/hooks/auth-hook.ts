@@ -20,7 +20,6 @@ export const useAuth = () => {
     ) => {
       setIsLoggedIn(true);
       setUserId(uid);
-      console.log("user id", uid);
       setToken(token);
       setUsername(username);
       const tokenExpirationDate =
@@ -54,7 +53,6 @@ export const useAuth = () => {
     const userData = localStorage.getItem("userData");
     if (userData) {
       const parsedUserData = JSON.parse(userData);
-      console.log(parsedUserData);
       const expirationDate = new Date(parsedUserData.expiration);
       if (expirationDate > new Date()) {
         login(

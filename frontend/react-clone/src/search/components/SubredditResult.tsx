@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import LightButton from "../../shared/components/LightButton";
 
@@ -7,6 +8,10 @@ const SubredditResult: React.FC<{
   members: number;
   description: string;
 }> = (props) => {
+  const [isMember, setIsMember] = useState(false);
+  const handleClickSubreddit = () => {
+    
+  }
   return (
     <div className="animate-fade flex p-5 bg-zinc-800 border border-zinc-700 items-center">
       <div>
@@ -22,7 +27,7 @@ const SubredditResult: React.FC<{
           <h2 className="text-zinc-400"> •</h2>
           <h2 className="text-zinc-400 text-md">{`${props.members} members`}</h2>
           <div className="pl-2">
-            <LightButton buttonText={"Join Subreddit"} />
+            <LightButton buttonText={isMember ? "Leave Subreddit" : "Join Subreddit"} />
           </div>
         </div>
         <h2 className="text-zinc-400 text-sm">{props.description}</h2>

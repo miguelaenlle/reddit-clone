@@ -100,13 +100,11 @@ const CreateSubreddit: React.FC = (props) => {
           {subName: formik.values.name, description: formik.values.description},
           token
         );
-        console.log(responseData);
         if (responseData.error) {
           updateError(responseData.error);
         } else {
           const subredditID = responseData.data.sub_id;
           const url = `/sub/${subredditID}`;
-          console.log("url", url);
           history.push(url);
         }
       } else {
