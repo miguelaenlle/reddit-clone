@@ -1,12 +1,31 @@
 import { UserGroupIcon } from "@heroicons/react/outline";
-import { useHistory } from "react-router-dom";
+import { useContext } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { AuthContext } from "../../context/auth-context";
 import Button from "../../shared/components/Button";
 
 const NewCommunityButton: React.FC<{}> = (props) => {
+  const authContext = useContext(AuthContext);
+  const location = useLocation();
   const history = useHistory();
   const handleClick = () => {
-    history.push("/create-sub");
+    if (authContext?.isLoggedIn) {
+      history.push({
+        pathname: "/create-sub",
+        state: {
+          background: location,
+        },
+      });
+    } else {
+      history.push({
+        pathname: "/signup",
+        state: {
+          background: location,
+        },
+      });
+    }
   };
+
   return (
     <Button
       onClick={handleClick}

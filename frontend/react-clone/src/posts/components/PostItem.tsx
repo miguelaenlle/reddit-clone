@@ -99,7 +99,10 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
                   <ButtonNoBorder
                     buttonImage={<ReplyIcon className={imageCSS} />}
                     buttonText={"Reply"}
-                  />=
+                    handleClick={() => {
+                      
+                    }}
+                  />
                 </div>
                 {props.comment.comment_ids && (
                   <React.Fragment>

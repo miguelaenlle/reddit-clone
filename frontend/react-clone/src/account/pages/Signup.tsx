@@ -9,6 +9,7 @@ import { Link, useHistory, useLocation } from "react-router-dom";
 
 import { imageCSS } from "../../shared/constants/image-class";
 import { useHttpClient } from "../../hooks/http-hook";
+import EmailVerification from "../components/EmailVerification";
 
 const validate = (values: { [key: string]: string }) => {
   const errors: { [key: string]: string } = {};
@@ -49,17 +50,11 @@ const Signup: React.FC<{}> = (props) => {
 
   const httpClient = useHttpClient();
   const [displayedError, setDisplayedError] = useState<string | null>(null);
-  const [resent, setResent] = useState(false);
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (resent) {
-      const timeout = setTimeout(() => {
-        setResent(false);
-      }, 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [resent]);
+  const updateDisplayedError = (error: string | null) => {
+    setDisplayedError(error);
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -102,36 +97,6 @@ const Signup: React.FC<{}> = (props) => {
       }
     }
 
-    console.log(formik.values);
-  };
-
-  const [lastResend, setLastResend] = useState<Date | null>(null);
-
-  const resendVerificationEmail = async () => {
-    const url = `${process.env.REACT_APP_BACKEND_URL}/auth/resend-email`;
-    const requestBody = {
-      email: emailSentTo,
-    };
-
-    try {
-      if (!lastResend || lastResend < new Date(Date.now() - 60 * 1000)) {
-        setLastResend(new Date());
-        const resendResult = await httpClient.sendRequest(
-          url,
-          "POST",
-          requestBody
-        );
-        setResent(true);
-        console.log(resendResult);
-      } else {
-        setDisplayedError("Please wait a minute before resending your email.");
-      }
-    } catch (error: any) {
-      const errorMessage = error.message;
-      if (errorMessage) {
-        setDisplayedError(errorMessage);
-      }
-    }
   };
 
   const state: any = location.state;
@@ -145,11 +110,16 @@ const Signup: React.FC<{}> = (props) => {
       },
     });
   };
+  const handleEndConfirm = () => {
+    setDisplayedError(null);
+    setEmailSentTo(null);
+  };
 
   return (
     <Modal>
       <div className="mt-20 p-5 mx-auto max-w-4xl w/80 bg-zinc-800 border border-zinc-700 text-white">
         <h1 className="text-2xl text-white">Create Account</h1>
+        <p className="text-lg text-zinc-400">To post or create subreddits on redddit, create an account first!</p>
         <div className="mt-5 relative">
           <form className="space-y-2" onSubmit={formik.handleSubmit}>
             <TextField
@@ -188,30 +158,19 @@ const Signup: React.FC<{}> = (props) => {
               {displayedError && (
                 <div className="text-red-500 text-md">{displayedError}</div>
               )}
+
               {emailSentTo ? (
                 <React.Fragment>
-                  {resent ? (
-                    <p className="animate-fade text-zinc-200">
-                      An email was successfully resent to{" "}
-                      <span className="text-zinc-400">{emailSentTo}</span>
-                    </p>
-                  ) : (
-                    <p className="animate-fade text-zinc-200">
-                      Click the link sent to{" "}
-                      <span className="text-zinc-400">{emailSentTo}</span> to
-                      verify your email.
-                    </p>
-                  )}
-
-                  <LightButton
-                    loading={httpClient.isLoading}
-                    buttonImage={<RefreshIcon className={imageCSS} />}
-                    onClick={() => {
-                      console.log("resend email");
-                      resendVerificationEmail();
-                    }}
-                    buttonText="Resend Email"
+                  <EmailVerification
+                    emailSentTo={emailSentTo}
+                    updateDisplayedError={updateDisplayedError}
                   />
+                  <p
+                    onClick={handleEndConfirm}
+                    className="group hover:text-white text-zinc-400 hover:cursor-pointer"
+                  >
+                    Cancel
+                  </p>
                 </React.Fragment>
               ) : (
                 <LightButton

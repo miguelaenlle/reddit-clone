@@ -3,7 +3,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/outline";
 import DropdownOption from "./DropdownOption";
 
 const DropdownForUser: React.FC<{
-  username: string;
+  username: string | null;
   optionIds: string[];
   optionValues: { [key: string]: string };
   optionIcons: { [key: string]: React.ReactElement };
@@ -54,7 +54,7 @@ const DropdownForUser: React.FC<{
       >
         {props.optionIcons[props.selectedOption]}
         <p className="grow text-zinc-400 group-hover:text-white pr-10 transition-colors">
-          {`u/${props.username}`}
+          {props.username ? `u/${props.username}` : "My Account"}
         </p>
         <ChevronUpIcon
           className={`text-zinc-400 h-4 group-hover:text-white transition-colors ${
