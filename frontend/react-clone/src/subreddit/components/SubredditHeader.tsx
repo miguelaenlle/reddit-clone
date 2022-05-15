@@ -11,6 +11,7 @@ import { CheckIcon } from "@heroicons/react/outline";
 import { imageCSS } from "../../shared/constants/image-class";
 import ButtonNoBorder from "../../shared/components/ButtonNoBorder";
 import { AuthContext } from "../../context/auth-context";
+import { useSubredditMembership } from "../hooks/use-subreddit-membership";
 
 const MIN_DESCRIPTION_CHARACTERS = 10;
 const MAX_DESCRIPTION_CHARACTERS = 300;
@@ -19,6 +20,7 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
   const authContext = useContext(AuthContext);
   const httpClient = useHttpClient();
   const location = useLocation();
+  const subMembership = useSubredditMembership();
 
   const [editingDescription, setEditingDescription] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +32,20 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
     string | undefined
   >();
 
+  const [isSubredditMember, setIsSubredditMember] = useState(false);
+
+  useEffect(() => {
+    const isMember = subMembership.checkMembershipStatus(props.subId);
+    if (isMember) {
+      setIsSubredditMember(true);
+    } else {
+      setIsSubredditMember(false);
+    }
+  }, [subMembership.subreddits]);
+
   useEffect(() => {
     const userId = authContext?.userId;
     const subId = subreddit?.subOwnerId;
-    console.log("user id", userId, "subId", subId);
     if (userId && subId) {
       if (userId === subId) {
         setEditingEnabled(true);
@@ -44,6 +56,16 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
       setEditingEnabled(false);
     }
   }, [authContext?.userId, subreddit?.subId]);
+
+  useEffect(() => {
+    initializeData();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (newDescriptionError) {
+      setNewDescriptionError(undefined);
+    }
+  }, [newDescription]);
 
   const handleEditDescription = () => {
     if (subreddit) {
@@ -71,7 +93,6 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
       // update the description in the database
       const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits/${subreddit.subId}`;
       const token = authContext?.token;
-      console.log(url, token);
 
       try {
         const result = await httpClient.sendRequest(
@@ -96,7 +117,6 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
           }
         });
         setEditingDescription(false);
-        console.log(result.ok);
       } catch (error) {
         setNewDescriptionError(
           "Failed to update the description, please try again."
@@ -134,16 +154,16 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    initializeData();
-  }, [location.pathname]);
 
-  useEffect(() => {
-    if (newDescriptionError) {
-      setNewDescriptionError(undefined);
+  const handleChangeSubredditState = () => {
+    if (!subMembership.subredditIsLoading) {
+      if (!isSubredditMember) {
+        subMembership.joinSubreddit(props.subId);
+      } else {
+        subMembership.leaveSubreddit(props.subId);
+      }
     }
-  }, [newDescription]);
-
+  };
   return (
     <div>
       <div
@@ -190,9 +210,19 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
                       {subreddit.members}{" "}
                       {subreddit.members === 1 ? "member" : "members"}
                     </h1>
-                    <div className="pl-2">
-                      <LightButton buttonText={"Join Subreddit"} />
-                    </div>
+                    {(authContext?.isLoggedIn ?? false) && (
+                      <div className="pl-2">
+                        <LightButton
+                          onClick={handleChangeSubredditState}
+                          loading={subMembership.subredditIsLoading}
+                          buttonText={
+                            isSubredditMember
+                              ? "Leave Subreddit"
+                              : "Join Subreddit"
+                          }
+                        />
+                      </div>
+                    )}
                   </React.Fragment>
                 </div>
                 {editingDescription ? (
