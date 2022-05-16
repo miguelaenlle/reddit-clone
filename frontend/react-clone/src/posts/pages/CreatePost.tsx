@@ -41,8 +41,6 @@ const CreatePost: React.FC<{}> = (props) => {
   const httpClient = useHttpClient();
   const [selectedOption, setSelectedOption] = useState("");
   const [loadingSubreddit, setLoadingSubreddit] = useState(false);
-  const [storedLocation, setStoredLocation] = useState(location);
-  const handleDismiss = () => {};
 
   const handleSubmit = async (values: { [key: string]: string }) => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/posts`;

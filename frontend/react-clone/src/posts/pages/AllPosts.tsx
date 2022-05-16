@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
+// import { DUMMY_POSTS } from "../../homepage/constants/dummy-posts";
 import FeedItem from "../../shared/components/FeedItem";
 import Dropdown from "../../shared/components/Dropdown";
 import {

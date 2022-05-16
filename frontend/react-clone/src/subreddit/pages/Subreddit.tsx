@@ -26,7 +26,7 @@ const Subreddit: React.FC<{}> = (props) => {
 
   useEffect(() => {
     postClient.updateQuery(location.search);
-  }, [location.search]);
+  }, [location.search, location.pathname]);
 
   return (
     <div className="pt-14 bg-zinc-900 min-h-screen">

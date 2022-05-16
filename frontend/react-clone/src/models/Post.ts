@@ -9,6 +9,7 @@ export class Post {
   postDate: Date | null = null;
   initialUpvotes = 0;
   numComments = 0;
+  isDeleted = false;
   constructor(
     id: string,
     title: string,
@@ -19,7 +20,8 @@ export class Post {
     opId: string,
     postDate: Date,
     initialUpvotes: number,
-    numComments: number
+    numComments: number,
+    isDeleted: boolean
   ) {
     this.id = id;
     this.title = title;
@@ -33,5 +35,6 @@ export class Post {
     this.opId = opId;
     this.initialUpvotes = initialUpvotes;
     this.numComments = numComments;
+    this.isDeleted = isDeleted;
   }
 }
