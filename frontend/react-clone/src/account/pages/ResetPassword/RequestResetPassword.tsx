@@ -1,7 +1,7 @@
 import { ArrowRightIcon, RefreshIcon } from "@heroicons/react/outline";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { useHttpClient } from "../../../hooks/http-hook";
 import LightButton from "../../../shared/components/LightButton";
 import Modal from "../../../shared/components/Modal";
@@ -27,6 +27,7 @@ const RequestResetPassword: React.FC<{}> = (props) => {
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
   const [lastPasswordReset, setLastPasswordReset] = useState<Date | null>(null);
   const [resent, setResent] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     if (resent) {

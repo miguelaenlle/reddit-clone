@@ -86,6 +86,7 @@ const FeedItem: React.FC<{
         >
           {props.post.title}
         </h1>
+        <p className = "text-zinc-400">{props.post.isDeleted ? "[removed]" : ""}</p>
         <p className="z-50 text-l text-zinc-400 py-2">
           <span onClick={openSubreddit} className="hover:underline text-white">
             r/{props.post.subName}

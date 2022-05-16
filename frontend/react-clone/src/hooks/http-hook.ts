@@ -139,7 +139,8 @@ export const useHttpClient = () => {
             post.user_id._id,
             post.post_time,
             post.num_upvotes,
-            post.num_comments
+            post.num_comments,
+            post.deleted
           );
         });
         return formattedPosts;
