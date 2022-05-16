@@ -4,7 +4,7 @@ import NewPostButton from "../../homepage/components/NewPostButton";
 import {
   optionIds,
   sortOptionIcons,
-  sortOptionValues
+  sortOptionValues,
 } from "../../homepage/constants/sort-modes";
 import { usePostsClient } from "../../hooks/post-hook";
 import PostCollection from "../../posts/components/PostCollection";
@@ -41,7 +41,7 @@ const Subreddit: React.FC<{}> = (props) => {
             selectedOption={postClient.selectedOption}
             handleSelectedOption={postClient.handleSelectedOption}
           />
-          <NewPostButton />
+          <NewPostButton initialSubId={params.subId} />
         </div>
 
         <PostCollection

@@ -18,6 +18,7 @@ import { AuthContext } from "./context/auth-context";
 import RequestResetPassword from "./account/pages/ResetPassword/RequestResetPassword";
 import SetNewPassword from "./account/pages/Confirmation/ConfirmEmail";
 import CreateSubreddit from "./subreddit/pages/CreateSubreddit";
+import CreatePost from "./posts/pages/CreatePost";
 
 function App() {
   const auth = useAuth();
@@ -76,6 +77,12 @@ function App() {
 
         {background && (
           <Switch>
+            <Route exact path="/create-post?subId=:subId">
+              <CreatePost />
+            </Route>
+            <Route exact path="/create-post">
+              <CreatePost />
+            </Route>
             <Route exact path="/post/:postId">
               <PostPage />
             </Route>

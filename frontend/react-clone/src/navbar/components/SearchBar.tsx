@@ -5,7 +5,11 @@ import { XIcon } from "@heroicons/react/outline";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Subreddit } from "../../models/Subreddit";
 
-const SearchBar: React.FC<{}> = (props) => {
+const SearchBar: React.FC<{
+  isCompact: boolean;
+  displayedValue?: string;
+  handleSelectResult?: (name: string, subId: string) => void;
+}> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const httpClient = useHttpClient();
   const history = useHistory();
@@ -25,7 +29,7 @@ const SearchBar: React.FC<{}> = (props) => {
         const searchResultsFormatted = await httpClient.fetchSubreddits(
           searchQuery,
           0,
-          7
+          props.isCompact ? 5 : 7
         );
         setResults(searchResultsFormatted);
       }
@@ -52,13 +56,27 @@ const SearchBar: React.FC<{}> = (props) => {
   };
   const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      handleConfirmSearch();
+      if (props.isCompact) {
+        if (props.handleSelectResult && results[0]) {
+          props.handleSelectResult(results[0].subName, results[0].subId);
+          setPopupDisplayed(false);
+        }
+      } else {
+        handleConfirmSearch();
+      }
     }
   };
 
-  const handleChooseItem = (subId: string) => {
-    history.push(`/sub/${subId}`);
-    setPopupDisplayed(false);
+  const handleChooseItem = (name: string, subId: string) => {
+    if (!props.isCompact) {
+      history.push(`/sub/${subId}`);
+      setPopupDisplayed(false);
+    } else {
+      if (props.handleSelectResult) {
+        props.handleSelectResult(name, subId);
+        setPopupDisplayed(false);
+      }
+    }
   };
 
   const handleOpenInput = () => {
@@ -102,7 +120,9 @@ const SearchBar: React.FC<{}> = (props) => {
         <input
           onFocus={handleOpenInput}
           placeholder="Search"
-          className="z-10 relative w-full border border-zinc-700 space-x-2 h-10 rounded-md bg-transparent text-white placeholder-zinc-400 px-3 selected:border-1"
+          className={`z-10 relative w-full border border-zinc-700 space-x-2 h-10 ${
+            props.isCompact ? "" : "rounded-md"
+          } bg-transparent text-white placeholder-zinc-400 px-3 selected:border-1`}
           onBlur={handleCloseInput}
           onChange={handleSearchQuery}
           onKeyDown={handleEnter}
@@ -110,6 +130,7 @@ const SearchBar: React.FC<{}> = (props) => {
       </div>
       {popupDisplayed && searchQuery.length > 0 && (
         <SearchPopup
+          isCompact={props.isCompact}
           loading={isLoading}
           query={searchQuery}
           results={results}
