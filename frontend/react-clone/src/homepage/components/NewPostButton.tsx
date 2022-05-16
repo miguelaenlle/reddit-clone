@@ -1,11 +1,34 @@
 import Button from "../../shared/components/Button";
 import { ChatAltIcon } from "@heroicons/react/outline";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/auth-context";
 
-const NewPostButton: React.FC<{}> = (props) => {
+const NewPostButton: React.FC<{ initialSubId?: string }> = (props) => {
+  const authContext = useContext(AuthContext);
+  const location = useLocation();
   const history = useHistory();
+
+  
+
+
   const handleClick = () => {
-    history.push("/create-post");
+    if (authContext?.isLoggedIn) {
+      history.push({
+        pathname: `/create-post`,
+        search: props.initialSubId ? "?subId=" + props.initialSubId : undefined,
+        state: {
+          background: location,
+        },
+      });
+    } else {
+      history.push({
+        pathname: "/signup",
+        state: {
+          background: location,
+        },
+      });
+    }
   };
   return (
     <Button

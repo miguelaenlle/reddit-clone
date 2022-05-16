@@ -12,7 +12,7 @@ const Navbar: React.FC<{}> = (props) => {
         </h1>
       </Link>
       <HomeDropdown />
-      <SearchBar />
+      <SearchBar isCompact={false} />
       <UserDropdown />
     </div>
   );

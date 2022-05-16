@@ -5,20 +5,23 @@ import SearchLoader from "./SearchLoader";
 import SearchPrompt from "./SearchPrompt";
 
 const SearchPopup: React.FC<{
+  isCompact: boolean;
   loading: boolean;
   query: string;
   results: Subreddit[];
   handleConfirmSearch: () => void;
-  handleChooseItem: (subId: string) => void;
+  handleChooseItem: (name: string, subId: string) => void;
 }> = (props) => {
   return (
     <div>
       <div className="absolute w-full mt-1 py-1 hover:cursor-pointer bg-zinc-800 border border-white rounded-md">
-        <SearchPrompt
-          query={props.query}
-          handleSearch={props.handleConfirmSearch}
-        />
-        {(props.loading || props.results.length === 0) ? (
+        {!props.isCompact && (
+          <SearchPrompt
+            query={props.query}
+            handleSearch={props.handleConfirmSearch}
+          />
+        )}
+        {props.loading || props.results.length === 0 ? (
           <SearchLoader />
         ) : (
           props.results.map((result) => {
@@ -28,7 +31,9 @@ const SearchPopup: React.FC<{
                 subName={result.subName}
                 subId={result.subId}
                 members={result.members}
-                handleClick={props.handleChooseItem}
+                handleClick={() => {
+                  props.handleChooseItem(result.subName, result.subId);
+                }}
               />
             );
           })
