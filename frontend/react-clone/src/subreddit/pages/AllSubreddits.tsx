@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/auth-context";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Subreddit } from "../../models/Subreddit";
+import UserSubreddits from "../../user/components/UserSubreddits";
 import SubredditsList from "../components/SubredditsList";
 
 const NUM_RESULTS_PER_PAGE = 25;
 
 const AllSubreddits: React.FC<{}> = (props) => {
+  const authContext = useContext(AuthContext);
   const [subreddits, setSubreddits] = useState<Subreddit[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
@@ -53,9 +56,12 @@ const AllSubreddits: React.FC<{}> = (props) => {
     <div className="pt-14 bg-zinc-900 min-h-screen">
       <div className="p-5">
         <div className="pt-10 z-0 animate-fade relative">
-          <div className="space-y-5 animate-fade mb-20">
-            <h1 className="text-white text-xl">My Subreddits</h1>
-          </div>
+          {authContext?.userId && (
+            <div className="space-y-5 animate-fade mb-20">
+              <h1 className="text-white text-x l">My Subreddits</h1>
+              <UserSubreddits userId={authContext?.userId} />
+            </div>
+          )}
           <div className="space-y-5 animate-fade">
             <h1 className="text-white text-xl ">All Subreddits</h1>
             <SubredditsList
