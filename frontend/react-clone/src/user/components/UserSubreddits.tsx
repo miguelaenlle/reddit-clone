@@ -3,8 +3,10 @@ import { useHttpClient } from "../../hooks/http-hook";
 import { Subreddit } from "../../models/Subreddit";
 import SubredditResult from "../../search/components/SubredditResult";
 import SubredditResultLoader from "../../search/components/SubredditResultLoader";
+import { useSubredditMembership } from "../../subreddit/hooks/use-subreddit-membership";
 
 const UserSubreddits: React.FC<{ userId: string }> = (props) => {
+  const subMembership = useSubredditMembership();
   const httpClient = useHttpClient();
   const [userSubreddits, setUserSubreddits] = useState<Subreddit[]>([]);
   const initializeUserSubreddits = async () => {
@@ -29,6 +31,10 @@ const UserSubreddits: React.FC<{ userId: string }> = (props) => {
             subId={result.subId}
             members={result.members}
             description={result.description}
+            isMember={subMembership.subreddits.includes(result.subId)}
+            subredditLoading={subMembership.subredditsLoading.includes(result.subId)}
+            joinSubreddit={() => subMembership.joinSubreddit(result.subId)}
+            leaveSubreddit={() => subMembership.leaveSubreddit(result.subId)}
           />
         );
       })}

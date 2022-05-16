@@ -7,9 +7,19 @@ export const useSubredditMembership = () => {
   const authContext = useContext(AuthContext);
   const [subreddits, setSubreddits] = useState<string[]>([]);
   const [subredditIsLoading, setSubredditIsLoading] = useState(false);
+  const [subredditsLoading, setSubredditsLoading] = useState<string[]>([]);
   useEffect(() => {
     initializeMemberships();
   }, [authContext?.userId]);
+
+  const addSubredditToLoading = (subId: string) => {
+    setSubredditsLoading((prev) => [...prev, subId]);
+  };
+
+  const removeSubredditFromLoading = (subId: string) => {
+    setSubredditsLoading((prev) => prev.filter((id) => id !== subId));
+  };
+
   const initializeMemberships = async () => {
     // get the user id
     if (authContext?.userId) {
@@ -39,12 +49,14 @@ export const useSubredditMembership = () => {
         process.env.REACT_APP_BACKEND_URL
       }/subreddits/${subredditId}/${isJoin ? "join" : "leave"}`;
       try {
+        addSubredditToLoading(subredditId);
         const response = await httpClient.sendRequest(
           url,
           "POST",
           {},
           authContext?.token
         );
+        console.log(response);
         if (isJoin) {
           setSubreddits((prevSubreddits) => [...prevSubreddits, subredditId]);
         } else {
@@ -53,8 +65,10 @@ export const useSubredditMembership = () => {
           );
         }
         setSubredditIsLoading(false);
+        removeSubredditFromLoading(subredditId);
       } catch (error) {
         setSubredditIsLoading(false);
+        removeSubredditFromLoading(subredditId);
       }
     },
     [subreddits]
@@ -73,6 +87,7 @@ export const useSubredditMembership = () => {
   );
   return {
     subredditIsLoading,
+    subredditsLoading,
     subreddits,
     initializeMemberships,
     checkMembershipStatus,

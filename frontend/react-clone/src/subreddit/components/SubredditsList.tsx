@@ -1,6 +1,7 @@
 import { Subreddit } from "../../models/Subreddit";
 import SubredditResult from "../../search/components/SubredditResult";
 import SubredditResultLoader from "../../search/components/SubredditResultLoader";
+import { useSubredditMembership } from "../hooks/use-subreddit-membership";
 
 const SubredditsList: React.FC<{
   subreddits: Subreddit[];
@@ -9,6 +10,7 @@ const SubredditsList: React.FC<{
   resultsPerPage: number;
   expandSubreddits: () => void;
 }> = (props) => {
+  const subMembership = useSubredditMembership();
   return (
     <div className="space-y-3">
       {props.subreddits.map((result) => {
@@ -19,6 +21,12 @@ const SubredditsList: React.FC<{
             subId={result.subId}
             members={result.members}
             description={result.description}
+            isMember={subMembership.subreddits.includes(result.subId)}
+            subredditLoading={subMembership.subredditsLoading.includes(
+              result.subId
+            )}
+            joinSubreddit={() => subMembership.joinSubreddit(result.subId)}
+            leaveSubreddit={() => subMembership.leaveSubreddit(result.subId)}
           />
         );
       })}
