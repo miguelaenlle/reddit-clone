@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { NodeBuilderFlags } from "typescript";
 import { AuthContext } from "../../context/auth-context";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
@@ -14,6 +15,7 @@ export const useEditPost = (post: Post) => {
 
   const [title, setTitle] = useState(post.title);
   const [description, setDescription] = useState(post.text);
+  const [error, setError] = useState<string | undefined>();
 
   useEffect(() => {
     const userId = authContext?.userId;
@@ -33,15 +35,36 @@ export const useEditPost = (post: Post) => {
   };
 
   const handleUpdateTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(undefined);
     setNewTitle(e.target.value);
   };
   const handleUpdateDescription = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
+    setError(undefined);
     setNewDescription(e.target.value);
   };
 
+  const validateInputs = () => {
+    if (newTitle.length === 0 || newDescription.length > 40) {
+      return false;
+    } else if (description.length > 300) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const handleSubmit = async () => {
+    setError(undefined);
+    const inputsValid = validateInputs();
+    console.log(inputsValid);
+    if (!inputsValid) {
+      console.log("Inputs are invalid.");
+      setError("Title must be 1-40 characters & description must be 0-300");
+      return;
+    }
+
     const url = `${process.env.REACT_APP_BACKEND_URL}/posts/${post.id}`;
     setIsLoading(true);
 
@@ -62,13 +85,16 @@ export const useEditPost = (post: Post) => {
       setIsEditing(false);
 
       console.log(response);
-    } catch {}
+    } catch {
+      setError("An error occured, please try again.");
+    }
     setIsLoading(false);
   };
 
   // need visual validation too pls
 
   return {
+    error,
     editor,
     isLoading,
     isEditing,
