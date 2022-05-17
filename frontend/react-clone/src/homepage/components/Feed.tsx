@@ -27,6 +27,7 @@ const Feed: React.FC<{}> = (props) => {
     const url = `${
       process.env.REACT_APP_BACKEND_URL
     }/feed?sortMode=${selectedOption}&page=${0}&numResults=${10}`;
+    console.log(url);
     const data = await httpClient.sendRequest(url, "GET");
     const formattedPosts = data.posts.map(
       (post: { [key: string]: any }) =>

@@ -58,6 +58,8 @@ export const usePostsClient = (
       return null;
     }
 
+    console.log("Current query", query)
+
     const formattedPosts: Post[] | null = await httpClient.fetchPosts(
       pageNumber,
       selectedOption,

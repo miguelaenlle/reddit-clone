@@ -31,7 +31,9 @@ const SearchBar: React.FC<{
           0,
           props.isCompact ? 5 : 7
         );
-        setResults(searchResultsFormatted);
+        if (searchResultsFormatted) {
+          setResults(searchResultsFormatted);
+        }
       }
     } catch (error) {}
   };

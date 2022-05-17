@@ -91,6 +91,7 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
                 </p>
                 <div className="flex space-x-4">
                   <VoteItem
+                    isLoading={false}
                     voteDirection={voteDirection}
                     numUpvotes={commentData.upvotes}
                     handleUpvote={handleUpvote}
