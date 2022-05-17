@@ -64,6 +64,16 @@ const PrimaryContent: React.FC<{
             onChange={editsHandler.handleUpdateTitle}
             value={editsHandler.newTitle}
           />
+          <p
+            className={`pt-3 ${
+              editsHandler.newTitle.length > 0 &&
+              editsHandler.newTitle.length < 40
+                ? "text-zinc-400"
+                : `text-red-500`
+            }`}
+          >
+            {editsHandler.newTitle.length}/40
+          </p>
         </div>
       ) : (
         <h1 className="mt-1.5 text-3xl text-white">{editsHandler.title}</h1>
@@ -83,25 +93,41 @@ const PrimaryContent: React.FC<{
                 onBlur={() => {}}
                 onChange={editsHandler.handleUpdateDescription}
               />
+              <p
+                className={`pt-1 ${
+                  editsHandler.newDescription.length >= 0 &&
+                  editsHandler.newDescription.length < 300
+                    ? "text-zinc-400"
+                    : `text-red-500`
+                }`}
+              >
+                {editsHandler.newDescription.length}/300
+              </p>
             </div>
           ) : (
             <p className="mt-3 text-zinc-200 text-lg">
               {editsHandler.description}
             </p>
           )}
+
+          {editsHandler.isEditing && editsHandler.error && (
+            <p className="pt-5 text-red-500 text-lg">{editsHandler.error}</p>
+          )}
           <div className="mt-14 space-x-2 flex">
-            <VoteItem
-              isLoading={votesHandler.isLoading}
-              voteDirection={votesHandler.voteDirection}
-              numUpvotes={votesHandler.upvotes}
-              handleUpvote={votesHandler.handleUpvote}
-              handleDownvote={votesHandler.handleDownvote}
-            />
             {!editsHandler.isEditing && (
-              <LightButton
-                buttonImage={<ReplyIcon className={imageCSS} />}
-                buttonText="Reply"
-              />
+              <React.Fragment>
+                <VoteItem
+                  isLoading={votesHandler.isLoading}
+                  voteDirection={votesHandler.voteDirection}
+                  numUpvotes={votesHandler.upvotes}
+                  handleUpvote={votesHandler.handleUpvote}
+                  handleDownvote={votesHandler.handleDownvote}
+                />
+                <LightButton
+                  buttonImage={<ReplyIcon className={imageCSS} />}
+                  buttonText="Reply"
+                />
+              </React.Fragment>
             )}
             {editsHandler.editor && (
               <React.Fragment>
