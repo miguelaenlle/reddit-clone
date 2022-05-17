@@ -3,15 +3,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import VoteItem from "./VoteItem";
 import { Post } from "../../models/Post";
+import { useVotes } from "../../posts/hooks/use-votes";
 
 const FeedItem: React.FC<{
   post: Post;
 }> = (props) => {
   const location = useLocation();
   const history = useHistory();
-  const [upvotes, setUpvotes] = useState(props.post.initialUpvotes);
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
-  const [voteDirection, setVoteDirection] = useState(0);
+  const votesHandler = useVotes(props.post.id, props.post.initialUpvotes);
 
   const updateTimeAgo = () => {
     try {
@@ -19,39 +19,6 @@ const FeedItem: React.FC<{
         setTimeAgo(moment(props.post.postDate).fromNow());
       }
     } catch {}
-  };
-
-  const handleUpvote = () => {
-    setVoteDirection((previousVote) => {
-      if (previousVote === 1) {
-        setUpvotes((previousVotes) => previousVotes - 1);
-        return 0;
-      } else if (previousVote === 0) {
-        setUpvotes((previousVotes) => previousVotes + 1);
-        return 1;
-      } else if (previousVote === -1) {
-        setUpvotes((previousVotes) => previousVotes + 2);
-        return 1;
-      } else {
-        return previousVote;
-      }
-    });
-  };
-  const handleDownvote = () => {
-    setVoteDirection((previousVote) => {
-      if (previousVote === -1) {
-        setUpvotes((previousVotes) => previousVotes + 1);
-        return 0;
-      } else if (previousVote === 0) {
-        setUpvotes((previousVotes) => previousVotes - 1);
-        return -1;
-      } else if (previousVote === 1) {
-        setUpvotes((previousVotes) => previousVotes - 2);
-        return -1;
-      } else {
-        return previousVote;
-      }
-    });
   };
 
   useEffect(() => {
@@ -86,7 +53,9 @@ const FeedItem: React.FC<{
         >
           {props.post.title}
         </h1>
-        <p className = "text-zinc-400">{props.post.isDeleted ? "[removed]" : ""}</p>
+        <p className="text-zinc-400">
+          {props.post.isDeleted ? "[removed]" : ""}
+        </p>
         <p className="z-50 text-l text-zinc-400 py-2">
           <span onClick={openSubreddit} className="hover:underline text-white">
             r/{props.post.subName}
@@ -100,10 +69,11 @@ const FeedItem: React.FC<{
         </p>
         <div className="flex">
           <VoteItem
-            voteDirection={voteDirection}
-            handleUpvote={handleUpvote}
-            handleDownvote={handleDownvote}
-            numUpvotes={upvotes}
+            isLoading={votesHandler.isLoading}
+            voteDirection={votesHandler.voteDirection}
+            handleUpvote={votesHandler.handleUpvote}
+            handleDownvote={votesHandler.handleDownvote}
+            numUpvotes={votesHandler.upvotes}
           />
           <div className="flex-grow"></div>
           <p className="text-zinc-400">{props.post.numComments} comments</p>

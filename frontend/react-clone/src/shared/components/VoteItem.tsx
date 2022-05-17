@@ -1,27 +1,38 @@
 import { ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/outline";
+import LoadingSpinner from "./LoadingSpinner";
 
 const VoteItem: React.FC<{
+  isLoading: boolean;
   voteDirection: number;
   numUpvotes: number;
   handleUpvote: () => void;
   handleDownvote: () => void;
 }> = (props) => {
+  const hoverClass = `hover:${!props.isLoading ? "cursor-pointer" : "cursor-default"}`
   return (
     <div className="flex space-x-2 items-center">
-      <div onClick={props.handleUpvote} className="hover:cursor-pointer">
+      <div onClick={props.handleUpvote} className={hoverClass}>
         <ArrowUpIcon
           className={`h-4 ${
-            props.voteDirection === 1 ? "text-white" : "text-zinc-400"
+            props.voteDirection === 1 && !props.isLoading
+              ? "text-white"
+              : "text-zinc-400"
           } hover:text-white font-bold transition-colors`}
         />
       </div>
-      <p className="text-zinc-400 hover:cursor-default transition-all">
-        {props.numUpvotes}
-      </p>
-      <div onClick={props.handleDownvote} className="hover:cursor-pointer">
+      {!props.isLoading ? (
+        <p className="text-zinc-400 hover:cursor-default transition-all">
+          {props.numUpvotes}
+        </p>
+      ) : (
+        <LoadingSpinner />
+      )}
+      <div onClick={props.handleDownvote} className={hoverClass}>
         <ArrowDownIcon
           className={`h-4 ${
-            props.voteDirection === -1 ? "text-white" : "text-zinc-400"
+            props.voteDirection === -1 && !props.isLoading
+              ? "text-white"
+              : "text-zinc-400"
           } hover:text-white font-bold transition-colors`}
         />
       </div>
