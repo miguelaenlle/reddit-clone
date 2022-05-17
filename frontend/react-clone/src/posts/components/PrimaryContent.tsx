@@ -20,6 +20,7 @@ import { useVotes } from "../hooks/use-votes";
 import { useEditPost } from "../hooks/use-edits";
 import DeleteConfirmationButton from "./DeleteConfirmationButton";
 import { useComments } from "../hooks/use-comment";
+import CommentField from "./CommentField";
 
 const PrimaryContent: React.FC<{
   post: Post;
@@ -27,7 +28,7 @@ const PrimaryContent: React.FC<{
 }> = (props) => {
   const editsHandler = useEditPost(props.post);
   const votesHandler = useVotes(props.post.id, props.post.initialUpvotes);
-  const commentsHandler = useComments(props.post.id, props.addComment);
+  const commentsHandler = useComments(true, props.post.id, props.addComment);
 
   const history = useHistory();
 
@@ -171,36 +172,15 @@ const PrimaryContent: React.FC<{
         </React.Fragment>
       )}
       {commentsHandler.replying && (
-        <div className="pt-5">
-          <InputField
-            name={""}
-            placeholder={"Comment"}
-            touched={undefined}
-            error={undefined}
-            value={commentsHandler.reply}
-            onBlur={() => {}}
-            onChange={commentsHandler.handleReplyChange}
-          />
-          {commentsHandler.error && (
-            <p className="text-red-500">{commentsHandler.error}</p>
-          )}
-          <div className="flex items-center space-x-2 pt-2">
-            <div className="flex-grow"></div>
-
-            <LightButton
-              loading={commentsHandler.isLoading}
-              onClick={commentsHandler.handleSubmitCommentToPost}
-              buttonImage={<AnnotationIcon className={imageCSS} />}
-              buttonText="Comment"
-            />
-
-            <LightButton
-              onClick={commentsHandler.handleCloseReply}
-              buttonImage={<XIcon className={imageCSS} />}
-              buttonText="Cancel"
-            />
-          </div>
-        </div>
+        <CommentField
+          isLoading={commentsHandler.isLoading}
+          replyText={commentsHandler.reply}
+          handleReplyChange={commentsHandler.handleReplyChange}
+          handleSubmitCommentToPost={commentsHandler.handleSubmitCommentToPost}
+          handleCloseReply={commentsHandler.handleCloseReply}
+          error={commentsHandler.error}
+          commentOnComment={false}
+        />
       )}
     </div>
   );

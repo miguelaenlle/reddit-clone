@@ -4,7 +4,8 @@ import { AuthContext } from "../../context/auth-context";
 import { useHttpClient } from "../../hooks/http-hook";
 
 export const useComments = (
-  postId: string,
+  parentIsPost: boolean,
+  parentId: string,
   addComment: (comment: { [key: string]: any }) => void
 ) => {
   const authContext = useContext(AuthContext);
@@ -41,11 +42,23 @@ export const useComments = (
 
   const handleSubmitCommentToPost = async () => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/comments/`;
-    const body = {
-      parentPostId: postId,
-      parentIsPost: true,
-      text: reply,
-    };
+    let body = {}
+    if (parentIsPost) {
+      body = {
+        parentPostId: parentId,
+        parentIsPost: parentIsPost,
+        text: reply,
+      };
+  
+    } else {
+      body = {
+        parentCommentId: parentId,
+        parentIsPost: parentIsPost,
+        text: reply,
+      };
+
+    }
+
 
     const error = checkReplyValidity();
     if (error) {
@@ -55,6 +68,7 @@ export const useComments = (
 
     try {
       setIsLoading(true);
+      console.log(body);
       const responseData = await httpClient.sendRequest(
         url,
         "POST",
@@ -62,6 +76,7 @@ export const useComments = (
         authContext?.token
       );
       console.log(responseData);
+
       addComment(responseData.comment);
       setIsLoading(false);
       setReplying(false);

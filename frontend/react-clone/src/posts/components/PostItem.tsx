@@ -5,13 +5,17 @@ import { imageCSS } from "../../shared/constants/image-class";
 import React, { useEffect, useState } from "react";
 import { Comment } from "../../models/Comment";
 import moment from "moment";
+import CommentField from "./CommentField";
+import { useComments } from "../hooks/use-comment";
 
 const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
   const [voteDirection, setVoteDirection] = useState(0);
   const [upvotes, setUpvotes] = useState<number>(0);
   const [expanded, setExpanded] = useState(true);
   const [commentData, setCommentData] = useState<Comment | null>(null);
-
+  const [comments, setComments] = useState<{ [key: string]: any }[]>(
+    props.comment.comment_ids ? props.comment.comment_ids : []
+  );
   const handleUpvote = () => {
     setVoteDirection((previousVote) => {
       if (previousVote === 1) {
@@ -48,7 +52,7 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
     setExpanded((prevExpanded) => !prevExpanded);
   };
 
-  const initilaizeCommentData = () => {
+  const initializeCommentData = () => {
     try {
       const newComment = new Comment(
         props.comment._id,
@@ -68,8 +72,16 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
     } catch (error) {}
   };
 
+  const handleComment = (comment: { [key: string]: any }) => {
+    try {
+      setComments((prevComments) => [comment, ...prevComments]);
+    } catch {}
+  };
+
+  const commentsHandler = useComments(false, props.comment._id, handleComment);
+
   useEffect(() => {
-    initilaizeCommentData();
+    initializeCommentData();
   }, []);
 
   return (
@@ -97,30 +109,30 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
                     handleUpvote={handleUpvote}
                     handleDownvote={handleDownvote}
                   />
-                  <ButtonNoBorder
-                    buttonImage={<ReplyIcon className={imageCSS} />}
-                    buttonText={"Reply"}
-                    handleClick={() => {
-                      
-                    }}
-                  />
+                  {!commentsHandler.replying && (
+                    <ButtonNoBorder
+                      buttonImage={<ReplyIcon className={imageCSS} />}
+                      buttonText={"Reply"}
+                      handleClick={commentsHandler.handleReply}
+                    />
+                  )}
                 </div>
-                {props.comment.comment_ids && (
+                {comments && (
                   <React.Fragment>
                     {/* <div>{props.comment.comment_ids.length}</div> */}
-                    
-                    {props.comment.comment_ids.sort((comment1: any, comment2: any) => {
-                      return comment1.date < comment2.date ? 1 : -1
-                    }).map(
-                      (commentData: { [key: string]: any }) => {
+
+                    {comments
+                      .sort((comment1: any, comment2: any) => {
+                        return comment1.date < comment2.date ? 1 : -1;
+                      })
+                      .map((commentData: { [key: string]: any }) => {
                         return (
                           <PostItem
                             key={`comment-response-${Math.random().toString()}`}
                             comment={commentData}
                           />
                         );
-                      }
-                    )}
+                      })}
                   </React.Fragment>
                 )}
               </React.Fragment>
@@ -131,9 +143,22 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
             <p
               className={`text-white italic text-sm ${!expanded ? "py-2" : ""}`}
             >
-              This comment failed to load.
+              {"[Comment failed to load]"}
             </p>
           </div>
+        )}
+        {commentsHandler.replying && (
+          <CommentField
+            isLoading={commentsHandler.isLoading}
+            replyText={commentsHandler.reply}
+            handleReplyChange={commentsHandler.handleReplyChange}
+            handleSubmitCommentToPost={
+              commentsHandler.handleSubmitCommentToPost
+            }
+            handleCloseReply={commentsHandler.handleCloseReply}
+            error={commentsHandler.error}
+            commentOnComment={true}
+          />
         )}
       </div>
     </div>
