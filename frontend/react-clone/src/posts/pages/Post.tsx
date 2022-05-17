@@ -38,21 +38,77 @@ const PostPage: React.FC<{}> = (props) => {
     } catch (error) {}
   };
 
+  const [comments, setComments] = useState<{ [key: string]: any }[]>([]);
+  const handleNewComments = (newComments: { [key: string]: any }[]) => {
+    setComments(newComments);
+  };
+
+  const sortComments = (selectedOption: string) => {
+    if (selectedOption === "new") {
+      setComments((previousComments) => {
+        return [...previousComments].sort((a, b) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+      });
+    } else if (selectedOption === "old") {
+      setComments((previousComments) => {
+        return [...previousComments].sort((a, b) => {
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        });
+      });
+    } else if (selectedOption === "top") {
+      setComments((previousComments) => {
+        return [...previousComments].sort((a, b) => {
+          return b.upvotes - a.upvotes;
+        });
+      });
+    } else if (selectedOption === "controversial") {
+      setComments((previousComments) => {
+        return [...previousComments].sort((a, b) => {
+          return a.upvotes - b.upvotes;
+        });
+      });
+    }
+  };
+
+  const [commentsID, setCommentsID] = useState(
+    `comments-${Math.random().toString()}`
+  );
+
+  const addComment = (comment: { [key: string]: any }) => {
+    console.log("Add comment", comment);
+    setComments((previousComments) => {
+      return [comment, ...previousComments];
+    });
+    setCommentsID(`comments-${Math.random().toString()}`);
+  };
+
   useEffect(() => {
     pullPost();
   }, []);
 
   // pull the post information from the API
   return (
-    <Modal >
+    <Modal>
       <div className="z-50 mt-20 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700">
         {httpClient.isLoading ? (
           <p className="text-white">Loading...</p>
         ) : (
-          <div>{post && <PrimaryContent post={post} />}</div>
+          <div>
+            {post && <PrimaryContent post={post} addComment={addComment} />}
+          </div>
         )}
       </div>
-      {post && <Comments post={post} />}
+      {post && (
+        <div key={commentsID}>
+          <Comments
+            post={post}
+            comments={comments}
+            handleNewComments={handleNewComments}
+            sortComments={sortComments}
+          />
+        </div>
+      )}
     </Modal>
   );
 };

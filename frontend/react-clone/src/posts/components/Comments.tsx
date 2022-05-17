@@ -13,40 +13,19 @@ import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
 import { reverse } from "dns";
 import PostItemLoader from "./PostItemLoader";
+import { Comment } from "../../models/Comment";
 
-const Comments: React.FC<{ post: Post }> = (props) => {
+const Comments: React.FC<{
+  post: Post;
+  comments: { [key: string]: any }[];
+  handleNewComments: (newComments: { [key: string]: any }[]) => void;
+  sortComments: (selectedOption: string) => void;
+}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("new");
   const httpClient = useHttpClient();
 
   const [comments, setComments] = useState<{ [key: string]: any }[]>([]);
 
-  const sortComments = (selectedOption: string) => {
-    if (selectedOption === "new") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
-      });
-    } else if (selectedOption === "old") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        });
-      });
-    } else if (selectedOption === "top") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return b.upvotes - a.upvotes;
-        });
-      });
-    } else if (selectedOption === "controversial") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return a.upvotes - b.upvotes;
-        });
-      });
-    }
-  };
 
   const pullComments = async () => {
     try {
@@ -63,8 +42,7 @@ const Comments: React.FC<{ post: Post }> = (props) => {
       );
 
       setComments(sortedComments);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const handleSelectedOption = (newSelectedOption: string) => {
@@ -76,7 +54,7 @@ const Comments: React.FC<{ post: Post }> = (props) => {
   }, []);
 
   useEffect(() => {
-    sortComments(selectedOption);
+    props.sortComments(selectedOption);
   }, [selectedOption]);
 
   return (
