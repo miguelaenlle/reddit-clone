@@ -40,7 +40,6 @@ const DeleteConfirmationButton: React.FC<{
         {},
         authContext?.token
       );
-      console.log(response);
       // refresh the page and go back to the last page
       if (props.isPost) {
         window.location.reload();

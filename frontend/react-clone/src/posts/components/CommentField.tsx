@@ -24,7 +24,7 @@ const CommentField: React.FC<{
         onChange={props.handleReplyChange}
       />
       {props.error && <p className="text-red-500">{props.error}</p>}
-      <div className="flex items-center space-x-2 pt-2">
+      <div className="flex items-center space-x-2 pt-1.5">
         {!props.commentOnComment && <div className="flex-grow"></div>}
 
         <LightButton

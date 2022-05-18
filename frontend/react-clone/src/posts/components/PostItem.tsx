@@ -1,13 +1,14 @@
 import VoteItem from "../../shared/components/VoteItem";
 import ButtonNoBorder from "../../shared/components/ButtonNoBorder";
 import {
+  CheckIcon,
   PencilIcon,
   ReplyIcon,
   TrashIcon,
   XIcon,
 } from "@heroicons/react/outline";
 import { imageCSS } from "../../shared/constants/image-class";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Comment } from "../../models/Comment";
 import moment from "moment";
 import CommentField from "./CommentField";
@@ -15,25 +16,41 @@ import { useComments } from "../hooks/use-comment";
 import SubComments from "./SubComments";
 import { AuthContext } from "../../context/auth-context";
 import DeleteConfirmationButton from "./DeleteConfirmationButton";
+import { useVotes } from "../hooks/use-votes";
+import { useEditPost } from "../hooks/use-edits";
+import LightButton from "../../shared/components/LightButton";
+import InputField from "../../shared/components/InputField";
+import { useEditComment } from "../hooks/use-edit-comment";
 
 const PostItem: React.FC<{
   comment: { [key: string]: any };
   deleteComment: (commentId: string) => void;
 }> = (props) => {
   const authContext = useContext(AuthContext);
-  const [voteDirection, setVoteDirection] = useState(0);
-  const [upvotes, setUpvotes] = useState<number>(0);
   const [expanded, setExpanded] = useState(true);
   const [commentData, setCommentData] = useState<Comment | null>(null);
   const [comments, setComments] = useState<{ [key: string]: any }[]>(
     props.comment.comment_ids ? props.comment.comment_ids : []
   );
-  const [canEdit, setCanEdit] = useState(false);
+
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  useEffect(() => {
+    setIsDeleted(props.comment.deleted)
+  }, [props.comment.deleted])
+  
+
+  const votesHandler = useVotes(
+    props.comment._id,
+    props.comment.upvotes ?? 0,
+    false
+  );
+
+  const editsHandler = useEditComment(props.comment);
 
   const deleteComment = (commentId: string) => {
     try {
       setComments((prevComments) => {
-        console.log(prevComments);
         const filteredComments = prevComments.map((comment) => {
           if (commentId === comment._id) {
             comment.deleted = true;
@@ -42,55 +59,11 @@ const PostItem: React.FC<{
             return comment;
           }
         });
-        console.log("Filtered comments", filteredComments);
         return filteredComments;
       });
     } catch {}
   };
 
-  useEffect(() => {
-    const userId = authContext?.userId;
-    if (userId) {
-      const commentUserId = props.comment?.user_id?._id;
-      if (userId === commentUserId) {
-        // check if the user is allowed to edit
-        setCanEdit(true);
-      }
-    }
-  }, [authContext?.userId]);
-
-  const handleUpvote = () => {
-    setVoteDirection((previousVote) => {
-      if (previousVote === 1) {
-        setUpvotes((previousVotes) => previousVotes - 1);
-        return 0;
-      } else if (previousVote === 0) {
-        setUpvotes((previousVotes) => previousVotes + 1);
-        return 1;
-      } else if (previousVote === -1) {
-        setUpvotes((previousVotes) => previousVotes + 2);
-        return 1;
-      } else {
-        return previousVote;
-      }
-    });
-  };
-  const handleDownvote = () => {
-    setVoteDirection((previousVote) => {
-      if (previousVote === -1) {
-        setUpvotes((previousVotes) => previousVotes + 1);
-        return 0;
-      } else if (previousVote === 0) {
-        setUpvotes((previousVotes) => previousVotes - 1);
-        return -1;
-      } else if (previousVote === 1) {
-        setUpvotes((previousVotes) => previousVotes - 2);
-        return -1;
-      } else {
-        return previousVote;
-      }
-    });
-  };
   const handleExpand = () => {
     setExpanded((prevExpanded) => !prevExpanded);
   };
@@ -110,7 +83,6 @@ const PostItem: React.FC<{
         props.comment.user_id._id
       );
       const initialUpvotes = newComment.upvotes ?? 0;
-      setUpvotes(initialUpvotes);
       setCommentData(newComment);
     } catch (error) {}
   };
@@ -127,6 +99,10 @@ const PostItem: React.FC<{
     initializeCommentData();
   }, []);
 
+  const subComments = useMemo(() => {
+    return <SubComments comments={comments} deleteComment={deleteComment} />;
+  }, [comments]);
+
   return (
     <div className="flex pt-5">
       <div onClick={handleExpand} className="group hover:cursor-pointer pr-3">
@@ -141,37 +117,57 @@ const PostItem: React.FC<{
             </p>
             {expanded && (
               <React.Fragment>
-                {props.comment.deleted ? (
+                {isDeleted ? (
                   <p className="text-zinc-400 py-3 text-base">{"[removed]"}</p>
                 ) : (
-                  <p className="text-white py-3 text-base">
-                    {commentData.comment_content}
-                  </p>
+                  <React.Fragment>
+                    {editsHandler.editing ? (
+                      <div className="pt-3 pb-0.5">
+                        <InputField
+                          name={""}
+                          placeholder={"Comment"}
+                          touched={undefined}
+                          error={undefined}
+                          value={editsHandler.newComment}
+                          onBlur={() => {}}
+                          onChange={editsHandler.handleNewComment}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-white py-3 text-base">
+                        {editsHandler.commentText}
+                      </p>
+                    )}
+                  </React.Fragment>
+                )}
+
+                {editsHandler.error && (
+                  <p className="text-red-500 pb-2">{editsHandler.error}</p>
                 )}
                 <div className="flex space-x-4">
-                  {!commentData.deleted && (
+                  {!isDeleted && (
                     <React.Fragment>
                       <VoteItem
-                        isLoading={false}
-                        voteDirection={voteDirection}
-                        numUpvotes={commentData.upvotes}
-                        handleUpvote={handleUpvote}
-                        handleDownvote={handleDownvote}
+                        isLoading={votesHandler.isLoading}
+                        voteDirection={votesHandler.voteDirection}
+                        numUpvotes={votesHandler.upvotes}
+                        handleUpvote={votesHandler.handleUpvote}
+                        handleDownvote={votesHandler.handleDownvote}
                       />
 
-                      {!commentsHandler.replying && (
+                      {!commentsHandler.replying && !editsHandler.editing && (
                         <ButtonNoBorder
                           buttonImage={<ReplyIcon className={imageCSS} />}
                           buttonText={"Reply"}
                           handleClick={commentsHandler.handleReply}
                         />
                       )}
-                      {canEdit && (
+                      {editsHandler.canEdit && !editsHandler.editing && (
                         <React.Fragment>
                           <ButtonNoBorder
                             buttonImage={<PencilIcon className={imageCSS} />}
                             buttonText={"Edit"}
-                            handleClick={() => {}}
+                            handleClick={editsHandler.handleOpenEditor}
                           />
                           <DeleteConfirmationButton
                             itemId={props.comment._id}
@@ -179,6 +175,21 @@ const PostItem: React.FC<{
                             deleteComment={props.deleteComment}
                           />
                         </React.Fragment>
+                      )}
+                      {editsHandler.editing && (
+                        <div className="flex space-x-2">
+                          <LightButton
+                            loading={editsHandler.loading}
+                            onClick={editsHandler.handleSubmitEdit}
+                            buttonImage={<CheckIcon className={imageCSS} />}
+                            buttonText="Confirm"
+                          />
+                          <LightButton
+                            onClick={editsHandler.handleCloseEditor}
+                            buttonImage={<XIcon className={imageCSS} />}
+                            buttonText="Cancel"
+                          />
+                        </div>
                       )}
                     </React.Fragment>
                   )}
@@ -198,10 +209,7 @@ const PostItem: React.FC<{
                   />
                 )}
 
-                <SubComments
-                  comments={comments}
-                  deleteComment={deleteComment}
-                />
+                {subComments}
               </React.Fragment>
             )}
           </React.Fragment>
