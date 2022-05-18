@@ -1,14 +1,26 @@
 import VoteItem from "../../shared/components/VoteItem";
 import ButtonNoBorder from "../../shared/components/ButtonNoBorder";
-import { PencilIcon, ReplyIcon, TrashIcon } from "@heroicons/react/outline";
+import {
+  PencilIcon,
+  ReplyIcon,
+  TrashIcon,
+  XIcon,
+} from "@heroicons/react/outline";
 import { imageCSS } from "../../shared/constants/image-class";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Comment } from "../../models/Comment";
 import moment from "moment";
 import CommentField from "./CommentField";
 import { useComments } from "../hooks/use-comment";
+import SubComments from "./SubComments";
+import { AuthContext } from "../../context/auth-context";
+import DeleteConfirmationButton from "./DeleteConfirmationButton";
 
-const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
+const PostItem: React.FC<{
+  comment: { [key: string]: any };
+  deleteComment: (commentId: string) => void;
+}> = (props) => {
+  const authContext = useContext(AuthContext);
   const [voteDirection, setVoteDirection] = useState(0);
   const [upvotes, setUpvotes] = useState<number>(0);
   const [expanded, setExpanded] = useState(true);
@@ -16,6 +28,37 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
   const [comments, setComments] = useState<{ [key: string]: any }[]>(
     props.comment.comment_ids ? props.comment.comment_ids : []
   );
+  const [canEdit, setCanEdit] = useState(false);
+
+  const deleteComment = (commentId: string) => {
+    try {
+      setComments((prevComments) => {
+        console.log(prevComments);
+        const filteredComments = prevComments.map((comment) => {
+          if (commentId === comment._id) {
+            comment.deleted = true;
+            return comment;
+          } else {
+            return comment;
+          }
+        });
+        console.log("Filtered comments", filteredComments);
+        return filteredComments;
+      });
+    } catch {}
+  };
+
+  useEffect(() => {
+    const userId = authContext?.userId;
+    if (userId) {
+      const commentUserId = props.comment?.user_id?._id;
+      if (userId === commentUserId) {
+        // check if the user is allowed to edit
+        setCanEdit(true);
+      }
+    }
+  }, [authContext?.userId]);
+
   const handleUpvote = () => {
     setVoteDirection((previousVote) => {
       if (previousVote === 1) {
@@ -98,43 +141,67 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
             </p>
             {expanded && (
               <React.Fragment>
-                <p className="text-white py-3 text-base">
-                  {commentData.comment_content}
-                </p>
+                {props.comment.deleted ? (
+                  <p className="text-zinc-400 py-3 text-base">{"[removed]"}</p>
+                ) : (
+                  <p className="text-white py-3 text-base">
+                    {commentData.comment_content}
+                  </p>
+                )}
                 <div className="flex space-x-4">
-                  <VoteItem
-                    isLoading={false}
-                    voteDirection={voteDirection}
-                    numUpvotes={commentData.upvotes}
-                    handleUpvote={handleUpvote}
-                    handleDownvote={handleDownvote}
-                  />
-                  {!commentsHandler.replying && (
-                    <ButtonNoBorder
-                      buttonImage={<ReplyIcon className={imageCSS} />}
-                      buttonText={"Reply"}
-                      handleClick={commentsHandler.handleReply}
-                    />
+                  {!commentData.deleted && (
+                    <React.Fragment>
+                      <VoteItem
+                        isLoading={false}
+                        voteDirection={voteDirection}
+                        numUpvotes={commentData.upvotes}
+                        handleUpvote={handleUpvote}
+                        handleDownvote={handleDownvote}
+                      />
+
+                      {!commentsHandler.replying && (
+                        <ButtonNoBorder
+                          buttonImage={<ReplyIcon className={imageCSS} />}
+                          buttonText={"Reply"}
+                          handleClick={commentsHandler.handleReply}
+                        />
+                      )}
+                      {canEdit && (
+                        <React.Fragment>
+                          <ButtonNoBorder
+                            buttonImage={<PencilIcon className={imageCSS} />}
+                            buttonText={"Edit"}
+                            handleClick={() => {}}
+                          />
+                          <DeleteConfirmationButton
+                            itemId={props.comment._id}
+                            isPost={false}
+                            deleteComment={props.deleteComment}
+                          />
+                        </React.Fragment>
+                      )}
+                    </React.Fragment>
                   )}
                 </div>
-                {comments && (
-                  <React.Fragment>
-                    {/* <div>{props.comment.comment_ids.length}</div> */}
 
-                    {comments
-                      .sort((comment1: any, comment2: any) => {
-                        return comment1.date < comment2.date ? 1 : -1;
-                      })
-                      .map((commentData: { [key: string]: any }) => {
-                        return (
-                          <PostItem
-                            key={`comment-response-${Math.random().toString()}`}
-                            comment={commentData}
-                          />
-                        );
-                      })}
-                  </React.Fragment>
+                {commentsHandler.replying && (
+                  <CommentField
+                    isLoading={commentsHandler.isLoading}
+                    replyText={commentsHandler.reply}
+                    handleReplyChange={commentsHandler.handleReplyChange}
+                    handleSubmitCommentToPost={
+                      commentsHandler.handleSubmitCommentToPost
+                    }
+                    handleCloseReply={commentsHandler.handleCloseReply}
+                    error={commentsHandler.error}
+                    commentOnComment={true}
+                  />
                 )}
+
+                <SubComments
+                  comments={comments}
+                  deleteComment={deleteComment}
+                />
               </React.Fragment>
             )}
           </React.Fragment>
@@ -146,19 +213,6 @@ const PostItem: React.FC<{ comment: { [key: string]: any } }> = (props) => {
               {"[Comment failed to load]"}
             </p>
           </div>
-        )}
-        {commentsHandler.replying && (
-          <CommentField
-            isLoading={commentsHandler.isLoading}
-            replyText={commentsHandler.reply}
-            handleReplyChange={commentsHandler.handleReplyChange}
-            handleSubmitCommentToPost={
-              commentsHandler.handleSubmitCommentToPost
-            }
-            handleCloseReply={commentsHandler.handleCloseReply}
-            error={commentsHandler.error}
-            commentOnComment={true}
-          />
         )}
       </div>
     </div>

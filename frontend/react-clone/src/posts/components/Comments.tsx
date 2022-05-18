@@ -26,6 +26,23 @@ const Comments: React.FC<{
 
   const [comments, setComments] = useState<{ [key: string]: any }[]>([]);
 
+  const deleteComment = (commentId: string) => {
+    try {
+      setComments((prevComments) => {
+        console.log(prevComments);
+        const filteredComments = prevComments.map((comment) => {
+          if (commentId === comment._id) {
+            comment.deleted = true;
+            return comment;
+          } else {
+            return comment;
+          }
+        });
+        console.log("Filtered comments", filteredComments);
+        return filteredComments;
+      });
+    } catch {}
+  };
 
   const pullComments = async () => {
     try {
@@ -79,7 +96,13 @@ const Comments: React.FC<{
         </div>
       ) : comments.length > 0 ? (
         comments.map((comment) => {
-          return <PostItem key={`comment-${comment._id}`} comment={comment} />;
+          return (
+            <PostItem
+              key={`comment-${comment._id}`}
+              comment={comment}
+              deleteComment={deleteComment}
+            />
+          );
         })
       ) : (
         <p className="mt-5 text-zinc-400">No comments yet.</p>
