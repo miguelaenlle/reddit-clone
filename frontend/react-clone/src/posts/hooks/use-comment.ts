@@ -42,23 +42,20 @@ export const useComments = (
 
   const handleSubmitCommentToPost = async () => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/comments/`;
-    let body = {}
+    let body = {};
     if (parentIsPost) {
       body = {
         parentPostId: parentId,
         parentIsPost: parentIsPost,
         text: reply,
       };
-  
     } else {
       body = {
         parentCommentId: parentId,
         parentIsPost: parentIsPost,
         text: reply,
       };
-
     }
-
 
     const error = checkReplyValidity();
     if (error) {
@@ -75,11 +72,20 @@ export const useComments = (
         body,
         authContext?.token
       );
-      console.log(responseData);
+      const comment = responseData.comment;
+      const commentWithUser = {
+        ...comment,
+        user_id: {
+          _id: comment.user_id,
+          username: authContext?.username ?? "",
+        },
+      };
+      console.log(commentWithUser);
 
-      addComment(responseData.comment);
+      addComment(commentWithUser);
       setIsLoading(false);
       setReplying(false);
+      setReply("");
     } catch {}
   };
 

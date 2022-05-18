@@ -163,7 +163,10 @@ const PrimaryContent: React.FC<{
                       buttonImage={<PencilIcon className={imageCSS} />}
                       buttonText="Edit"
                     />
-                    <DeleteConfirmationButton postId={props.post.id} />
+                    <DeleteConfirmationButton
+                      itemId={props.post.id}
+                      isPost={true}
+                    />
                   </React.Fragment>
                 )}
               </React.Fragment>
@@ -171,6 +174,7 @@ const PrimaryContent: React.FC<{
           </div>
         </React.Fragment>
       )}
+
       {commentsHandler.replying && (
         <CommentField
           isLoading={commentsHandler.isLoading}
