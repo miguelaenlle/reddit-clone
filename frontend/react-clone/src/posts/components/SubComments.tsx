@@ -5,6 +5,7 @@ const SubComments: React.FC<{
   comments: { [key: string]: any }[];
   deleteComment: (commentId: string) => void;
 }> = (props) => {
+  
   return (
     <React.Fragment>
       {props.comments && (
@@ -28,4 +29,4 @@ const SubComments: React.FC<{
   );
 };
 
-export default React.memo(SubComments);
+export default SubComments;

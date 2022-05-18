@@ -27,7 +27,7 @@ const PrimaryContent: React.FC<{
   addComment: (comment: { [key: string]: any }) => void;
 }> = (props) => {
   const editsHandler = useEditPost(props.post);
-  const votesHandler = useVotes(props.post.id, props.post.initialUpvotes);
+  const votesHandler = useVotes(props.post.id, props.post.initialUpvotes, true);
   const commentsHandler = useComments(true, props.post.id, props.addComment);
 
   const history = useHistory();
