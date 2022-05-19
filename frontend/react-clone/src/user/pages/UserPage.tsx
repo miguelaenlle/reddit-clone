@@ -41,14 +41,14 @@ const User: React.FC<{}> = (props) => {
             handleSelectedOption={postClient.handleSelectedOption}
           />
         </div>
-        <PostCollection
+        {/* <PostCollection
           posts={postClient.posts}
           isLoading={postClient.httpIsLoading}
           httpIsLoading={postClient.httpIsLoading}
           numResultsPerPage={RESULTS_PER_PAGE}
           page={postClient.page}
           expandResults={postClient.expandResults}
-        />
+        /> */}
       </div>
     </div>
   );

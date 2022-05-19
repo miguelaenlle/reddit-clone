@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
@@ -37,55 +37,19 @@ const PostPage: React.FC<{}> = (props) => {
       setPost(post);
     } catch (error) {}
   };
-
-  const [comments, setComments] = useState<{ [key: string]: any }[]>([]);
-  const handleNewComments = (newComments: { [key: string]: any }[]) => {
-    setComments(newComments);
-  };
-
-  const sortComments = (selectedOption: string) => {
-    if (selectedOption === "new") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
-      });
-    } else if (selectedOption === "old") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        });
-      });
-    } else if (selectedOption === "top") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return b.upvotes - a.upvotes;
-        });
-      });
-    } else if (selectedOption === "controversial") {
-      setComments((previousComments) => {
-        return [...previousComments].sort((a, b) => {
-          return a.upvotes - b.upvotes;
-        });
-      });
-    }
-  };
-
+  
   const [commentsID, setCommentsID] = useState(
     `comments-${Math.random().toString()}`
   );
 
   const addComment = (comment: { [key: string]: any }) => {
-    console.log("Add comment", comment);
-    setComments((previousComments) => {
-      return [comment, ...previousComments];
-    });
     setCommentsID(`comments-${Math.random().toString()}`);
   };
 
   useEffect(() => {
     pullPost();
   }, []);
+
 
   // pull the post information from the API
   return (
@@ -101,12 +65,7 @@ const PostPage: React.FC<{}> = (props) => {
       </div>
       {post && (
         <div key={commentsID}>
-          <Comments
-            post={post}
-            comments={comments}
-            handleNewComments={handleNewComments}
-            sortComments={sortComments}
-          />
+          <Comments post={post} />
         </div>
       )}
     </Modal>

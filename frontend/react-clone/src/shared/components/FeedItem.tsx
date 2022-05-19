@@ -11,7 +11,7 @@ const FeedItem: React.FC<{
   const location = useLocation();
   const history = useHistory();
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
-  const votesHandler = useVotes(props.post.id, props.post.initialUpvotes);
+  const votesHandler = useVotes(props.post.id, props.post.initialUpvotes, true);
 
   const updateTimeAgo = () => {
     try {
@@ -76,7 +76,6 @@ const FeedItem: React.FC<{
             numUpvotes={votesHandler.upvotes}
           />
           <div className="flex-grow"></div>
-          <p className="text-zinc-400">{props.post.numComments} comments</p>
         </div>
       </div>
     </div>

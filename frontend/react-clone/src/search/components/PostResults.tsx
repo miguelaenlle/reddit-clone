@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   optionIds,
@@ -9,12 +10,18 @@ import { usePostsClient } from "../../hooks/post-hook";
 import PostCollection from "../../posts/components/PostCollection";
 import Dropdown from "../../shared/components/Dropdown";
 
-const RESULTS_PER_PAGE = 25;
+const RESULTS_PER_PAGE = 1;
 
 const PostResults: React.FC<{}> = (props) => {
   const location = useLocation();
 
-  const postClient = usePostsClient(true, "", undefined, undefined, RESULTS_PER_PAGE);
+  const postClient = usePostsClient(
+    true,
+    "",
+    undefined,
+    undefined,
+    RESULTS_PER_PAGE
+  );
 
   const updateQuery = () => {
     const searchQuery = location.search;
@@ -42,14 +49,18 @@ const PostResults: React.FC<{}> = (props) => {
         />
       </div>
       <PostCollection
+        query={postClient.query}
+        hitLimit={postClient.hitLimit}
+        atBottom={postClient.atBottom}
         posts={postClient.posts}
         isLoading={postClient.httpIsLoading}
         httpIsLoading={postClient.httpIsLoading}
         numResultsPerPage={RESULTS_PER_PAGE}
         page={postClient.page}
         expandResults={postClient.expandResults}
+        handleHitBottom={postClient.handleHitBottom}
       />
     </div>
   );
 };
-export default React.memo(PostResults);
+export default PostResults;

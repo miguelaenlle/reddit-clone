@@ -35,14 +35,14 @@ const AllPosts: React.FC<{}> = (props) => {
         />
       </div>
 
-      <PostCollection
+      {/* <PostCollection
         posts={postsClient.posts}
         isLoading={postsClient.isLoading}
         httpIsLoading={postsClient.httpIsLoading}
         numResultsPerPage={NUM_RESULTS_PER_PAGE}
         page={postsClient.page}
         expandResults={postsClient.expandResults}
-      />
+      /> */}
     </div>
   );
 };

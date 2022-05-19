@@ -58,9 +58,7 @@ export const useEditPost = (post: Post) => {
   const handleSubmit = async () => {
     setError(undefined);
     const inputsValid = validateInputs();
-    console.log(inputsValid);
     if (!inputsValid) {
-      console.log("Inputs are invalid.");
       setError("Title must be 1-40 characters & description must be 0-300");
       return;
     }
@@ -84,7 +82,6 @@ export const useEditPost = (post: Post) => {
 
       setIsEditing(false);
 
-      console.log(response);
     } catch {
       setError("An error occured, please try again.");
     }
