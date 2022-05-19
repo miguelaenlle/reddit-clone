@@ -44,14 +44,14 @@ const Subreddit: React.FC<{}> = (props) => {
           <NewPostButton initialSubId={params.subId} />
         </div>
 
-        <PostCollection
+        {/* <PostCollection
           posts={postClient.posts}
           isLoading={postClient.httpIsLoading}
           httpIsLoading={postClient.httpIsLoading}
           numResultsPerPage={RESULTS_PER_PAGE}
           page={postClient.page}
           expandResults={postClient.expandResults}
-        />
+        /> */}
       </div>
     </div>
   );

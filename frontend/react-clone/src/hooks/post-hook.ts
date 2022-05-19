@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Post } from "../models/Post";
 import { useHttpClient } from "./http-hook";
 
@@ -9,6 +9,8 @@ export const usePostsClient = (
   initialSubId: string | undefined,
   resultsPerPage: number
 ) => {
+  const [atBottom, setAtBottom] = useState(false);
+  const [hitLimit, setHitLimit] = useState(false);
   const [query, setQuery] = useState(initialQuery);
   const [userId, setUserId] = useState(initialUserId);
   const [subId, setSubId] = useState(initialSubId);
@@ -20,6 +22,10 @@ export const usePostsClient = (
   const [selectedOption, setSelectedOption] = useState("top");
 
   const httpClient = useHttpClient();
+
+  const handleHitBottom = () => {
+    setAtBottom(true);
+  };
 
   const resetData = () => {
     setPage(0);
@@ -57,9 +63,6 @@ export const usePostsClient = (
     if (search && !query) {
       return null;
     }
-
-    console.log("Current query", query)
-
     const formattedPosts: Post[] | null = await httpClient.fetchPosts(
       pageNumber,
       selectedOption,
@@ -78,13 +81,19 @@ export const usePostsClient = (
     }
   };
 
-  const expandResults = async () => {
+  const expandResults = useCallback(async () => {
     setIsLoading(true);
+
     const newPage = page + 1;
+
     setPage(newPage);
     try {
+      //
       const additionalSearchResults = await fetchPosts(newPage, selectedOption);
       if (additionalSearchResults) {
+        if (additionalSearchResults.length === 0) {
+          setHitLimit(true);
+        }
         setPosts((prevResults) => {
           const newResults = [...prevResults, ...additionalSearchResults];
           return newResults;
@@ -94,7 +103,8 @@ export const usePostsClient = (
     } catch (error) {
       setIsLoading(false);
     }
-  };
+    setAtBottom(false);
+  }, [query, page, selectedOption, posts, isLoading]);
 
   const handleChangedOption = async (newOption: string) => {
     const posts = await fetchPosts(page, newOption);
@@ -106,6 +116,9 @@ export const usePostsClient = (
   const httpIsLoading = httpClient.isLoading;
 
   return {
+    hitLimit,
+    atBottom,
+    query,
     httpIsLoading,
     isLoading,
     selectedOption,
@@ -115,6 +128,7 @@ export const usePostsClient = (
     initializePosts,
     expandResults,
     handleChangedOption,
+    handleHitBottom,
     updateQuery,
     updateUserId,
     updateSubId,

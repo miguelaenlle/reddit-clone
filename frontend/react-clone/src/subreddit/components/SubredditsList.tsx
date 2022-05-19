@@ -10,7 +10,9 @@ const SubredditsList: React.FC<{
   resultsPerPage: number;
   expandSubreddits: () => void;
 }> = (props) => {
+  
   const subMembership = useSubredditMembership();
+
   return (
     <div className="space-y-3">
       {props.subreddits.map((result) => {

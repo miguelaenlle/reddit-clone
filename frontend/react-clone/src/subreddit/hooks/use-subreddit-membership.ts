@@ -56,7 +56,6 @@ export const useSubredditMembership = () => {
           {},
           authContext?.token
         );
-        console.log(response);
         if (isJoin) {
           setSubreddits((prevSubreddits) => [...prevSubreddits, subredditId]);
         } else {

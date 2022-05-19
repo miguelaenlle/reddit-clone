@@ -16,20 +16,16 @@ const SubredditResult: React.FC<{
   const handleClickSubreddit = () => {
     if (props.isMember) {
       setSubredditMembers((prevMembers) => {
-        console.log(prevMembers, prevMembers - 1);
         return prevMembers - 1;
       });
       
       props.leaveSubreddit();
-      console.log("Leave");
     } else {
       props.joinSubreddit();
       setSubredditMembers((prevMembers) => {
         
-        console.log(prevMembers, prevMembers + 1)
         return prevMembers + 1;
       });
-      console.log("Join");
     }
   };
   return (

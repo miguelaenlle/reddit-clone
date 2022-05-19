@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/auth-context";
 import { useHttpClient } from "../../hooks/http-hook";
 
-export const useVotes = (postId: string, numVotes: number) => {
+export const useVotes = (postId: string, numVotes: number, isPost: boolean) => {
   const authContext = useContext(AuthContext);
   const httpClient = useHttpClient();
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +14,9 @@ export const useVotes = (postId: string, numVotes: number) => {
 
     try {
       // get the user's vote direction
-      const url = `${process.env.REACT_APP_BACKEND_URL}/posts/${postId}/vote-direction`;
+      const url = `${process.env.REACT_APP_BACKEND_URL}/${
+        isPost ? "posts" : "comments"
+      }/${postId}/vote-direction`;
       const responseData = await httpClient.sendRequest(
         url,
         "GET",
@@ -23,9 +25,7 @@ export const useVotes = (postId: string, numVotes: number) => {
       );
       const voteDirection = responseData.voteDirection;
       setVoteDirection(voteDirection);
-      console.log("Vote direction", voteDirection);
     } catch (error) {
-      console.log(error);
     }
 
     setIsLoading(false);
@@ -37,14 +37,15 @@ export const useVotes = (postId: string, numVotes: number) => {
 
   const handleVote = async (newDirection: number) => {
     try {
-      const url = `${process.env.REACT_APP_BACKEND_URL}/posts/${postId}/vote`;
+      const url = `${process.env.REACT_APP_BACKEND_URL}/${
+        isPost ? "posts" : "comments"
+      }/${postId}/vote`;
       const responseData = await httpClient.sendRequest(
         url,
         "PATCH",
         { voteDirection: newDirection },
         authContext?.token
       );
-      console.log(responseData);
     } catch (error) {}
   };
 

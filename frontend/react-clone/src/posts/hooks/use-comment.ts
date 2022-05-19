@@ -65,7 +65,6 @@ export const useComments = (
 
     try {
       setIsLoading(true);
-      console.log(body);
       const responseData = await httpClient.sendRequest(
         url,
         "POST",
@@ -80,7 +79,6 @@ export const useComments = (
           username: authContext?.username ?? "",
         },
       };
-      console.log(commentWithUser);
 
       addComment(commentWithUser);
       setIsLoading(false);

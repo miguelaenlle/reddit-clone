@@ -56,7 +56,6 @@ const CreatePost: React.FC<{}> = (props) => {
         inputData,
         authContext?.token
       );
-      console.log(response);
       const postId = response.id;
       history.push({
         pathname: `/post/${postId}`,
@@ -87,11 +86,9 @@ const CreatePost: React.FC<{}> = (props) => {
   const initializePreselectedSubreddit = async () => {
     const queryParams = new URLSearchParams(location.search);
     const subId = queryParams.get("subId");
-    console.log(subId);
     if (subId) {
       setLoadingSubreddit(true);
       const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits/${subId}`;
-      console.log(url);
       try {
         const response = await httpClient.sendRequest(url, "GET");
         const subredditData = response.data;
@@ -105,7 +102,6 @@ const CreatePost: React.FC<{}> = (props) => {
         setSelectedOption(subredditItem.subName);
         formik.setFieldValue("subreddit", subredditItem.subId);
       } catch (error) {
-        console.log(error);
       }
       setLoadingSubreddit(false);
     }
