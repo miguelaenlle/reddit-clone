@@ -21,8 +21,9 @@ const limiter = rateLimit({
 
 const app = express();
 
-app.use(limiter);
+// app.use(limiter);
 app.use(bodyParser.json());
+
 
 app.use((request, response, next) => {
   response.setHeader("Access-Control-Allow-Origin", "*");
@@ -33,6 +34,7 @@ app.use((request, response, next) => {
   response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   next();
 });
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

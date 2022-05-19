@@ -19,7 +19,7 @@ router.get(
     check("page").notEmpty().isInt({ min: 0 }),
     check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
   ],
-  usersController.searchForUsers
+  usersController.searchForUsers // REMOVE BODY
 );
 
 module.exports = router;

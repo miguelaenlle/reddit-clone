@@ -20,23 +20,12 @@ const createComment = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { authToken, parentPostId, parentCommentId, parentIsPost, text } =
-    request.body;
+  const { parentPostId, parentCommentId, parentIsPost, text } = request.body;
 
   // verify the user token
 
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedToken.id;
-  } catch (error) {
-    console.log(error);
-    return next(errorMessages.createCommentFailedError);
-  }
+  const userData = request.userData;
+  const userId = userData.userId;
 
   // get the user object
 
@@ -198,21 +187,11 @@ const updateComment = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { authToken, newCommentContent } = request.body;
+  const {  newCommentContent } = request.body;
 
   // verify the user token
 
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedToken.id;
-  } catch (error) {
-    return next(errorMessages.updateCommentFailedError);
-  }
+  const userId = request.userData.userId;
 
   // get the user
 
@@ -273,17 +252,8 @@ const deleteComment = async (request, response, next) => {
 
   // make sure the user exists
 
-  let userId;
-  try {
-    const decodedToken = await verifyLoginToken(authToken);
-    if (!decodedToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedToken.id;
-  } catch (error) {
-    return next(errorMessages.deleteCommentFailedError);
-  }
+  
+  const userId = request.userData.userId;
 
   // get the user
 
@@ -342,23 +312,11 @@ const voteComment = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { authToken, voteDirection } = request.body;
+  const { voteDirection } = request.body;
 
   // make sure the user exists
-  let userId;
-  try {
-    decodedAuthToken = await verifyLoginToken(authToken);
-    if (!decodedAuthToken) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-
-    userId = decodedAuthToken.id;
-    if (!userId) {
-      return next(errorMessages.authTokenVerifyError);
-    }
-  } catch {
-    return next(errorMessages.createCommentFailedError);
-  }
+  
+  const userId = request.userData.userId;
   // pull user data
 
   let currentUser;

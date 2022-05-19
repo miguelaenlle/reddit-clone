@@ -1,13 +1,14 @@
 const express = require("express");
 const { check } = require("express-validator");
+const checkAuth = require("../middleware/check-auth");
 const router = express.Router();
 
 const postsController = require("../controllers/posts-controller");
 
 router.post(
   "/",
+  checkAuth,
   [
-    check("authToken").notEmpty(),
     check("subId").notEmpty(),
     check("title").trim().notEmpty().isLength({
       min: 1,
@@ -28,15 +29,15 @@ router.get(
     check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
     check("sortMode").trim().notEmpty(),
   ],
-  postsController.getAllPosts
+  postsController.getAllPosts 
 );
 
 router.get("/:postId/", [], postsController.getPost);
 
 router.patch(
   "/:postId/",
+  checkAuth,
   [
-    check("authToken").notEmpty(),
     check("newTitle").trim().notEmpty().isLength({
       min: 1,
       max: 40,
@@ -49,23 +50,17 @@ router.patch(
   postsController.updatePost
 );
 
-router.delete(
-  "/:postId/",
-  [check("authToken").notEmpty()],
-  postsController.deletePost
-);
+router.delete("/:postId/", checkAuth, postsController.deletePost);
 
-router.get(
-  "/:postId/comments",
-  postsController.getPostComments
-); 
+router.get("/:postId/comments", postsController.getPostComments);
 
 router.post(
   "/:postId/vote",
-  [
-    check("authToken").notEmpty(),
-    check("voteDirection").notEmpty().isInt({ min: -1, max: 1 }),
-  ],
+
+  checkAuth,
+
+  check("voteDirection").notEmpty().isInt({ min: -1, max: 1 }),
+
   postsController.voteOnPost
 );
 
