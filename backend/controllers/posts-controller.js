@@ -22,7 +22,7 @@ const createNewPost = async (request, response, next) => {
   const { subId, title, text } = request.body;
 
   // requires authentication
-  console.log(request.userData);
+  // // console.log(request.userData);
   const userData = request.userData;
   const userId = userData.userId;
 
@@ -37,7 +37,7 @@ const createNewPost = async (request, response, next) => {
       return next(errorMessages.notValidatedError);
     }
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
     return next(errorMessages.postCreateError);
   }
 
@@ -60,6 +60,7 @@ const createNewPost = async (request, response, next) => {
     sub_id: subreddit.id,
     user_id: currentUser.id,
     title: title,
+    searchTitle: title.toLowerCase(),
     text: text,
     post_time: currentDate,
     num_upvotes: 0,
@@ -77,7 +78,7 @@ const createNewPost = async (request, response, next) => {
   try {
     await newPost.save();
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
     return next(errorMessages.postCreateError);
   }
 
@@ -90,14 +91,13 @@ const createNewPost = async (request, response, next) => {
 };
 
 const getAllPosts = async (request, response, next) => {
-  // needs: query (optional), subId (optional), page, numResults, sortMode (per page) (no auth)
+  // needs: query (optional), subId (optional), userId (optional), page, numResults, sortMode (per page) (no auth)
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { query, subId, page, numResults, sortMode } = request.body;
-
+  const { query, subId, userId, page, numResults, sortMode } = request.query;
   // pull all posts
 
   let posts;
@@ -126,11 +126,11 @@ const getAllPosts = async (request, response, next) => {
     }
 
     let searchQuery;
-    if (query) {
+    if (query && query.length > 0) {
       searchQuery = {
         $or: [
           {
-            title: {
+            searchTitle: {
               $regex: new RegExp(query.toLowerCase()),
             },
           },
@@ -142,36 +142,39 @@ const getAllPosts = async (request, response, next) => {
         ],
       };
     }
+    let filterQuery = {
+      deleted: false,
+    };
     if (subId) {
-      if (searchQuery) {
-        const oldSearchQuery = searchQuery;
-        searchQuery = {
-          $and: [
-            oldSearchQuery,
-            {
-              sub_id: subId,
-              deleted: false,
-            },
-          ],
-        };
-      } else {
-        searchQuery = {
-          sub_id: subId,
-          deleted: false,
-        };
-      }
-    } else {
-      searchQuery = {
-        $and: [searchQuery, { deleted: false }],
-      };
+      filterQuery.sub_id = subId;
     }
-    console.log(searchQuery);
+    if (userId) {
+      filterQuery.user_id = userId;
+    }
+    const oldSearchQuery = searchQuery;
+    if (oldSearchQuery) {
+      searchQuery = {
+        $and: [oldSearchQuery, filterQuery],
+      };
+    } else {
+      searchQuery = filterQuery;
+    }
+
     posts = await Post.find(searchQuery)
       .sort(sortFilter)
       .skip(page * numResults)
-      .limit(numResults);
+      .limit(numResults)
+      .populate("user_id")
+      .populate("sub_id");
+
+    console.log(
+      "Sort filter",
+      JSON.stringify(sortFilter),
+      "Search Query",
+      JSON.stringify(searchQuery)
+    );
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
     return next(errorMessages.getPostsError);
   }
 
@@ -232,7 +235,7 @@ const updatePost = async (request, response, next) => {
       user_id: userId,
     });
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
     return next(errorMessages.postUpdateFailedError);
   }
 
@@ -293,7 +296,7 @@ const deletePost = async (request, response, next) => {
       user_id: userId,
     });
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
     return next(errorMessages.postUpdateFailedError);
   }
 
@@ -356,21 +359,21 @@ const getPostComments = async (request, response, next) => {
     for (const recursionLevel in [...Array(10).keys()]) {
       let recursionQuery = "comment_ids";
       const accurateRecursionLevel = parseInt(recursionLevel) + 1;
-      console.log(accurateRecursionLevel);
+      // // console.log(accurateRecursionLevel);
 
       if (accurateRecursionLevel > 1) {
         recursionQuery = `${recursionQuery}${`.${recursionQuery}`.repeat(
           accurateRecursionLevel - 1
         )}`;
-        console.log(recursionQuery);
+        // // console.log(recursionQuery);
       }
-      console.log(commentData);
+      // // console.log(commentData);
       commentData = await commentData.populate(recursionQuery);
       commentData = await commentData.populate(`${recursionQuery}.user_id`);
     }
     commentsChain = commentData;
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
     return next(errorMessages.getChildCommentsFailedError);
   }
 
@@ -378,6 +381,56 @@ const getPostComments = async (request, response, next) => {
     commentsChain: commentsChain.comment_ids,
     message: "Successfully retrieved child comments.",
   });
+};
+
+const getVoteDirection = async (request, response, next) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(errorMessages.invalidInputsError);
+  }
+  const postId = request.params.postId;
+  const userId = request.userData.userId;
+  // pull current user
+  let currentUser;
+  try {
+    currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return next(errorMessages.authTokenVerifyError);
+    }
+    if (!currentUser.isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
+  } catch (error) {
+    // // console.log(error);
+    return next(errorMessages.voteFailedError);
+  }
+
+  // pull the current vote direction
+
+  const userVoteObjects = await Vote.find({
+    user_id: currentUser.id,
+    parent_post_id: postId,
+  });
+
+  const matchingVotes = userVoteObjects.filter(
+    (object) => object.parent_post_id.toString() === postId
+  );
+  // update the user's vote
+  // // console.log(matchingVotes);
+
+  if (matchingVotes.length > 0) {
+    const vote = matchingVotes[0];
+    const initialVoteValue = vote.vote_value;
+    return response.status(200).json({
+      voteDirection: initialVoteValue,
+      message: "Successfully retrieved vote direction.",
+    });
+  } else {
+    return response.status(200).json({
+      voteDirection: 0,
+      message: "Successfully retrieved vote direction.",
+    });
+  }
 };
 
 const voteOnPost = async (request, response, next) => {
@@ -409,7 +462,7 @@ const voteOnPost = async (request, response, next) => {
       return next(errorMessages.notValidatedError);
     }
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
     return next(errorMessages.voteFailedError);
   }
 
@@ -431,9 +484,7 @@ const voteOnPost = async (request, response, next) => {
   // doesn't exist -> okay, just won't give OP karma
   let opUser;
   try {
-    if (post.user_id.toString() !== currentUser.id) {
-      opUser = await User.findById(post.user_id);
-    }
+    opUser = await User.findById(post.user_id);
   } catch {}
 
   // create new session
@@ -441,7 +492,7 @@ const voteOnPost = async (request, response, next) => {
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
-    // console.log(currentUser);
+    // // // console.log(currentUser);
     const userVoteObjects = await Vote.find({
       user_id: currentUser.id,
       parent_post_id: post.id,
@@ -450,7 +501,7 @@ const voteOnPost = async (request, response, next) => {
       (object) => object.parent_post_id.toString() === post.id
     );
     // update the user's vote
-    console.log(matchingVotes);
+    // // console.log(matchingVotes);
     let voteChange = 0;
 
     if (matchingVotes.length > 0) {
@@ -473,7 +524,7 @@ const voteOnPost = async (request, response, next) => {
         // 0 -> -1 -1
         voteChange = voteDirection;
       }
-      console.log("updating pre-existing vote");
+      // // console.log("updating pre-existing vote");
       await Vote.findByIdAndUpdate(
         vote.id,
         {
@@ -499,14 +550,15 @@ const voteOnPost = async (request, response, next) => {
       //   },
       //   { session }
       // );
-      console.log("Created a new vote for the user");
+      // // console.log("Created a new vote for the user");
       voteChange = voteDirection;
     }
 
     // get/take karma from OP
+    console.log("OP user", opUser);
     if (voteChange !== 0) {
       if (opUser) {
-        console.log(`Give OP ${voteChange} karma`);
+        console.log(`Give OP ${opUser.userId} ${voteChange} karma`);
         await User.findByIdAndUpdate(
           opUser.id,
           {
@@ -516,7 +568,7 @@ const voteOnPost = async (request, response, next) => {
         );
       }
       // get/take total upvotes from the post
-      console.log(`Give post ${voteChange} karma`);
+      // // console.log(`Give post ${voteChange} karma`);
       await Post.findByIdAndUpdate(
         post.id,
         {
@@ -526,7 +578,8 @@ const voteOnPost = async (request, response, next) => {
       );
     }
     await session.commitTransaction();
-  } catch {
+  } catch (error) {
+    console.log("Error", error);
     return next(errorMessages.voteFailedError);
   }
   // populate user voteIds
@@ -557,3 +610,4 @@ exports.updatePost = updatePost;
 exports.deletePost = deletePost;
 exports.getPostComments = getPostComments;
 exports.voteOnPost = voteOnPost;
+exports.getVoteDirection = getVoteDirection;

@@ -1,3 +1,4 @@
+const cors = require("cors");
 const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -5,12 +6,13 @@ const authRoutes = require("./routes/auth-routes");
 const userRoutes = require("./routes/user-routes");
 const subredditRoutes = require("./routes/subreddit-routes");
 const postRoutes = require("./routes/posts-routes");
-const commentRoutes = require("./routes/comments-routes")
-const feedRoutes = require("./routes/feed-routes")
+const commentRoutes = require("./routes/comments-routes");
+const feedRoutes = require("./routes/feed-routes");
 
 const HttpError = require("./models/http-error");
 
 const rateLimit = require("express-rate-limit");
+const formData = require("express-form-data");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -24,24 +26,15 @@ const app = express();
 // app.use(limiter);
 app.use(bodyParser.json());
 
-
-app.use((request, response, next) => {
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  next();
-});
-
+app.use(cors());
+app.options("*", cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/subreddits", subredditRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/comments", commentRoutes)
-app.use("/api/feed", feedRoutes)
+app.use("/api/comments", commentRoutes);
+app.use("/api/feed", feedRoutes);
 
 app.use((request, response, next) => {
   const error = new HttpError("Could not find this route.", 404);

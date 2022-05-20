@@ -54,7 +54,7 @@ router.post(
 router.post(
   "/change-password",
   [
-    check("email").normalizeEmail().isEmail(),
+    check("userId").not().isEmpty(),
     check("newPassword").isLength({
       min: 6,
     }),
