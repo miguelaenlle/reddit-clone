@@ -97,7 +97,9 @@ const CreatePost: React.FC<{}> = (props) => {
           subredditData._id,
           subredditData.sub_owner,
           subredditData.num_members,
-          subredditData.description
+          subredditData.description,
+          subredditData.background_image_url,
+          subredditData.picture_url
         );
         setSelectedOption(subredditItem.subName);
         formik.setFieldValue("subreddit", subredditItem.subId);
