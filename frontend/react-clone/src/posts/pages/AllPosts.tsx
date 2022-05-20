@@ -35,14 +35,18 @@ const AllPosts: React.FC<{}> = (props) => {
         />
       </div>
 
-      {/* <PostCollection
+      <PostCollection
+        query={postsClient.query}
+        hitLimit={postsClient.hitLimit}
+        atBottom={postsClient.atBottom}
         posts={postsClient.posts}
-        isLoading={postsClient.isLoading}
+        isLoading={postsClient.httpIsLoading}
         httpIsLoading={postsClient.httpIsLoading}
         numResultsPerPage={NUM_RESULTS_PER_PAGE}
         page={postsClient.page}
         expandResults={postsClient.expandResults}
-      /> */}
+        handleHitBottom={postsClient.handleHitBottom}
+      />
     </div>
   );
 };

@@ -30,13 +30,7 @@ const PostCollection: React.FC<{
       } else {
         return;
       }
-      if (!props.isLoading) {
-        if (bottomOfWindow && !props.isLoading) {
-          if (props.query) {
-            props.expandResults();
-          }
-        }
-      }
+      props.expandResults();
     }
   };
 
@@ -78,7 +72,6 @@ const PostCollection: React.FC<{
         !props.atBottom && (
           <p
             onClick={() => {
-              console.log(props.query);
               props.expandResults();
             }}
             className="my-5 text-zinc-400 hover:cursor-pointer hover:text-zinc-200"

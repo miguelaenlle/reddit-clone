@@ -42,17 +42,17 @@ const validate = (values: { [key: string]: string }) => {
     errors.description = "Description must be under 300 characters long";
   }
 
-  // if (!values.icon) {
-  //   errors.icon = "Required";
-  // } else if (values.icon.length === 0) {
-  //   errors.icon = "Required";
-  // }
+  if (!values.icon) {
+    errors.icon = "Required";
+  } else if (values.icon.length === 0) {
+    errors.icon = "Required";
+  }
 
-  // if (!values.banner) {
-  //   errors.banner = "Required";
-  // } else if (values.banner.length === 0) {
-  //   errors.banner = "Required";
-  // }
+  if (!values.banner) {
+    errors.banner = "Required";
+  } else if (values.banner.length === 0) {
+    errors.banner = "Required";
+  }
 
   return errors;
 };
@@ -81,6 +81,8 @@ const CreateSubreddit: React.FC = (props) => {
     initialValues: {
       name: "",
       description: "",
+      icon: "",
+      banner: "",
     },
     validate,
     onSubmit: (values) => {
@@ -89,18 +91,31 @@ const CreateSubreddit: React.FC = (props) => {
   });
 
   const handleCreateSubreddit = async () => {
+    if (!icon || !banner) {
+      setDisplayedError("Please upload an icon and a banner");
+      return;
+    }
     setDisplayedError(null);
     const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits`;
     try {
+      const formData = new FormData();
+      formData.append("subName", formik.values.name);
+      formData.append("description", formik.values.description);
+      formData.append("icon", icon);
+      formData.append("banner", banner);
+
       const token = authContext?.token;
       if (token) {
-        const responseData = await httpClient.sendRequest(
+        const responseData = await httpClient.sendFormDataRequest(
           url,
           "POST",
-          {subName: formik.values.name, description: formik.values.description},
+          formData,
           token
         );
-        if (responseData.error) {
+
+        console.log(responseData);
+
+        if (responseData.error !== "OK") {
           updateError(responseData.error);
         } else {
           const subredditID = responseData.data.sub_id;
@@ -111,6 +126,7 @@ const CreateSubreddit: React.FC = (props) => {
         updateError("You must be logged in to create a subreddit");
       }
     } catch (error: any) {
+      console.log(error);
       if (error.message) {
         updateError(error.message);
       }
@@ -159,7 +175,7 @@ const CreateSubreddit: React.FC = (props) => {
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
             />
-            {/* <DragAndDrop
+            <DragAndDrop
               id="icon"
               imageId={imageId}
               isLoading={httpClient.isLoading}
@@ -178,7 +194,7 @@ const CreateSubreddit: React.FC = (props) => {
               isIcon={false}
               dragText={"Click to upload banner"}
               uploadFile={uploadBannerFile}
-            /> */}
+            />
             <br />
             {displayedError && (
               <p className="text-red-500 text-lg">{displayedError}</p>
