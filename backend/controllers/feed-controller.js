@@ -31,15 +31,24 @@ const getFeedPosts = async (request, response, next) => {
     };
   } else if (sortMode === "new") {
     sortFilter = {
-      post_time: -1,
+      post_time: -1
     };
   } else if (sortMode === "old") {
     sortFilter = {
       post_time: 1,
     };
   }
+
+  const oldFilter = sortFilter;
+  const deletedFilter = {
+    deleted: false,
+  }
+  const newFilter = {
+    $and: [oldFilter, deletedFilter]
+  }
+
   
-  const posts = await Post.find()
+  const posts = await Post.find({deleted: false})
     .sort(sortFilter)
     .skip(page * numResults)
     .limit(numResults)
