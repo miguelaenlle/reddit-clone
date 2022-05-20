@@ -23,12 +23,16 @@ const subredditSchema = new Schema({
   sub_owner: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref: "users"
+    ref: "users",
   },
   picture_url: {
-    type: String, 
+    type: String,
     required: false,
-  }
+  },
+  image_id: {
+    type: String,
+    required: true,
+  },
 });
 
 subredditSchema.plugin(uniqueValidator);

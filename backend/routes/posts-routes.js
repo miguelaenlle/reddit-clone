@@ -54,7 +54,7 @@ router.delete("/:postId/", checkAuth, postsController.deletePost);
 
 router.get("/:postId/comments", postsController.getPostComments);
 
-router.post(
+router.patch(
   "/:postId/vote",
 
   checkAuth,
@@ -63,5 +63,11 @@ router.post(
 
   postsController.voteOnPost
 );
+
+router.get(
+  "/:postId/vote-direction",
+  checkAuth,
+  postsController.getVoteDirection
+)
 
 module.exports = router;

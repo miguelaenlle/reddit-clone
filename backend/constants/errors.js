@@ -12,16 +12,16 @@ const failedToFindUserError = new HttpError(
   404
 );
 
-const userIsVerifiedError = new HttpError("User is already verified.", 422);
+const userIsVerifiedError = new HttpError("User is already verified.", 401);
 
 const userExistsError = new HttpError(
   "User exists already, please login instead.",
-  422
+  409
 );
 
 const usernameExistsError = new HttpError(
   "Username already exists, please find a different username.",
-  422
+  409
 );
 
 const signupFailedError = new HttpError(

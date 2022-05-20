@@ -1,16 +1,79 @@
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+
 const errorMessages = require("../constants/errors");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
+const HttpError = require("../models/http-error");
 const Subreddit = require("../models/subreddit");
 const User = require("../models/user");
+
+const updateSubredditInfo = async (request, response, next) => {
+  // requires authentication (verify auth token)
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(errorMessages.invalidInputsError);
+  }
+  const { newDescription } = request.body;
+  const subId = request.params.subredditId;
+
+  const userId = request.userData.userId;
+
+  let existingUser;
+  try {
+    existingUser = await User.findById(userId);
+    const isVerified = existingUser.isVerified;
+    if (!isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
+  } catch (errorMessage) {
+    return next(errorMessages.authTokenVerifyError);
+  }
+
+  // get the subreddit
+
+  let subreddit;
+  try {
+    subreddit = await Subreddit.findById(subId);
+  } catch (error) {
+    return next(errorMessages.subredditNotFoundError);
+  }
+  console.log(subreddit.sub_owner.toString(), existingUser._id.toString());
+  if (subreddit.sub_owner.toString() !== existingUser._id.toString()) {
+    return next(new HttpError("You do not own this subreddit", 403));
+  }
+
+  // update the subreddit
+  try {
+    await Subreddit.findByIdAndUpdate(subId, {
+      description: newDescription,
+    });
+  } catch (error) {
+    return next(new HttpError("Could not update subreddit", 500));
+  }
+
+  return response.status(200).json({
+    message: "Subreddit description updated successfully",
+  });
+};
 
 const createSubreddit = async (request, response, next) => {
   // requires authentication (verify auth JWT)
   // inputs: authToken, subreddit name, description
+  // banner image
+  // icon image 
+  let iconFileInfo = ""
+  let bannerFileInfo = ""
+
+  try {
+    iconFileInfo = request.files.icon[0].fieldname;
+    bannerFileInfo = request.files.banner[0].fieldname;
+  } catch {
+    return next(errorMessages.invalidInputsError);
+  }
 
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
+    console.log(errors);
     return next(errorMessages.invalidInputsError);
   }
 
@@ -18,6 +81,7 @@ const createSubreddit = async (request, response, next) => {
 
   // validate the auth token
   const userId = request.userData.userId;
+  console.log(userId);
   // find the user
   // make sure they are validated
 
@@ -37,9 +101,11 @@ const createSubreddit = async (request, response, next) => {
     name: subName,
     description: description,
     num_members: 0,
-    background_image_url: "",
-    picture_url: "",
+    background_image_url: bannerFileInfo.path,
+    picture_url: iconFileInfo.path,
+    sub_owner: existingUser.id,
     post_ids: [],
+    image_id: "test_id",
   });
 
   // make sure the subreddit doesn't exist yet
@@ -56,6 +122,8 @@ const createSubreddit = async (request, response, next) => {
   try {
     await newSubreddit.save();
   } catch (error) {
+    console.log(subName, description);
+    console.log("Save error", error);
     return next(errorMessages.subredditCreateError);
   }
 
@@ -67,9 +135,9 @@ const createSubreddit = async (request, response, next) => {
       },
     });
   } catch (error) {
+    console.log(error);
     return next(errorMessages.subredditCreateError);
   }
-
   return response.status(200).json({
     data: {
       sub_name: newSubreddit.name,
@@ -117,19 +185,19 @@ const searchForSubreddits = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { query, page, numResults } = request.params;
-
+  const { query, page, numResults } = request.query;
   let subredditSearchResults;
 
   try {
     subredditSearchResults = await Subreddit.find({
       name: {
-        $regex: new RegExp(query),
+        $regex: new RegExp(query.toLowerCase()),
       },
     })
       .skip(page * numResults)
       .limit(numResults);
   } catch (error) {
+    console.log(error);
     return next(errorMessages.searchFailedError);
   }
 
@@ -316,6 +384,7 @@ const leaveSubreddit = async (request, response, next) => {
   });
 };
 
+exports.updateSubredditInfo = updateSubredditInfo;
 exports.createSubreddit = createSubreddit;
 exports.searchForSubreddits = searchForSubreddits;
 exports.getSubreddit = getSubreddit;
