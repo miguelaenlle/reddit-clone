@@ -1,11 +1,15 @@
 const jwt = require("jsonwebtoken");
 
-const verificationResetTokenIsValid = (verificationToken, oldHashedPassword) => {
+const verificationResetTokenIsValid = (
+  verificationToken,
+  oldHashedPassword
+) => {
   try {
     const decodedToken = jwt.verify(verificationToken, oldHashedPassword);
     return decodedToken;
   } catch (error) {
-    return undefined
+    console.log(error);
+    return undefined;
   }
 };
 
