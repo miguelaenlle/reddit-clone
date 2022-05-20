@@ -10,7 +10,7 @@ import { usePostsClient } from "../../hooks/post-hook";
 import PostCollection from "../../posts/components/PostCollection";
 import Dropdown from "../../shared/components/Dropdown";
 
-const RESULTS_PER_PAGE = 1;
+const RESULTS_PER_PAGE = 25;
 
 const PostResults: React.FC<{}> = (props) => {
   const location = useLocation();
