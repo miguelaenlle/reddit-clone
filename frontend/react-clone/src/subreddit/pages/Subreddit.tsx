@@ -11,7 +11,7 @@ import PostCollection from "../../posts/components/PostCollection";
 import Dropdown from "../../shared/components/Dropdown";
 import SubredditHeader from "../components/SubredditHeader";
 
-const RESULTS_PER_PAGE = 25;
+const NUM_RESULTS_PER_PAGE = 25;
 
 const Subreddit: React.FC<{}> = (props) => {
   const params = useParams<{ subId: string }>();
@@ -20,7 +20,7 @@ const Subreddit: React.FC<{}> = (props) => {
     undefined,
     undefined,
     params.subId,
-    RESULTS_PER_PAGE
+    NUM_RESULTS_PER_PAGE
   );
   const location = useLocation();
 
@@ -44,14 +44,18 @@ const Subreddit: React.FC<{}> = (props) => {
           <NewPostButton initialSubId={params.subId} />
         </div>
 
-        {/* <PostCollection
+        <PostCollection
+          query={postClient.query}
+          hitLimit={postClient.hitLimit}
+          atBottom={postClient.atBottom}
           posts={postClient.posts}
           isLoading={postClient.httpIsLoading}
           httpIsLoading={postClient.httpIsLoading}
-          numResultsPerPage={RESULTS_PER_PAGE}
+          numResultsPerPage={NUM_RESULTS_PER_PAGE}
           page={postClient.page}
           expandResults={postClient.expandResults}
-        /> */}
+          handleHitBottom={postClient.handleHitBottom}
+        />
       </div>
     </div>
   );
