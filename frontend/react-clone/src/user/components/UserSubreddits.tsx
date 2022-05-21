@@ -27,14 +27,13 @@ const UserSubreddits: React.FC<{ userId: string }> = (props) => {
         return (
           <SubredditResult
             key={`sub-result-${result.subId}-${Math.random().toString()}`}
+            iconURL={result.iconUrl}
             subName={result.subName}
             subId={result.subId}
             members={result.members}
             description={result.description}
             isMember={subMembership.subreddits.includes(result.subId)}
             subredditLoading={subMembership.subredditsLoading.includes(result.subId)}
-            joinSubreddit={() => subMembership.joinSubreddit(result.subId)}
-            leaveSubreddit={() => subMembership.leaveSubreddit(result.subId)}
           />
         );
       })}
