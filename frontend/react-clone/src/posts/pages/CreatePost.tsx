@@ -12,6 +12,7 @@ import Modal from "../../shared/components/Modal";
 import TextField from "../../shared/components/TextField";
 import { imageCSS } from "../../shared/constants/image-class";
 import { AuthContext } from "../../context/auth-context";
+import UploadImages from "../components/UploadImages";
 
 const validate = (values: { [key: string]: string }) => {
   const errors: { [key: string]: string } = {};
@@ -103,8 +104,7 @@ const CreatePost: React.FC<{}> = (props) => {
         );
         setSelectedOption(subredditItem.subName);
         formik.setFieldValue("subreddit", subredditItem.subId);
-      } catch (error) {
-      }
+      } catch (error) {}
       setLoadingSubreddit(false);
     }
   };
@@ -172,7 +172,7 @@ const CreatePost: React.FC<{}> = (props) => {
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
             />
-            {/* <DragAndDrop id = "banner-icon" dragText={"Add images"} /> */}
+            <UploadImages />
             <br />
             <div className="flex">
               <div className="grow"></div>
