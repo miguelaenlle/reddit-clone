@@ -24,25 +24,27 @@ const upload = multer({
     projectId: "enhanced-tuner-347902", //GCLOUD_PROJECT
     keyFilename: "./keys/enhanced-tuner-347902-e1303528f500.json", //GSC_KEYFILE, path to a json file,
     destination: (request, file, callback) => {
-      const fieldname = file.fieldname
+      const fieldname = file.fieldname;
       if (fieldname === "icon") {
         callback(null, "./icons");
       } else if (fieldname === "banner") {
         callback(null, "./banners");
       }
-
     },
     filename: (request, file, callback) => {
-      callback(null, Date.now() + "--" + file.originalname);
+      callback(
+        null,
+        Date.now() + "--" + Math.random().toString() + "--" + file.originalname
+      );
     },
   }),
 });
 // create two separate instances
 
-
 router.post(
   "/",
   checkAuth,
+
   upload.fields([
     {
       name: "icon",
@@ -73,6 +75,20 @@ router.patch(
   checkAuth, // will be used to determine if the user is actually the subreddit owner
   [check("newDescription").trim().notEmpty().isLength({ min: 1, max: 300 })],
   subredditsController.updateSubredditInfo
+);
+
+
+router.patch(
+  "/:subredditId/banner-upload",
+  checkAuth, // will be used to determine if the user is actually the subreddit owner
+  upload.single("banner"),
+  subredditsController.updateSubredditImage
+);
+router.patch(
+  "/:subredditId/icon-upload",
+  checkAuth, // will be used to determine if the user is actually the subreddit owner
+  upload.single("icon"),
+  subredditsController.updateSubredditIcon
 );
 
 router.get(
