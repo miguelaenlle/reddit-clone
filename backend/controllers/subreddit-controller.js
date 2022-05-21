@@ -7,6 +7,16 @@ const HttpError = require("../models/http-error");
 const Subreddit = require("../models/subreddit");
 const User = require("../models/user");
 
+const { Storage } = require("@google-cloud/storage");
+
+const storage = new Storage({
+  keyFilename: "./keys/enhanced-tuner-347902-e1303528f500.json",
+});
+
+const deleteFile = async (fileName) => {
+  await storage.bucket("redddit-bucket").file(fileName).delete();
+};
+
 const updateSubredditIcon = async (request, response, next) => {
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
@@ -15,7 +25,7 @@ const updateSubredditIcon = async (request, response, next) => {
 
   const iconUpload = request.file;
   const path = iconUpload.path;
-  console.log(path)
+  console.log(path);
 
   // pull user
   const userId = request.userData.userId;
@@ -46,6 +56,8 @@ const updateSubredditIcon = async (request, response, next) => {
   if (subreddit.sub_owner.toString() !== existingUser._id.toString()) {
     return next(new HttpError("You do not own this subreddit", 403));
   }
+
+  const originalPicturePath = subreddit.picture_url;
 
   // update the subreddit's banner-image-url
   try {
@@ -56,13 +68,21 @@ const updateSubredditIcon = async (request, response, next) => {
     return next(new HttpError("Could not update subreddit", 500));
   }
 
+  // delete the original path
+  try {
+    console.log(originalPicturePath);
+    await deleteFile(originalPicturePath);
+  } catch (error) {
+    console.log(error);
+    return next(new HttpError("Could not delete the original file", 500));
+  }
+
   // return the path of the new banner-image-url
   return response.status(200).json({
     message: "Banner image updated successfully",
     icon_image_url: path,
   });
-
-}
+};
 
 const updateSubredditImage = async (request, response, next) => {
   const errors = validationResult(request);
@@ -72,7 +92,7 @@ const updateSubredditImage = async (request, response, next) => {
 
   const bannerUpload = request.file;
   const path = bannerUpload.path;
-  console.log(path)
+  console.log(path);
 
   // pull user
   const userId = request.userData.userId;
@@ -105,12 +125,22 @@ const updateSubredditImage = async (request, response, next) => {
   }
 
   // update the subreddit's banner-image-url
+
+  const originalPicturePath = subreddit.background_image_url;
+
   try {
     await Subreddit.findByIdAndUpdate(subId, {
       background_image_url: path,
     });
   } catch (error) {
     return next(new HttpError("Could not update subreddit", 500));
+  }
+
+  // delete the original picture
+  try {
+    await deleteFile(originalPicturePath);
+  } catch (error) {
+    return next(new HttpError("Could not delete the original file", 500));
   }
 
   // return the path of the new banner-image-url
@@ -216,7 +246,7 @@ const createSubreddit = async (request, response, next) => {
   const newSubreddit = new Subreddit({
     name: subName,
     description: description,
-    num_members: 0,
+    num_members: 1,
     background_image_url: bannerFileInfo,
     picture_url: iconFileInfo,
     sub_owner: existingUser.id,
