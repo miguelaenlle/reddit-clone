@@ -64,6 +64,7 @@ const UserDropdown: React.FC<{}> = (props) => {
     <React.Fragment>
       {authContext?.isLoggedIn ? (
         <DropdownForUser
+          userId={authContext.userId}
           username={authContext.username}
           optionIds={optionIds}
           optionValues={userOptionValues}

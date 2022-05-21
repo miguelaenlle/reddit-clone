@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/outline";
 import DropdownOption from "./DropdownOption";
+import { useHistory, useLocation } from "react-router-dom";
 
 const DropdownForUser: React.FC<{
+  userId: string | null;
   username: string | null;
   optionIds: string[];
   optionValues: { [key: string]: string };
@@ -11,11 +13,31 @@ const DropdownForUser: React.FC<{
   handleLogout: () => void;
   handleSelectedOption: (option: string) => void;
 }> = (props) => {
+  const location = useLocation();
+  const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const handleClickOpen = () => {
     setIsOpen((prevOpen) => !prevOpen);
   };
   const handleSelectOption = (option: string) => {
+    console.log(option);
+    if (option === "profile") {
+      history.push(`/user/${props.userId}`);
+    } else if (option === "new_community") {
+      history.push({
+        pathname: `/create-sub`,
+        state: {
+          background: location,
+        },
+      });
+    } else if (option === "new_post") {
+      history.push({
+        pathname: `/create-post`,
+        state: {
+          background: location,
+        },
+      });
+    } 
     props.handleSelectedOption(option);
     setIsOpen(false);
   };
