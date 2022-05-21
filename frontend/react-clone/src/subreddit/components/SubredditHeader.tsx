@@ -14,6 +14,7 @@ import { AuthContext } from "../../context/auth-context";
 import { useSubredditMembership } from "../hooks/use-subreddit-membership";
 import Background from "./Background";
 import SubredditInfo from "./SubredditInfo";
+import Icon from "./Icon";
 
 const MIN_DESCRIPTION_CHARACTERS = 10;
 const MAX_DESCRIPTION_CHARACTERS = 300;
@@ -196,15 +197,7 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
       <Background editingEnabled={editingEnabled} subreddit={subreddit} />
 
       <div className="items-start space-x-5 flex p-5 bg-zinc-800 border-y border-zinc-700">
-        <div>
-          <div
-            className={`group flex ${
-              editingEnabled ? "hover:cursor-pointer hover:border-zinc-400" : ""
-            } justify-center items-center groudp h-24 w-24 bg-white border-4 border-zinc-300 rounded-full`}
-          >
-            <PencilIcon className="p-4 text-zinc-200 group-hover:text-zinc-400" />
-          </div>
-        </div>
+        <Icon editingEnabled={editingEnabled} subreddit={subreddit} />
         <SubredditInfo
           isLoggedIn={authContext?.isLoggedIn ?? false}
           isLoading={isLoading}

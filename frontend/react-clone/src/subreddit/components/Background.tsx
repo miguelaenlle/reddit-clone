@@ -3,9 +3,7 @@ import { AuthContext } from "../../context/auth-context";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Subreddit } from "../../models/Subreddit";
 import LoadingSpinner from "../../shared/components/LoadingSpinner";
-
-const DEFAULT_BANNER =
-  "https://preview.redd.it/xw6wqhhjubh31.jpg?width=2400&format=pjpg&auto=webp&s=32690f33b69e599ed11ea3e7c0e6286c0770245e";
+import { generateImageUrl } from "../../shared/helpers/generate-image-url";
 
 const Background: React.FC<{
   editingEnabled: boolean;
@@ -14,13 +12,13 @@ const Background: React.FC<{
   const authContext = useContext(AuthContext);
   const httpClient = useHttpClient();
 
-  const baseBackgroundUrl = process.env.REACT_APP_STORAGE_URL;
   const [imageURL, setImageUrl] = useState<string | null>(
-    props.subreddit?.backgroundUrl ?? null
+    props.subreddit?.backgroundUrl
+      ? generateImageUrl(props.subreddit?.backgroundUrl)
+      : null
   );
   const filePickerRef = useRef<HTMLInputElement>(null);
 
-  const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handlePicked = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,27 +35,26 @@ const Background: React.FC<{
       setIsUploading(true);
       const formData = new FormData();
       formData.append("banner", newFile);
+      try {
+        const response = await httpClient.sendFormDataRequest(
+          url,
+          "PATCH",
+          formData,
+          authContext?.token
+        );
+        const bannerImageUrl: string | undefined =
+          response.data?.banner_image_url;
+        if (bannerImageUrl) {
+          const newImageUrl = generateImageUrl(bannerImageUrl);
+          console.log(newImageUrl);
+          setImageUrl(newImageUrl);
+        }
+        console.log("Response", response);
 
-      const response = await httpClient.sendFormDataRequest(
-        url,
-        "PATCH",
-        formData,
-        authContext?.token
-      );
-      const bannerImageUrl: string | undefined =
-        response.data?.banner_image_url;
-      if (bannerImageUrl) {
-        const newImageUrl =
-          `${baseBackgroundUrl}/${bannerImageUrl}`.replaceAll(
-            "%",
-            "%25"
-          );
-        console.log(newImageUrl);
-        setImageUrl(newImageUrl);
+        setIsUploading(false);
+      } catch (error) {
+        setIsUploading(false);
       }
-      console.log("Response", response);
-
-      setIsUploading(false);
     }
   };
 
@@ -71,11 +68,7 @@ const Background: React.FC<{
 
   useEffect(() => {
     if (props.subreddit) {
-      const backgroundUrl =
-        `${baseBackgroundUrl}/${props.subreddit.backgroundUrl}`.replaceAll(
-          "%",
-          "%25"
-        );
+      const backgroundUrl = generateImageUrl(props.subreddit.backgroundUrl);
 
       console.log(backgroundUrl);
       if (backgroundUrl) {
@@ -90,7 +83,7 @@ const Background: React.FC<{
         props.editingEnabled && !isUploading
           ? "hover:cursor-pointer border-2 hover:border-zinc-400"
           : ""
-      } border-zinc-700 bg-blue-500 h-40 z-0`}
+      } border-zinc-700 h-40 z-0`}
     >
       <input
         className={"hidden"}
@@ -102,7 +95,7 @@ const Background: React.FC<{
       />
       {imageURL && (
         <img
-          src={imageURL ?? DEFAULT_BANNER}
+          src={imageURL}
           className="absolute w-full h-full object-cover"
         ></img>
       )}
