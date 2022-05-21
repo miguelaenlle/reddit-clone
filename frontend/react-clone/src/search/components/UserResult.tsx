@@ -8,7 +8,9 @@ const UserResult: React.FC<{
   return (
     <div className="flex p-5 bg-zinc-800 border border-zinc-700 items-center">
       <div>
-        <div className="w-10 h-10 rounded-full bg-zinc-200 mr-5"></div>
+        <div className="flex w-10 h-10 rounded-full bg-zinc-700 mr-5 justify-center items-center">
+          <p className="text-zinc-400 text-lg text-center">u/</p>
+        </div>
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center space-x-2">
