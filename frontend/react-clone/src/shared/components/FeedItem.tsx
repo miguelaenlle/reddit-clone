@@ -42,7 +42,7 @@ const FeedItem: React.FC<{
   };
 
   return (
-    <div className="w-1/3 p-1.5">
+    <div className="p-1.5">
       <div
         ref={feedItemDivRef}
         className="z-10 hover:cursor-pointer group bg-zinc-800 border border-zinc-700 p-3 hover:border-zinc-400 max-h-fit transition-colors"

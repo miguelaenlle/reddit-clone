@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRef } from "react";
 import { Route, Switch } from "react-router-dom";
-import { createNoSubstitutionTemplateLiteral } from "typescript";
+import StackGrid from "react-stack-grid";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
 import PostPage from "../../posts/pages/Post";
@@ -71,7 +71,11 @@ const Feed: React.FC<{}> = (props) => {
 
   useEffect(() => {
     pullData(true);
-  }, [page, selectedOption]);
+  }, [page]);
+
+  useEffect(() => {
+    pullData(false);
+  }, [selectedOption]);
 
   const handleScroll = () => {
     const { scrollTop, offsetHeight } = document.documentElement;
@@ -107,15 +111,17 @@ const Feed: React.FC<{}> = (props) => {
           <NewCommunityButton />
         </div>
         <div className={`mx-1 my-6 animate-pulse h-2 bg-transparent`}></div>
-        <div className="z-0 animate-fade relative">
+        <div className="z-0 animate-fade relative ">
           <div
             className={`${
               httpClient.isLoading ? "blur-sm" : ""
-            } z-1 animate-fade flex flex-wrap`}
+            } z-1 animate-fade w-full`}
           >
-            {posts.map((post) => (
-              <FeedItem key={`post-${post.id}`} post={post} />
-            ))}
+            <StackGrid columnWidth={300} gutterHeight={5} gutterWidth={0}>
+              {posts.map((post) => (
+                <FeedItem key={`post-${post.id}`} post={post} />
+              ))}
+            </StackGrid>
           </div>
 
           {posts.length % MAX_RESULTS_PER_PAGE === 0 &&
