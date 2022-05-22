@@ -56,10 +56,8 @@ const Icon: React.FC<{
         const iconImageUrl: string | undefined = response.data?.icon_image_url;
         if (iconImageUrl) {
           const newImageUrl = generateImageUrl(iconImageUrl);
-          console.log(newImageUrl);
           setImageUrl(newImageUrl);
         }
-        console.log("Response", response);
 
         setIsUploading(false);
       } catch {

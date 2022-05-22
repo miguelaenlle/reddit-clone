@@ -5,9 +5,6 @@ import { useSubredditMembership } from "../hooks/use-subreddit-membership";
 
 const SubredditResultsList: React.FC<{ subreddits: Subreddit[] }> = (props) => {
   const subMembership = useSubredditMembership();
-  useEffect(() => {
-    console.log(props.subreddits);
-  }, [props.subreddits]);
   return (
     <React.Fragment>
       {props.subreddits.map((result) => {

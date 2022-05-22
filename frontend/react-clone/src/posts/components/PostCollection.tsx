@@ -1,7 +1,4 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import StackGrid from "react-stack-grid";
 import { Post } from "../../models/Post";
 import FeedItem from "../../shared/components/FeedItem";
@@ -43,29 +40,39 @@ const PostCollection: React.FC<{
     };
   }, [props.query, props.page, props.atBottom, props.hitLimit]);
 
+  const [stackGrid, setStackGrid] = useState<StackGrid | null>();
+
+  const updateGridLayout = () => {
+    if (stackGrid) {
+      stackGrid.updateLayout();
+    }
+  };
+
+  useEffect(() => {
+    updateGridLayout();
+  }, [props.posts]);
+
   return (
     <React.Fragment>
-      <div className="-mx-1.5 pt-4 z-0 animate-fade relative">
+      <div className="-mx-1.5 pt-4 z-0 animate-fade relative pb-24">
         {!props.httpIsLoading && props.posts.length === 0 && (
           <p className="text-zinc-200 text-xl">
             No posts yet. Be the first one to post!
           </p>
         )}
-        <StackGrid columnWidth={500} gutterHeight={5} gutterWidth={0}>
+        <StackGrid
+          gridRef={(grid) => setStackGrid(grid)}
+          columnWidth={500}
+          gutterHeight={0}
+          gutterWidth={0}
+        >
           {props.posts.map((post) => (
-            <FeedItem key={`post-${post.id}`} post={post} />
+            <FeedItem
+              key={`post-${post.id}`}
+              post={post}
+              handleUpdateLayout={updateGridLayout}
+            />
           ))}
-          {props.httpIsLoading && (
-            <React.Fragment>
-              {[...Array(5)].map(() => {
-                return (
-                  <FeedItemLoader
-                    key={`post-loader-${Math.random().toString()}`}
-                  />
-                );
-              })}
-            </React.Fragment>
-          )}
         </StackGrid>
       </div>
       {props.numResultsPerPage * (props.page + 1) === props.posts.length &&

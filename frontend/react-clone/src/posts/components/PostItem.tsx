@@ -21,6 +21,7 @@ import { useEditPost } from "../hooks/use-edits";
 import LightButton from "../../shared/components/LightButton";
 import InputField from "../../shared/components/InputField";
 import { useEditComment } from "../hooks/use-edit-comment";
+import { useHistory, useLocation } from "react-router-dom";
 
 const PostItem: React.FC<{
   comment: { [key: string]: any };
@@ -36,14 +37,26 @@ const PostItem: React.FC<{
   const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
-    setIsDeleted(props.comment.deleted)
-  }, [props.comment.deleted])
-  
+    setIsDeleted(props.comment.deleted);
+  }, [props.comment.deleted]);
+
+  const location = useLocation();
+  const history = useHistory();
+
+  const handleOpenSignup = () => {
+    history.push({
+      pathname: `/signup`,
+      state: {
+        background: location,
+      },
+    });
+  };
 
   const votesHandler = useVotes(
     props.comment._id,
     props.comment.upvotes ?? 0,
-    false
+    false,
+    handleOpenSignup
   );
 
   const editsHandler = useEditComment(props.comment);
