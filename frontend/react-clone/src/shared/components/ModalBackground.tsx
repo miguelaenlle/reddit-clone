@@ -11,7 +11,7 @@ const ModalBackground: React.FC<{ onDismiss: () => void }> = (props) => {
   return (
     <div
       onClick={handleClickOutside}
-      className="animate-fade z-20 fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 overflow-y-auto"
+      className="animate-fade z-20 fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-80 overflow-y-auto"
     >
       {props.children}
     </div>

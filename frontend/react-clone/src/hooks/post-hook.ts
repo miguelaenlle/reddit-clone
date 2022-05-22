@@ -82,11 +82,9 @@ export const usePostsClient = (
   };
 
   const expandResults = useCallback(async () => {
-    console.log("Expand results");
     setIsLoading(true);
 
     const newPage = page + 1;
-    console.log(newPage);
 
     setPage(newPage);
     try {
@@ -103,7 +101,6 @@ export const usePostsClient = (
         setIsLoading(false);
       }
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
     }
     setAtBottom(false);

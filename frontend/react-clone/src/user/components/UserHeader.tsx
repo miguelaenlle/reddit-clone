@@ -20,7 +20,6 @@ const UserHeader: React.FC<{}> = (props) => {
       const user = await httpClient.fetchUser(userId);
       if (user) {
         const userData = user.data;
-        console.log("User data", userData);
         setUser(new User(userId, userData.username, userData.num_upvotes));
       }
     } catch (error) {}

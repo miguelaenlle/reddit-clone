@@ -1,10 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useRef } from "react";
-import { Route, Switch } from "react-router-dom";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import StackGrid from "react-stack-grid";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Post } from "../../models/Post";
-import PostPage from "../../posts/pages/Post";
 import Dropdown from "../../shared/components/Dropdown";
 import FeedItem from "../../shared/components/FeedItem";
 import {
@@ -60,6 +57,7 @@ const Feed: React.FC<{}> = (props) => {
         setPosts(formattedPosts);
       }
       setHitBottom(false);
+      updateGridLayout();
     },
     [selectedOption, page]
   );
@@ -96,46 +94,60 @@ const Feed: React.FC<{}> = (props) => {
     };
   }, []);
 
-  return (
-    <React.Fragment>
-      <div className="pt-20 px-5" ref={listInnerRef}>
-        <div className="z-10 flex space-x-2 relative">
-          <Dropdown
-            navbar={false}
-            optionIds={optionIds}
-            optionValues={sortOptionValues}
-            optionIcons={sortOptionIcons}
-            selectedOption={selectedOption}
-            handleSelectedOption={handleSelectedOption}
-          />
-          <NewPostButton />
-          <NewCommunityButton />
-        </div>
-        <div className={`mx-1 my-6 animate-pulse h-2 bg-transparent`}></div>
-        <div className="z-0 animate-fade relative ">
-          <div className={`z-1  w-full`}>
-            {posts.length > 0 && (
-              <StackGrid columnWidth={300} gutterHeight={5} gutterWidth={0}>
-                {posts.map((post) => (
-                  <FeedItem key={`post-${post.id}`} post={post} />
-                ))}
-              </StackGrid>
-            )}
-          </div>
+  const [stackGrid, setStackGrid] = useState<StackGrid | null>();
 
-          {posts.length % MAX_RESULTS_PER_PAGE === 0 &&
-            !httpClient.isLoading &&
-            !maxReached && (
-              <p
-                className="text-zinc-400 p-2 hover:cursor-pointer"
-                onClick={handleScroll}
-              >
-                Load more posts
-              </p>
-            )}
-        </div>
+  const updateGridLayout = () => {
+    if (stackGrid) {
+      stackGrid.updateLayout();
+    }
+  };
+  return (
+    <div className="pt-20 px-5" ref={listInnerRef}>
+      <div className="z-10 flex space-x-2 relative">
+        <Dropdown
+          navbar={false}
+          optionIds={optionIds}
+          optionValues={sortOptionValues}
+          optionIcons={sortOptionIcons}
+          selectedOption={selectedOption}
+          handleSelectedOption={handleSelectedOption}
+        />
+        <NewPostButton />
+        <NewCommunityButton />
       </div>
-    </React.Fragment>
+      <div className={`mx-1 my-6 animate-pulse h-2 bg-transparent`}></div>
+      <div className="z-0 animate-fade relative ">
+        <div className={`z-1  w-full`}>
+          {posts.length > 0 && (
+            <StackGrid
+              gridRef={(grid) => setStackGrid(grid)}
+              columnWidth={500}
+              gutterHeight={5}
+              gutterWidth={0}
+            >
+              {posts.map((post) => (
+                <FeedItem
+                  key={`post-${post.id}`}
+                  post={post}
+                  handleUpdateLayout={updateGridLayout}
+                />
+              ))}
+            </StackGrid>
+          )}
+        </div>
+
+        {posts.length % MAX_RESULTS_PER_PAGE === 0 &&
+          !httpClient.isLoading &&
+          !maxReached && (
+            <p
+              className="text-zinc-400 p-2 hover:cursor-pointer"
+              onClick={handleScroll}
+            >
+              Load more posts
+            </p>
+          )}
+      </div>
+    </div>
   );
 };
 export default Feed;

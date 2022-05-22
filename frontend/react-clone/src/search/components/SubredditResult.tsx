@@ -69,11 +69,13 @@ const SubredditResult: React.FC<{
           <h2 className="text-zinc-400"> •</h2>
           <h2 className="text-zinc-400 text-md">{`${subredditMembers} members`}</h2>
           <div className="pl-2">
-            <LightButton
-              onClick={handleClickSubreddit}
-              loading={httpClient.isLoading}
-              buttonText={isMember ? "Leave Subreddit" : "Join Subreddit"}
-            />
+            {authContext?.token && (
+              <LightButton
+                onClick={handleClickSubreddit}
+                loading={httpClient.isLoading}
+                buttonText={isMember ? "Leave Subreddit" : "Join Subreddit"}
+              />
+            )}
           </div>
         </div>
         <h2 className="text-zinc-400 text-sm">{props.description}</h2>

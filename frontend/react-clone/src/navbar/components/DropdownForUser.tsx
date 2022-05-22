@@ -20,7 +20,6 @@ const DropdownForUser: React.FC<{
     setIsOpen((prevOpen) => !prevOpen);
   };
   const handleSelectOption = (option: string) => {
-    console.log(option);
     if (option === "profile") {
       history.push(`/user/${props.userId}`);
     } else if (option === "new_community") {
@@ -70,7 +69,7 @@ const DropdownForUser: React.FC<{
         onClick={handleClickOpen}
         className={`relative border ${
           isOpen ? "border-zinc-700" : "border-0"
-        } group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
+        } group p-3 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
           !isOpen && bottomBorderRadius
         }`}
       >
@@ -79,7 +78,7 @@ const DropdownForUser: React.FC<{
           {props.username ? `u/${props.username}` : "My Account"}
         </p>
         <ChevronUpIcon
-          className={`text-zinc-400 h-4 group-hover:text-white transition-colors ${
+          className={`text-zinc-400 w-4 h-4 group-hover:text-white transition-colors ${
             isOpen ? "rotate-180" : ""
           } transition-transform`}
         />

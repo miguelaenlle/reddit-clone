@@ -113,7 +113,6 @@ const CreateSubreddit: React.FC = (props) => {
           token
         );
 
-        console.log(responseData);
 
         if (responseData.error !== "OK") {
           updateError(responseData.error);
@@ -126,7 +125,6 @@ const CreateSubreddit: React.FC = (props) => {
         updateError("You must be logged in to create a subreddit");
       }
     } catch (error: any) {
-      console.log(error);
       if (error.message) {
         updateError(error.message);
       }

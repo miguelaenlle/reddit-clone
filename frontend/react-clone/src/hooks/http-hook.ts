@@ -33,7 +33,6 @@ export const useHttpClient = () => {
         };
         if (method === "POST") {
           const response = await axios.post(url, formData, config);
-          console.log("Response", response);
           activeHttpRequests.current = activeHttpRequests.current.filter(
             (reqCtrl) => reqCtrl !== httpAbortController
           );

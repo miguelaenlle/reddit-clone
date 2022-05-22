@@ -34,7 +34,6 @@ const UploadImages: React.FC<{
   const handleImageUploaded = (file: File | null) => {
     if (file) {
       setIsLoading(true);
-      console.log(file);
       const fileReader = new FileReader();
       fileReader.onload = () => {
         if (fileReader.result && file) {
