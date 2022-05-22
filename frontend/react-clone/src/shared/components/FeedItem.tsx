@@ -15,7 +15,6 @@ const FeedItem: React.FC<{
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
 
   const handleOpenSignup = () => {
-    console.log("Sign up.");
     history.push({
       pathname: `/signup`,
       state: {
@@ -60,7 +59,7 @@ const FeedItem: React.FC<{
   };
 
   return (
-    <div className="z-0 p-1.5">
+    <div className="w-full z-0 p-1.5">
       <ImagePreview
         post={props.post}
         handleUpdateLayout={props.handleUpdateLayout}
