@@ -10,9 +10,9 @@ import LightButton from "../../shared/components/LightButton";
 import Modal from "../../shared/components/Modal";
 import TextField from "../../shared/components/TextField";
 import { imageCSS } from "../../shared/constants/image-class";
-
 import { v4 as uuidv4 } from "uuid";
 import { urlValues } from "../../navbar/constants/page-options";
+import Masonry from "react-masonry-css";
 
 const validate = (values: { [key: string]: string }) => {
   const errors: { [key: string]: string } = {};
