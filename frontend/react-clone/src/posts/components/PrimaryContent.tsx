@@ -1,37 +1,51 @@
 import {
-  AnnotationIcon,
-  ArrowRightIcon,
-  ChatIcon,
   CheckIcon,
   PencilIcon,
   ReplyIcon,
   XIcon,
 } from "@heroicons/react/outline";
 import moment from "moment";
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import React from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import { Post } from "../../models/Post";
+import ImagePreview from "../../shared/components/ImagePreview";
 import InputField from "../../shared/components/InputField";
 import LightButton from "../../shared/components/LightButton";
 import TextField from "../../shared/components/TextField";
 import VoteItem from "../../shared/components/VoteItem";
 import { imageCSS } from "../../shared/constants/image-class";
-import { useVotes } from "../hooks/use-votes";
-import { useEditPost } from "../hooks/use-edits";
-import DeleteConfirmationButton from "./DeleteConfirmationButton";
 import { useComments } from "../hooks/use-comment";
+import { useEditPost } from "../hooks/use-edits";
+import { useVotes } from "../hooks/use-votes";
 import CommentField from "./CommentField";
-import ImagePreview from "../../shared/components/ImagePreview";
+import DeleteConfirmationButton from "./DeleteConfirmationButton";
 
 const PrimaryContent: React.FC<{
   post: Post;
   addComment: (comment: { [key: string]: any }) => void;
 }> = (props) => {
   const editsHandler = useEditPost(props.post);
-  const votesHandler = useVotes(props.post.id, props.post.initialUpvotes, true);
-  const commentsHandler = useComments(true, props.post.id, props.addComment);
 
+  const location = useLocation();
   const history = useHistory();
+
+  const handleOpenSignup = () => {
+    console.log("Signup");
+    history.push({
+      pathname: `/signup`,
+      state: {
+        background: location,
+      },
+    });
+  };
+
+  const votesHandler = useVotes(
+    props.post.id,
+    props.post.initialUpvotes,
+    true,
+    handleOpenSignup
+  );
+  const commentsHandler = useComments(true, props.post.id, props.addComment);
 
   const openUser = () => {
     history.push(`/user/${props.post.opId}`);
@@ -122,8 +136,8 @@ const PrimaryContent: React.FC<{
           {editsHandler.isEditing && editsHandler.error && (
             <p className="pt-5 text-red-500 text-lg">{editsHandler.error}</p>
           )}
-          <div className = "pt-5">
-            <ImagePreview post={props.post} />
+          <div className="pt-5">
+            <ImagePreview post={props.post} handleUpdateLayout={() => {}} />
           </div>
           <div className="mt-14 space-x-2 flex">
             {!editsHandler.isEditing && (

@@ -8,11 +8,28 @@ import ImagePreview from "./ImagePreview";
 
 const FeedItem: React.FC<{
   post: Post;
+  handleUpdateLayout: () => void;
 }> = (props) => {
   const location = useLocation();
   const history = useHistory();
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
-  const votesHandler = useVotes(props.post.id, props.post.initialUpvotes, true);
+
+  const handleOpenSignup = () => {
+    console.log("Sign up.");
+    history.push({
+      pathname: `/signup`,
+      state: {
+        background: location,
+      },
+    });
+  };
+
+  const votesHandler = useVotes(
+    props.post.id,
+    props.post.initialUpvotes,
+    true,
+    handleOpenSignup
+  );
 
   const updateTimeAgo = () => {
     try {
@@ -44,7 +61,10 @@ const FeedItem: React.FC<{
 
   return (
     <div className="p-1.5">
-      <ImagePreview post={props.post} />
+      <ImagePreview
+        post={props.post}
+        handleUpdateLayout={props.handleUpdateLayout}
+      />
       <div
         ref={feedItemDivRef}
         className="z-10 hover:cursor-pointer group bg-zinc-800 border border-zinc-700 p-3 hover:border-zinc-400 max-h-fit transition-colors"

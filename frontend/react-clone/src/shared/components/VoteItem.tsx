@@ -13,6 +13,7 @@ const VoteItem: React.FC<{
     !props.isLoading ? "cursor-pointer" : "cursor-default"
   }`;
 
+
   return useMemo(
     () => (
       <div className="flex space-x-2 items-center">

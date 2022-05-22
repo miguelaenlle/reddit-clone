@@ -46,10 +46,8 @@ const Background: React.FC<{
           response.data?.banner_image_url;
         if (bannerImageUrl) {
           const newImageUrl = generateImageUrl(bannerImageUrl);
-          console.log(newImageUrl);
           setImageUrl(newImageUrl);
         }
-        console.log("Response", response);
 
         setIsUploading(false);
       } catch (error) {
@@ -70,7 +68,6 @@ const Background: React.FC<{
     if (props.subreddit) {
       const backgroundUrl = generateImageUrl(props.subreddit.backgroundUrl);
 
-      console.log(backgroundUrl);
       if (backgroundUrl) {
         setImageUrl(backgroundUrl);
       }

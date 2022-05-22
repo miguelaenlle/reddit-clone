@@ -153,8 +153,6 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
       const data = await httpClient.sendRequest(url, "GET");
       const subData = data.data;
 
-      console.log("Subreddit data", subData);
-
       const subredditData = new Subreddit(
         subData.name,
         subData.id,

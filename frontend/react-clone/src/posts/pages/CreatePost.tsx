@@ -66,7 +66,6 @@ const CreatePost: React.FC<{}> = (props) => {
         formData.append("images", file.file);
       }
 
-      console.log(formData);
 
       const response = await httpClient.sendFormDataRequest(
         url,
@@ -74,7 +73,6 @@ const CreatePost: React.FC<{}> = (props) => {
         formData,
         authContext?.token
       );
-      console.log(response);
       const responseData = response.data;
 
       const postId = responseData.id;
@@ -88,7 +86,6 @@ const CreatePost: React.FC<{}> = (props) => {
       window.location.reload();
       // redirect to the post location
     } catch (error) {
-      console.log(error);
     }
   };
 
