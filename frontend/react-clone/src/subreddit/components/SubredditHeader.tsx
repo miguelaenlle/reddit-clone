@@ -15,6 +15,7 @@ import { useSubredditMembership } from "../hooks/use-subreddit-membership";
 import Background from "./Background";
 import SubredditInfo from "./SubredditInfo";
 import Icon from "./Icon";
+import { useWindowDimensions } from "../../shared/hooks/use-window-dimensions";
 
 const MIN_DESCRIPTION_CHARACTERS = 10;
 const MAX_DESCRIPTION_CHARACTERS = 300;
@@ -34,6 +35,7 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
   const [newDescriptionError, setNewDescriptionError] = useState<
     string | undefined
   >();
+  const windowDimensions = useWindowDimensions();
 
   const [isSubredditMember, setIsSubredditMember] = useState(false);
   const [memberCount, setMemberCount] = useState(0);
@@ -192,10 +194,21 @@ const SubredditHeader: React.FC<{ subId: string }> = (props) => {
   };
   return (
     <div>
-      <Background editingEnabled={editingEnabled} subreddit={subreddit} />
+      <div className="relative">
+        <Background editingEnabled={editingEnabled} subreddit={subreddit} />
+        {windowDimensions.width <= 640 && (
+          <div className="w-full absolute -bottom-10">
+            <div className="w-full flex justify-center">
+              <Icon editingEnabled={editingEnabled} subreddit={subreddit} />
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="items-start space-x-5 flex p-5 bg-zinc-800 border-y border-zinc-700">
-        <Icon editingEnabled={editingEnabled} subreddit={subreddit} />
+        {windowDimensions.width > 640 && (
+          <Icon editingEnabled={editingEnabled} subreddit={subreddit} />
+        )}
         <SubredditInfo
           isLoggedIn={authContext?.isLoggedIn ?? false}
           isLoading={isLoading}

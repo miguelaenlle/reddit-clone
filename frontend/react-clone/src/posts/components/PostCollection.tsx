@@ -4,6 +4,8 @@ import { Post } from "../../models/Post";
 import FeedItem from "../../shared/components/FeedItem";
 import FeedItemLoader from "../../shared/components/FeedItemLoader";
 import LoadingSpinner from "../../shared/components/LoadingSpinner";
+import Masonry from "@mui/lab/Masonry";
+import MasonryPosts from "../../shared/components/MasonryPosts";
 
 const PostCollection: React.FC<{
   query: string | undefined;
@@ -56,24 +58,11 @@ const PostCollection: React.FC<{
     <React.Fragment>
       <div className="-mx-1.5 pt-4 z-0 animate-fade relative pb-24">
         {!props.httpIsLoading && props.posts.length === 0 && (
-          <p className="text-zinc-200 text-xl">
+          <p className="text-zinc-400">
             No posts yet. Be the first one to post!
           </p>
         )}
-        <StackGrid
-          gridRef={(grid) => setStackGrid(grid)}
-          columnWidth={500}
-          gutterHeight={0}
-          gutterWidth={0}
-        >
-          {props.posts.map((post) => (
-            <FeedItem
-              key={`post-${post.id}`}
-              post={post}
-              handleUpdateLayout={updateGridLayout}
-            />
-          ))}
-        </StackGrid>
+        <MasonryPosts posts={props.posts} />
       </div>
       {props.numResultsPerPage * (props.page + 1) === props.posts.length &&
         !props.isLoading &&
