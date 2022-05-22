@@ -139,7 +139,7 @@ const PrimaryContent: React.FC<{
           <div className="pt-5">
             <ImagePreview post={props.post} handleUpdateLayout={() => {}} />
           </div>
-          <div className="mt-14 space-x-2 flex">
+          <div className="mt-14 md:space-x-2 md:flex xs:space-y-2">
             {!editsHandler.isEditing && (
               <React.Fragment>
                 <VoteItem
@@ -154,6 +154,7 @@ const PrimaryContent: React.FC<{
                     onClick={commentsHandler.handleReply}
                     buttonImage={<ReplyIcon className={imageCSS} />}
                     buttonText="Reply"
+                    fullWidth={true}
                   />
                 )}
               </React.Fragment>
@@ -167,11 +168,13 @@ const PrimaryContent: React.FC<{
                       onClick={editsHandler.handleSubmit}
                       buttonImage={<CheckIcon className={imageCSS} />}
                       buttonText="Finish"
+                      fullWidth={true}
                     />
                     <LightButton
                       onClick={editsHandler.handleEndEditMode}
                       buttonImage={<XIcon className={imageCSS} />}
                       buttonText="Cancel"
+                      fullWidth={true}
                     />
                   </React.Fragment>
                 ) : (
@@ -180,10 +183,12 @@ const PrimaryContent: React.FC<{
                       onClick={editsHandler.handleStartEditMode}
                       buttonImage={<PencilIcon className={imageCSS} />}
                       buttonText="Edit"
+                      fullWidth={true}
                     />
                     <DeleteConfirmationButton
                       itemId={props.post.id}
                       isPost={true}
+                      fullWidth={true}
                     />
                   </React.Fragment>
                 )}
