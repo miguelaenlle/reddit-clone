@@ -7,6 +7,17 @@ const Subreddit = require("../models/subreddit");
 const User = require("../models/user");
 const Vote = require("../models/vote");
 const errorMessages = require("../constants/errors");
+const HttpError = require("../models/http-error");
+
+const { Storage } = require("@google-cloud/storage");
+const storage = new Storage({
+  keyFilename: "./keys/enhanced-tuner-347902-e1303528f500.json",
+});
+
+const deleteFile = async (fileName) => {
+  await storage.bucket("redddit-bucket").file(fileName).delete();
+};
+
 const createNewPost = async (request, response, next) => {
   // needs:
   // authToken
@@ -15,6 +26,7 @@ const createNewPost = async (request, response, next) => {
   // images (array of urls)
 
   const errors = validationResult(request);
+
   if (!errors.isEmpty()) {
     return next(errorMessages.invalidInputsError);
   }
@@ -56,6 +68,11 @@ const createNewPost = async (request, response, next) => {
 
   const currentDate = new Date();
 
+  const fileData = request.files;
+  console.log(fileData);
+
+  const paths = fileData.map((file) => file.path);
+
   const newPost = new Post({
     sub_id: subreddit.id,
     user_id: currentUser.id,
@@ -66,7 +83,7 @@ const createNewPost = async (request, response, next) => {
     num_upvotes: 0,
     num_comments: 0,
     deleted: false,
-    image_ids: [],
+    image_ids: paths,
     comment_ids: [],
   });
 
@@ -324,6 +341,20 @@ const deletePost = async (request, response, next) => {
   // in session:
   // delete the post
   // delete the postId from the user object
+
+  // delete the Post images
+  const deletionTasks = [];
+  try {
+    for (const imageId of post.image_ids) {
+      const deletionTask = deleteFile(imageId);
+      deletionTasks.push(deletionTask);
+    }
+    await Promise.all(deletionTasks);
+  } catch (error) {
+    console.error(error);
+    return next(new HttpError("Could not delete images", 500));
+  }
+
   try {
     await Post.findByIdAndUpdate(post.id, {
       deleted: true,
