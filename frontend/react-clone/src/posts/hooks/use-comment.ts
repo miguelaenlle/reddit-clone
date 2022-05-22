@@ -1,5 +1,5 @@
-import { prependOnceListener } from "process";
 import { useContext, useEffect, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/auth-context";
 import { useHttpClient } from "../../hooks/http-hook";
 
@@ -14,9 +14,22 @@ export const useComments = (
   const [replying, setReplying] = useState(false);
   const [reply, setReply] = useState("");
   const [error, setError] = useState<string | undefined>();
+  const history = useHistory();
+  const location = useLocation();
+  const state: any = location.state;
+  const background = state && state.background;
 
   const handleReply = () => {
-    setReplying(true);
+    if (authContext?.token) {
+      setReplying(true);
+    } else {
+      history.push({
+        pathname: "/signup",
+        state: {
+          background: background,
+        },
+      });
+    }
   };
   const handleCloseReply = () => {
     setReplying(false);

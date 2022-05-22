@@ -132,8 +132,8 @@ const getComment = async (request, response, next) => {
 };
 const getChildComments = async (request, response, next) => {
   // takes commentId via request.params
-  // params:
-  // none
+  // takes sortMode via request.query
+  // ?sortMode=new, controversial, etc
 
   const commentId = request.params.commentId;
 
@@ -146,10 +146,11 @@ const getChildComments = async (request, response, next) => {
   } catch {
     return next(errorMessages.getCommentFailedError);
   }
-
   let commentsChain = [];
   try {
-    let commentData = await comment.populate("comment_ids");
+    let commentData = await comment.populate({
+      path: "comment_ids",
+    });
     for (const recursionLevel in [...Array(10).keys()]) {
       let recursionQuery = "comment_ids";
       const accurateRecursionLevel = parseInt(recursionLevel) + 1;
@@ -162,7 +163,10 @@ const getChildComments = async (request, response, next) => {
         console.log(recursionQuery);
       }
       console.log(commentData);
-      commentData = await commentData.populate(recursionQuery);
+      commentData = await commentData.populate({
+        path: recursionQuery,
+      });
+      commentData = await commentData.populate(`${recursionQuery}.user_id`);
     }
     commentsChain = commentData;
   } catch (error) {
@@ -187,7 +191,7 @@ const updateComment = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const {  newCommentContent } = request.body;
+  const { newCommentContent } = request.body;
 
   // verify the user token
 
@@ -252,7 +256,6 @@ const deleteComment = async (request, response, next) => {
 
   // make sure the user exists
 
-  
   const userId = request.userData.userId;
 
   // get the user
@@ -295,10 +298,56 @@ const deleteComment = async (request, response, next) => {
     return next(errorMessages.deleteCommentFailedError);
   }
 
+  // find the post and subtract one from its comments_count
+
   return response.status(200).json({
     message: "Successfully deleted the comment.",
   });
 };
+
+const getVoteDirection = async (request, response, next) => {
+  // takes commentId via request.params
+  const commentId = request.params.commentId;
+
+  const userId = request.userData.userId;
+  let currentUser;
+  try {
+    currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return next(errorMessages.authTokenVerifyError);
+    }
+    if (!currentUser.isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
+  } catch (error) {
+    console.log(error);
+    return next(errorMessages.createCommentFailedError);
+  }
+
+  const userVoteObjects = await Vote.find({
+    user_id: currentUser.id,
+    parent_comment_id: commentId,
+  });
+
+  const matchingVotes = userVoteObjects.filter(
+    (object) => object.parent_comment_id.toString() === commentId
+  );
+
+  if (matchingVotes.length > 0) {
+    const vote = matchingVotes[0];
+    const initialVoteValue = vote.vote_value;
+    return response.status(200).json({
+      voteDirection: initialVoteValue,
+      message: "Successfully retrieved vote direction.",
+    });
+  } else {
+    return response.status(200).json({
+      voteDirection: 0,
+      message: "Successfully retrieved vote direction.",
+    });
+  }
+};
+
 const voteComment = async (request, response, next) => {
   // takes commentId via request.params
   const commentId = request.params.commentId;
@@ -315,7 +364,7 @@ const voteComment = async (request, response, next) => {
   const { voteDirection } = request.body;
 
   // make sure the user exists
-  
+
   const userId = request.userData.userId;
   // pull user data
 
@@ -455,3 +504,4 @@ exports.getChildComments = getChildComments;
 exports.updateComment = updateComment;
 exports.deleteComment = deleteComment;
 exports.voteComment = voteComment;
+exports.getVoteDirection = getVoteDirection;

@@ -1,11 +1,11 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import StackGrid from "react-stack-grid";
 import { Post } from "../../models/Post";
 import FeedItem from "../../shared/components/FeedItem";
 import FeedItemLoader from "../../shared/components/FeedItemLoader";
 import LoadingSpinner from "../../shared/components/LoadingSpinner";
+import Masonry from "@mui/lab/Masonry";
+import MasonryPosts from "../../shared/components/MasonryPosts";
 
 const PostCollection: React.FC<{
   query: string | undefined;
@@ -30,13 +30,7 @@ const PostCollection: React.FC<{
       } else {
         return;
       }
-      if (!props.isLoading) {
-        if (bottomOfWindow && !props.isLoading) {
-          if (props.query) {
-            props.expandResults();
-          }
-        }
-      }
+      props.expandResults();
     }
   };
 
@@ -48,37 +42,33 @@ const PostCollection: React.FC<{
     };
   }, [props.query, props.page, props.atBottom, props.hitLimit]);
 
+  const [stackGrid, setStackGrid] = useState<StackGrid | null>();
+
+  const updateGridLayout = () => {
+    if (stackGrid) {
+      stackGrid.updateLayout();
+    }
+  };
+
+  useEffect(() => {
+    updateGridLayout();
+  }, [props.posts]);
+
   return (
     <React.Fragment>
-      <div className="-mx-1.5 pt-4 z-0 animate-fade relative">
+      <div className="-mx-1.5 pt-4 z-0 animate-fade relative pb-24">
         {!props.httpIsLoading && props.posts.length === 0 && (
-          <p className="text-zinc-200 text-xl">
+          <p className="text-zinc-400">
             No posts yet. Be the first one to post!
           </p>
         )}
-        <div className={`z-1 animate-fade flex flex-wrap`}>
-          {props.posts.map((post) => (
-            <FeedItem key={`post-${post.id}`} post={post} />
-          ))}
-          {props.httpIsLoading && (
-            <React.Fragment>
-              {[...Array(5)].map(() => {
-                return (
-                  <FeedItemLoader
-                    key={`post-loader-${Math.random().toString()}`}
-                  />
-                );
-              })}
-            </React.Fragment>
-          )}
-        </div>
+        <MasonryPosts posts={props.posts} />
       </div>
       {props.numResultsPerPage * (props.page + 1) === props.posts.length &&
         !props.isLoading &&
         !props.atBottom && (
           <p
             onClick={() => {
-              console.log(props.query);
               props.expandResults();
             }}
             className="my-5 text-zinc-400 hover:cursor-pointer hover:text-zinc-200"

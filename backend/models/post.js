@@ -18,6 +18,10 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
+  searchTitle: {
+    type: String,
+    required: true
+  },
   text: {
     type: String,
     required: false,

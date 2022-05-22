@@ -7,13 +7,14 @@ const LightButton: React.FC<{
   loading?: boolean;
   buttonImage?: React.ReactElement;
   buttonText: string;
+  fullWidth?: boolean;
 }> = (props) => {
   return (
     <button
       type={props.submit ? "submit" : "button"}
       disabled={props.loading}
       onClick={props.onClick}
-      className={`group p-3 space-x-3 items-center flex bg-zinc-800 ${
+      className={`group p-3 space-x-3 items-center flex ${props.fullWidth ? "w-full" : ""} bg-zinc-800 ${
         !props.loading
           ? "group-hover:cursor-pointer group-hover:bg-zinc-900 text-zinc-400 hover:text-white"
           : "group-hover:cursor-not-allowed group-hover:bg-zinc-700 text-zinc-500"

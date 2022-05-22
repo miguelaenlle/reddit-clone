@@ -4,16 +4,24 @@ module.exports = {
     fontFamily: {},
     extend: {
       animation: {
+        fade: "fadeIn 0.3s ease-in-out 1 forwards",
+      },
+      screens: {
+        "xs": {
+          max: "640px"
+        },
+        "md": {
+          min: "640px"
+        }
         
-        fade: "fadeIn 0.3s ease-in-out 1 forwards"
       },
       keyframes: (theme) => ({
         fadeIn: {
           "0%": { opacity: 0 },
           "100%": { opacity: 100 },
-        }
+        },
       }),
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")],
 };

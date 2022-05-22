@@ -21,6 +21,7 @@ import { useEditPost } from "../hooks/use-edits";
 import LightButton from "../../shared/components/LightButton";
 import InputField from "../../shared/components/InputField";
 import { useEditComment } from "../hooks/use-edit-comment";
+import { useHistory, useLocation } from "react-router-dom";
 
 const PostItem: React.FC<{
   comment: { [key: string]: any };
@@ -36,14 +37,26 @@ const PostItem: React.FC<{
   const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
-    setIsDeleted(props.comment.deleted)
-  }, [props.comment.deleted])
-  
+    setIsDeleted(props.comment.deleted);
+  }, [props.comment.deleted]);
+
+  const location = useLocation();
+  const history = useHistory();
+
+  const handleOpenSignup = () => {
+    history.push({
+      pathname: `/signup`,
+      state: {
+        background: location,
+      },
+    });
+  };
 
   const votesHandler = useVotes(
     props.comment._id,
     props.comment.upvotes ?? 0,
-    false
+    false,
+    handleOpenSignup
   );
 
   const editsHandler = useEditComment(props.comment);
@@ -144,7 +157,7 @@ const PostItem: React.FC<{
                 {editsHandler.error && (
                   <p className="text-red-500 pb-2">{editsHandler.error}</p>
                 )}
-                <div className="flex space-x-4">
+                <div className="md:flex md:space-x-4">
                   {!isDeleted && (
                     <React.Fragment>
                       <VoteItem
@@ -154,6 +167,7 @@ const PostItem: React.FC<{
                         handleUpvote={votesHandler.handleUpvote}
                         handleDownvote={votesHandler.handleDownvote}
                       />
+                      <br className="md:hidden h-1" />
 
                       {!commentsHandler.replying && !editsHandler.editing && (
                         <ButtonNoBorder
@@ -177,7 +191,7 @@ const PostItem: React.FC<{
                         </React.Fragment>
                       )}
                       {editsHandler.editing && (
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2 xs:pt-2">
                           <LightButton
                             loading={editsHandler.loading}
                             onClick={editsHandler.handleSubmitEdit}

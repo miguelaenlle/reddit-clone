@@ -17,18 +17,22 @@ const verificationResetTokenIsValid = require("../helpers/jwt/verify-reset-token
 const validatePassword = require("../helpers/bcrypt/compare-hashed-password");
 
 const errorMessages = require("../constants/errors");
+const sendPasswordResetEmail = require("../util/mail/send-password-reset-email");
 
 const createUser = async (request, response, next) => {
+  console.log(request.body);
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
+    console.log(errors);
     return next(errorMessages.invalidInputsError);
   }
   const { username, email, password } = request.body;
+
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
   } catch (errorMessage) {
-    return response.status(422).json({
+    return response.status(409).json({
       emailError: true,
       usernameError: false,
       message: "Email already exists.",
@@ -42,7 +46,7 @@ const createUser = async (request, response, next) => {
   try {
     const usernameExists = await User.findOne({ username: username });
     if (usernameExists) {
-      return response.status(422).json({
+      return response.status(409).json({
         emailError: false,
         usernameError: true,
         message: "Username already exists.",
@@ -70,7 +74,7 @@ const createUser = async (request, response, next) => {
     num_upvotes: 0,
     sub_ids: [],
     post_ids: [],
-    comment_ids: []
+    comment_ids: [],
   });
 
   try {
@@ -223,9 +227,25 @@ const loginUser = async (request, response, next) => {
   // check if the user is authenticated
   const userAuthenticated = existingUser.isVerified;
   if (!userAuthenticated) {
-    return response.status(401).json({
-      message: "Please validate your email.",
-    });
+    let signupToken;
+    try {
+      signupToken = await generateSignupToken(existingUser.id);
+      console.log(signupToken);
+    } catch (errorMessage) {
+      return next(errorMessages.signupFailedError);
+    }
+    try {
+      await sendVerificationEmail(
+        email,
+        process.env.SENDGRID_EMAIL,
+        signupToken
+      );
+      return response.status(401).json({
+        message: "Please validate your email.",
+      });
+    } catch (errorMessage) {
+      return next(errorMessages.signupFailedError);
+    }
   }
 
   // generate JWT token
@@ -240,6 +260,7 @@ const loginUser = async (request, response, next) => {
   return response.status(201).json({
     id: existingUser.id,
     email: existingUser.email,
+    username: existingUser.username,
     token: loginToken,
     message: "Successfully logged in user.",
   });
@@ -281,7 +302,12 @@ const sendForgotPasswordEmail = async (request, response, next) => {
   // send the JWT token
 
   try {
-    await sendResetEmail(existingUser.email, process.env.SENDGRID_EMAIL);
+    await sendPasswordResetEmail(
+      existingUser.email,
+      process.env.SENDGRID_EMAIL,
+      passwordResetToken,
+      existingUser.id
+    );
   } catch (errorMessage) {
     return next(errorMessages.passwordResetFailedError);
   }
@@ -299,12 +325,12 @@ const changePassword = async (request, response, next) => {
   }
 
   // extract inputs
-  const { email, newPassword, forgotPasswordToken } = request.body;
+  const { userId, newPassword, forgotPasswordToken } = request.body;
 
   // check if user exists
   let existingUser;
   try {
-    existingUser = await User.findOne({ email: email }).exec();
+    existingUser = await User.findById(userId).exec();
     if (!existingUser) {
       return next(errorMessages.failedToFindUserError);
     }
@@ -320,6 +346,9 @@ const changePassword = async (request, response, next) => {
       forgotPasswordToken,
       existingUser.password
     );
+    console.log(resetTokenData);
+    console.log(existingUser.password);
+    console.log(forgotPasswordToken);
     if (!resetTokenData) {
       return next(errorMessages.authTokenVerifyError);
     }

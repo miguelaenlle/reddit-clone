@@ -31,9 +31,10 @@ const getUserSubreddits = async (request, response, next) => {
   const userId = request.params.uid;
   let designatedUser;
   try {
-    designatedUser = await User.findById(userId).exec();
+    designatedUser = await User.findById(userId);
+
     if (!designatedUser) {
-      return next(errorMessages.failedToFindUserError)
+      return next(errorMessages.failedToFindUserError);
     }
   } catch (error) {
     return response.status(404).json({
@@ -43,8 +44,9 @@ const getUserSubreddits = async (request, response, next) => {
 
   console.log(designatedUser);
 
+  designatedUser = await designatedUser.populate("sub_ids");
   const sub_ids = designatedUser.sub_ids;
-
+  console.log(designatedUser);
   return response.status(200).json({
     message: "Succesfully retrieved user data",
     sub_ids,
@@ -101,17 +103,23 @@ const searchForUsers = async (request, response, next) => {
   // e.g. page 1 -> skip first 50 results, then limit to 50
   let searchResults;
   try {
-    searchResults = await User.find(
-      {
-        username: {
-          $regex: new RegExp(searchQuery),
+    if (searchQuery) {
+      searchResults = await User.find(
+        {
+          username: {
+            $regex: new RegExp(searchQuery),
+          },
+          isVerified: true,
         },
-        isVerified: true,
-      },
-      ["username", "num_upvotes"]
-    )
-      .skip(page * numResults)
-      .limit(numResults);
+        ["username", "num_upvotes"]
+      )
+        .skip(page * numResults)
+        .limit(numResults);
+    } else {
+      searchResults = await User.find()
+        .skip(page * numResults)
+        .limit(numResults);
+    }
   } catch (error) {
     return next(errorMessages.userSearchFailed);
   }

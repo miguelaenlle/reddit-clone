@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/outline";
 import DropdownOption from "./DropdownOption";
+import { useHistory, useLocation } from "react-router-dom";
 
 const DropdownForUser: React.FC<{
+  userId: string | null;
   username: string | null;
   optionIds: string[];
   optionValues: { [key: string]: string };
@@ -11,11 +13,30 @@ const DropdownForUser: React.FC<{
   handleLogout: () => void;
   handleSelectedOption: (option: string) => void;
 }> = (props) => {
+  const location = useLocation();
+  const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const handleClickOpen = () => {
     setIsOpen((prevOpen) => !prevOpen);
   };
   const handleSelectOption = (option: string) => {
+    if (option === "profile") {
+      history.push(`/user/${props.userId}`);
+    } else if (option === "new_community") {
+      history.push({
+        pathname: `/create-sub`,
+        state: {
+          background: location,
+        },
+      });
+    } else if (option === "new_post") {
+      history.push({
+        pathname: `/create-post`,
+        state: {
+          background: location,
+        },
+      });
+    } 
     props.handleSelectedOption(option);
     setIsOpen(false);
   };
@@ -48,7 +69,7 @@ const DropdownForUser: React.FC<{
         onClick={handleClickOpen}
         className={`relative border ${
           isOpen ? "border-zinc-700" : "border-0"
-        } group p-3 w-60 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
+        } group p-3 flex space-x-2 items-center hover:cursor-pointer h-10 ${topBorderRadius} ${
           !isOpen && bottomBorderRadius
         }`}
       >
@@ -57,7 +78,7 @@ const DropdownForUser: React.FC<{
           {props.username ? `u/${props.username}` : "My Account"}
         </p>
         <ChevronUpIcon
-          className={`text-zinc-400 h-4 group-hover:text-white transition-colors ${
+          className={`text-zinc-400 w-4 h-4 group-hover:text-white transition-colors ${
             isOpen ? "rotate-180" : ""
           } transition-transform`}
         />
