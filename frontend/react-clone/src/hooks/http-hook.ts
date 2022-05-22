@@ -40,12 +40,12 @@ export const useHttpClient = () => {
           setIsLoading(false);
           return {
             error: response.statusText,
-            data: response.data.data,
+            data: response.data,
             message: response.data.message,
           };
         } else if (method === "PATCH") {
           const response = await axios.patch(url, formData, config);
-          console.log("Response", response);
+          
           activeHttpRequests.current = activeHttpRequests.current.filter(
             (reqCtrl) => reqCtrl !== httpAbortController
           );

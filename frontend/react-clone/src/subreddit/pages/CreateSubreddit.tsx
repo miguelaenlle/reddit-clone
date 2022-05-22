@@ -118,7 +118,7 @@ const CreateSubreddit: React.FC = (props) => {
         if (responseData.error !== "OK") {
           updateError(responseData.error);
         } else {
-          const subredditID = responseData.data.sub_id;
+          const subredditID = responseData.data.data.sub_id;
           const url = `/sub/${subredditID}`;
           history.push(url);
         }
