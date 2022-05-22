@@ -126,7 +126,7 @@ const SearchBar: React.FC<{
 
   return (
     <div className="relative flex-grow">
-      <div className="relative xs:flex">
+      <div className="relative phone:flex">
         <input
           onFocus={handleOpenInput}
           placeholder="Search"
@@ -137,9 +137,10 @@ const SearchBar: React.FC<{
           onChange={handleSearchQuery}
           onKeyDown={handleEnter}
         ></input>
+        
         <div
           onClick={handleConfirmSearch}
-          className="group md:hidden flex items-center px-2"
+          className="group computer:hidden flex items-center px-2"
         >
           <ChevronRightIcon
             className={"w-7 h-7 text-zinc-200 group-hover:text-zinc-400"}
