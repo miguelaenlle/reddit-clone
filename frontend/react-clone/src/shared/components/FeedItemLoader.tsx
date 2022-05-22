@@ -1,6 +1,6 @@
 const FeedItemLoader: React.FC = (props) => {
   return (
-    <div className="w-1/3 p-1.5">
+    <div className="w-full p-1.5">
       <div className="bg-zinc-800 border border-zinc-700">
         <div className={`bg-800 h-96`}></div>
         <div className="border-zinc-700 border bg-zinc-900 p-3">

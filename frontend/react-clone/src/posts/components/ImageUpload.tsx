@@ -1,8 +1,3 @@
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  XIcon,
-} from "@heroicons/react/outline";
 import ImageCounter from "./ImageCounter";
 import LeftRightIcon from "./LeftRightIcon";
 import XMarkButton from "./XMarkButton";
@@ -45,7 +40,7 @@ const ImageUpload: React.FC<{
                 />
               </div>
               {imageSelected && (
-                <div className="flex absolute z-9 top-0 right-0 w-full h-fulls items-center">
+                <div className="flex absolute z-9 top-0 right-0 w-full h-full items-center">
                   <div className="w-full flex px-2">
                     <LeftRightIcon
                       light={false}
