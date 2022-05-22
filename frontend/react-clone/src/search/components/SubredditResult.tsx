@@ -62,7 +62,7 @@ const SubredditResult: React.FC<{
         </div>
       </div>
       <div className="space-y-1.5">
-        <div className="flex items-center space-x-2">
+        <div className="md:flex items-center md:space-x-2">
           <Link to={`/sub/${props.subId}`}>
             <h2 className="hover:cursor-pointer hover:text-white hover:underline text-zinc-200 md:text-xl">
               {`r/${props.subName}`}

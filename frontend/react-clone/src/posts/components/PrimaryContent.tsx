@@ -30,7 +30,6 @@ const PrimaryContent: React.FC<{
   const history = useHistory();
 
   const handleOpenSignup = () => {
-    console.log("Signup");
     history.push({
       pathname: `/signup`,
       state: {

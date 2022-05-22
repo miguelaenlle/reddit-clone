@@ -8,11 +8,8 @@ import React from "react";
 
 const iconClass = "h-4 text-zinc-400 group-hover:text-white transition-colors";
 
-export const optionIds = [
-  "profile",
-  "new_community",
-  "new_post",
-];
+export const optionIds = ["profile", "new_community", "new_post"];
+export const userOptionIds = optionIds;
 
 export const userOptionIcons: { [key: string]: React.ReactElement } = {
   user: <UserIcon className={iconClass} />,
@@ -27,5 +24,5 @@ export const userOptionValues: { [key: string]: string } = {
   profile: "Profile",
   new_community: "New Community",
   new_post: "New Post",
-  logout: "Logout"
+  logout: "Logout",
 };
