@@ -12,6 +12,12 @@ module.exports = {
         },
         "md": {
           min: "640px"
+        },
+        "phone": {
+          max: "1000px"
+        },
+        "computer": {
+          min: "1000px"
         }
         
       },
