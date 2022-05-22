@@ -121,7 +121,7 @@ const Comments: React.FC<{
   };
 
   return (
-    <div className="mt-5 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700 m-96">
+    <div className="mt-5 p-5 mx-auto w/80 max-w-3xl bg-zinc-800 border border-zinc-700 m-96">
       <div className="flex items-center space-x-5">
         <p className="text-white">{commentCount} comments</p>
         <Dropdown

@@ -15,7 +15,6 @@ router.get("/:uid/comments", usersController.getUserComments);
 router.get(
   "/",
   [
-    check("searchQuery").notEmpty().isLength({ min: 1, max: 300 }),
     check("page").notEmpty().isInt({ min: 0 }),
     check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
   ],

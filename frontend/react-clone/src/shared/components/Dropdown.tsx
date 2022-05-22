@@ -56,7 +56,7 @@ const Dropdown: React.FC<{
             : "border-0"
         } group p-3 ${
           isOpen || !props.light ? "w-60" : ""
-        } flex space-x-2 items-center hover:cursor-pointer ${
+        } xs:w-full flex space-x-2 items-center hover:cursor-pointer ${
           props.light ? "py-1" : "h-10"
         } ${topBorderRadius} ${!isOpen && bottomBorderRadius}`}
       >
@@ -73,8 +73,8 @@ const Dropdown: React.FC<{
       <div
         id="dropdown"
         className={`${!isOpen ? "hidden" : ""} absolute ${
-          props.navbar ? "z-15" : "z-10"
-        } w-60 border-b border-x ${bottomBorderRadius} border-zinc-700 bg-zinc-800 animate-fade`}
+          props.navbar ? "z-15" : "z-50"
+        } w-60 xs:w-full border-b border-x ${bottomBorderRadius} border-zinc-700 bg-zinc-800 animate-fade`}
       >
         <ul className="py-1 " aria-labelledby="dropdownDefault">
           {props.optionIds.map((optionId) => (
