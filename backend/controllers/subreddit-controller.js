@@ -1,16 +1,225 @@
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+
 const errorMessages = require("../constants/errors");
 const verifyLoginToken = require("../helpers/jwt/verify-login-token");
+const HttpError = require("../models/http-error");
 const Subreddit = require("../models/subreddit");
 const User = require("../models/user");
+
+const { Storage } = require("@google-cloud/storage");
+
+const storage = new Storage({
+  keyFilename: "./keys/enhanced-tuner-347902-e1303528f500.json",
+});
+
+const deleteFile = async (fileName) => {
+  await storage.bucket("redddit-bucket").file(fileName).delete();
+};
+
+const updateSubredditIcon = async (request, response, next) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(errorMessages.invalidInputsError);
+  }
+
+  const iconUpload = request.file;
+  const path = iconUpload.path;
+  console.log(path);
+
+  // pull user
+  const userId = request.userData.userId;
+
+  let existingUser;
+  try {
+    existingUser = await User.findById(userId);
+    const isVerified = existingUser.isVerified;
+    if (!isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
+  } catch (errorMessage) {
+    return next(errorMessages.authTokenVerifyError);
+  }
+
+  // get the subreddit
+
+  const subId = request.params.subredditId;
+  let subreddit;
+  try {
+    subreddit = await Subreddit.findById(subId);
+  } catch (error) {
+    return next(errorMessages.subredditNotFoundError);
+  }
+  // check if owner of subreddit
+  // if not, return error
+
+  if (subreddit.sub_owner.toString() !== existingUser._id.toString()) {
+    return next(new HttpError("You do not own this subreddit", 403));
+  }
+
+  const originalPicturePath = subreddit.picture_url;
+
+  // update the subreddit's banner-image-url
+  try {
+    await Subreddit.findByIdAndUpdate(subId, {
+      picture_url: path,
+    });
+  } catch (error) {
+    return next(new HttpError("Could not update subreddit", 500));
+  }
+
+  // delete the original path
+  try {
+    console.log(originalPicturePath);
+    await deleteFile(originalPicturePath);
+  } catch (error) {
+    console.log(error);
+    return next(new HttpError("Could not delete the original file", 500));
+  }
+
+  // return the path of the new banner-image-url
+  return response.status(200).json({
+    message: "Banner image updated successfully",
+    icon_image_url: path,
+  });
+};
+
+const updateSubredditImage = async (request, response, next) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(errorMessages.invalidInputsError);
+  }
+
+  const bannerUpload = request.file;
+  const path = bannerUpload.path;
+  console.log(path);
+
+  // pull user
+  const userId = request.userData.userId;
+
+  let existingUser;
+  try {
+    existingUser = await User.findById(userId);
+    const isVerified = existingUser.isVerified;
+    if (!isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
+  } catch (errorMessage) {
+    return next(errorMessages.authTokenVerifyError);
+  }
+
+  // get the subreddit
+
+  const subId = request.params.subredditId;
+  let subreddit;
+  try {
+    subreddit = await Subreddit.findById(subId);
+  } catch (error) {
+    return next(errorMessages.subredditNotFoundError);
+  }
+  // check if owner of subreddit
+  // if not, return error
+
+  if (subreddit.sub_owner.toString() !== existingUser._id.toString()) {
+    return next(new HttpError("You do not own this subreddit", 403));
+  }
+
+  // update the subreddit's banner-image-url
+
+  const originalPicturePath = subreddit.background_image_url;
+
+  try {
+    await Subreddit.findByIdAndUpdate(subId, {
+      background_image_url: path,
+    });
+  } catch (error) {
+    return next(new HttpError("Could not update subreddit", 500));
+  }
+
+  // delete the original picture
+  try {
+    await deleteFile(originalPicturePath);
+  } catch (error) {
+    return next(new HttpError("Could not delete the original file", 500));
+  }
+
+  // return the path of the new banner-image-url
+  return response.status(200).json({
+    message: "Banner image updated successfully",
+    banner_image_url: path,
+  });
+};
+
+const updateSubredditInfo = async (request, response, next) => {
+  // requires authentication (verify auth token)
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(errorMessages.invalidInputsError);
+  }
+  const { newDescription } = request.body;
+  const subId = request.params.subredditId;
+
+  const userId = request.userData.userId;
+
+  let existingUser;
+  try {
+    existingUser = await User.findById(userId);
+    const isVerified = existingUser.isVerified;
+    if (!isVerified) {
+      return next(errorMessages.notValidatedError);
+    }
+  } catch (errorMessage) {
+    return next(errorMessages.authTokenVerifyError);
+  }
+
+  // get the subreddit
+
+  let subreddit;
+  try {
+    subreddit = await Subreddit.findById(subId);
+  } catch (error) {
+    return next(errorMessages.subredditNotFoundError);
+  }
+  console.log(subreddit.sub_owner.toString(), existingUser._id.toString());
+  if (subreddit.sub_owner.toString() !== existingUser._id.toString()) {
+    return next(new HttpError("You do not own this subreddit", 403));
+  }
+
+  // update the subreddit
+  try {
+    await Subreddit.findByIdAndUpdate(subId, {
+      description: newDescription,
+    });
+  } catch (error) {
+    return next(new HttpError("Could not update subreddit", 500));
+  }
+
+  return response.status(200).json({
+    message: "Subreddit description updated successfully",
+  });
+};
 
 const createSubreddit = async (request, response, next) => {
   // requires authentication (verify auth JWT)
   // inputs: authToken, subreddit name, description
+  // banner image
+  // icon image
+
+  let iconFileInfo = "";
+  let bannerFileInfo = "";
+
+  try {
+    iconFileInfo = request.files.icon[0].path;
+    bannerFileInfo = request.files.banner[0].path;
+  } catch {
+    return next(errorMessages.invalidInputsError);
+  }
+
+  console.log(request.files);
 
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
+    console.log(errors);
     return next(errorMessages.invalidInputsError);
   }
 
@@ -18,6 +227,7 @@ const createSubreddit = async (request, response, next) => {
 
   // validate the auth token
   const userId = request.userData.userId;
+  console.log(userId);
   // find the user
   // make sure they are validated
 
@@ -36,10 +246,12 @@ const createSubreddit = async (request, response, next) => {
   const newSubreddit = new Subreddit({
     name: subName,
     description: description,
-    num_members: 0,
-    background_image_url: "",
-    picture_url: "",
+    num_members: 1,
+    background_image_url: bannerFileInfo,
+    picture_url: iconFileInfo,
+    sub_owner: existingUser.id,
     post_ids: [],
+    image_id: "test_id",
   });
 
   // make sure the subreddit doesn't exist yet
@@ -56,6 +268,8 @@ const createSubreddit = async (request, response, next) => {
   try {
     await newSubreddit.save();
   } catch (error) {
+    console.log(subName, description);
+    console.log("Save error", error);
     return next(errorMessages.subredditCreateError);
   }
 
@@ -67,9 +281,9 @@ const createSubreddit = async (request, response, next) => {
       },
     });
   } catch (error) {
+    console.log(error);
     return next(errorMessages.subredditCreateError);
   }
-
   return response.status(200).json({
     data: {
       sub_name: newSubreddit.name,
@@ -117,19 +331,19 @@ const searchForSubreddits = async (request, response, next) => {
     return next(errorMessages.invalidInputsError);
   }
 
-  const { query, page, numResults } = request.params;
-
+  const { query, page, numResults } = request.query;
   let subredditSearchResults;
 
   try {
     subredditSearchResults = await Subreddit.find({
       name: {
-        $regex: new RegExp(query),
+        $regex: new RegExp(query.toLowerCase()),
       },
     })
       .skip(page * numResults)
       .limit(numResults);
   } catch (error) {
+    console.log(error);
     return next(errorMessages.searchFailedError);
   }
 
@@ -315,7 +529,9 @@ const leaveSubreddit = async (request, response, next) => {
     message: "Successfully left subreddit.",
   });
 };
-
+exports.updateSubredditIcon = updateSubredditIcon;
+exports.updateSubredditImage = updateSubredditImage;
+exports.updateSubredditInfo = updateSubredditInfo;
 exports.createSubreddit = createSubreddit;
 exports.searchForSubreddits = searchForSubreddits;
 exports.getSubreddit = getSubreddit;

@@ -12,6 +12,7 @@ const DeleteConfirmationButton: React.FC<{
   itemId: string;
   isPost: boolean;
   deleteComment?: (commentId: string) => void;
+  fullWidth?: boolean;
 }> = (props) => {
   const httpClient = useHttpClient();
   const location: any = useLocation();
@@ -66,20 +67,23 @@ const DeleteConfirmationButton: React.FC<{
     } else {
       return (
         <div
-          className={`flex items-center space-x-2 ${
-            props.isPost ? "pl-5" : ""
+          className={`md:flex xs:space-y-2 items-center md:space-x-2 ${
+            props.isPost ? "md:pl-5" : ""
           }`}
         >
           <p className="text-zinc-200 pr-2">Are you sure?</p>
+
           <LightButton
             buttonImage={<CheckIcon className={imageCSS} />}
             buttonText="Yes"
             onClick={handleClick}
+            fullWidth={props.fullWidth}
           />
           <LightButton
             buttonImage={<XIcon className={imageCSS} />}
             buttonText="Cancel"
             onClick={handleCloseDelete}
+            fullWidth={props.fullWidth}
           />
         </div>
       );
@@ -98,6 +102,7 @@ const DeleteConfirmationButton: React.FC<{
             buttonImage={<XIcon className={imageCSS} />}
             buttonText="Delete"
             onClick={handleOpenDelete}
+            fullWidth={props.fullWidth}
           />
         )}
       </React.Fragment>

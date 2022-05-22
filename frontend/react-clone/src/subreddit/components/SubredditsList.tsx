@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { Subreddit } from "../../models/Subreddit";
 import SubredditResult from "../../search/components/SubredditResult";
 import SubredditResultLoader from "../../search/components/SubredditResultLoader";
 import { useSubredditMembership } from "../hooks/use-subreddit-membership";
+import SubredditResultsList from "./SubredditResultsList";
 
 const SubredditsList: React.FC<{
   subreddits: Subreddit[];
@@ -10,28 +12,12 @@ const SubredditsList: React.FC<{
   resultsPerPage: number;
   expandSubreddits: () => void;
 }> = (props) => {
-  
-  const subMembership = useSubredditMembership();
-
+  const resultsList = useMemo(() => (
+    <SubredditResultsList subreddits={props.subreddits} />
+  ), [props.subreddits]);
   return (
     <div className="space-y-3">
-      {props.subreddits.map((result) => {
-        return (
-          <SubredditResult
-            key={`sub-result-${result.subId}-${Math.random().toString()}`}
-            subName={result.subName}
-            subId={result.subId}
-            members={result.members}
-            description={result.description}
-            isMember={subMembership.subreddits.includes(result.subId)}
-            subredditLoading={subMembership.subredditsLoading.includes(
-              result.subId
-            )}
-            joinSubreddit={() => subMembership.joinSubreddit(result.subId)}
-            leaveSubreddit={() => subMembership.leaveSubreddit(result.subId)}
-          />
-        );
-      })}
+      {resultsList}
       {props.subreddits.length === 0 && !props.httpIsLoading && (
         <h1 className="text-zinc-400 text-xl">No results found.</h1>
       )}

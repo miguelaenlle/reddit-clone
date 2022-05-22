@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
     "@heroicons/react": "^1.0.6",
+    "@mui/lab": "^5.0.0-alpha.82",
+    "@mui/material": "^5.8.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
@@ -12,12 +16,17 @@
     "@types/react": "^17.0.44",
     "@types/react-dom": "^17.0.15",
     "@types/react-router-dom": "^5.3.3",
+    "axios": "^0.27.2",
     "formik": "^2.2.9",
     "moment": "^2.29.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-images-uploading": "^3.1.6",
+    "react-masonry-component": "^6.3.0",
+    "react-masonry-css": "^1.0.16",
     "react-router-dom": "^5.3.0",
     "react-scripts": "5.0.0",
+    "react-stack-grid": "github:ppldo/react-stack-grid",
     "typescript": "^4.6.3",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
@@ -47,9 +56,13 @@
     ]
   },
   "devDependencies": {
+    "@mui/types": "^7.1.3",
+    "@types/react-measure": "^2.0.8",
+    "@types/react-stack-grid": "^0.7.3",
     "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.4",
     "postcss": "^8.4.12",
+    "tailwind-scrollbar": "^1.3.1",
     "tailwindcss": "^3.0.23"
   }
 }

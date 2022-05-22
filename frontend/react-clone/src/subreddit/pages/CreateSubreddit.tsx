@@ -10,9 +10,9 @@ import LightButton from "../../shared/components/LightButton";
 import Modal from "../../shared/components/Modal";
 import TextField from "../../shared/components/TextField";
 import { imageCSS } from "../../shared/constants/image-class";
-
 import { v4 as uuidv4 } from "uuid";
 import { urlValues } from "../../navbar/constants/page-options";
+import Masonry from "react-masonry-css";
 
 const validate = (values: { [key: string]: string }) => {
   const errors: { [key: string]: string } = {};
@@ -42,17 +42,17 @@ const validate = (values: { [key: string]: string }) => {
     errors.description = "Description must be under 300 characters long";
   }
 
-  // if (!values.icon) {
-  //   errors.icon = "Required";
-  // } else if (values.icon.length === 0) {
-  //   errors.icon = "Required";
-  // }
+  if (!values.icon) {
+    errors.icon = "Required";
+  } else if (values.icon.length === 0) {
+    errors.icon = "Required";
+  }
 
-  // if (!values.banner) {
-  //   errors.banner = "Required";
-  // } else if (values.banner.length === 0) {
-  //   errors.banner = "Required";
-  // }
+  if (!values.banner) {
+    errors.banner = "Required";
+  } else if (values.banner.length === 0) {
+    errors.banner = "Required";
+  }
 
   return errors;
 };
@@ -81,6 +81,8 @@ const CreateSubreddit: React.FC = (props) => {
     initialValues: {
       name: "",
       description: "",
+      icon: "",
+      banner: "",
     },
     validate,
     onSubmit: (values) => {
@@ -89,21 +91,32 @@ const CreateSubreddit: React.FC = (props) => {
   });
 
   const handleCreateSubreddit = async () => {
+    if (!icon || !banner) {
+      setDisplayedError("Please upload an icon and a banner");
+      return;
+    }
     setDisplayedError(null);
     const url = `${process.env.REACT_APP_BACKEND_URL}/subreddits`;
     try {
+      const formData = new FormData();
+      formData.append("subName", formik.values.name);
+      formData.append("description", formik.values.description);
+      formData.append("icon", icon);
+      formData.append("banner", banner);
+
       const token = authContext?.token;
       if (token) {
-        const responseData = await httpClient.sendRequest(
+        const responseData = await httpClient.sendFormDataRequest(
           url,
           "POST",
-          {subName: formik.values.name, description: formik.values.description},
+          formData,
           token
         );
-        if (responseData.error) {
+
+        if (responseData.error !== "OK") {
           updateError(responseData.error);
         } else {
-          const subredditID = responseData.data.sub_id;
+          const subredditID = responseData.data.data.sub_id;
           const url = `/sub/${subredditID}`;
           history.push(url);
         }
@@ -135,7 +148,7 @@ const CreateSubreddit: React.FC = (props) => {
   };
 
   return (
-    <Modal>
+    <Modal confirmLeave={true}>
       <div className="mt-20 p-5 mx-auto max-w-4xl w/80 bg-zinc-800 border border-zinc-700 text-white">
         <h1 className="text-2xl text-white">Create a Subreddit</h1>
         <div className="mt-5 relative">
@@ -159,7 +172,7 @@ const CreateSubreddit: React.FC = (props) => {
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
             />
-            {/* <DragAndDrop
+            <DragAndDrop
               id="icon"
               imageId={imageId}
               isLoading={httpClient.isLoading}
@@ -178,7 +191,7 @@ const CreateSubreddit: React.FC = (props) => {
               isIcon={false}
               dragText={"Click to upload banner"}
               uploadFile={uploadBannerFile}
-            /> */}
+            />
             <br />
             {displayedError && (
               <p className="text-red-500 text-lg">{displayedError}</p>

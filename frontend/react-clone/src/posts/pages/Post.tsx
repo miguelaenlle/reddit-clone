@@ -32,7 +32,8 @@ const PostPage: React.FC<{}> = (props) => {
         postData.post_time,
         postData.num_upvotes,
         postData.num_comments,
-        postData.deleted
+        postData.deleted,
+        postData.image_ids
       );
       setPost(post);
     } catch (error) {}
@@ -54,7 +55,7 @@ const PostPage: React.FC<{}> = (props) => {
   // pull the post information from the API
   return (
     <Modal>
-      <div className="z-50 mt-20 p-5 mx-20 w/80 bg-zinc-800 border border-zinc-700">
+      <div className="z-50 mt-20 p-5 mx-auto w/80 max-w-3xl bg-zinc-800 border border-zinc-700">
         {httpClient.isLoading ? (
           <p className="text-white">Loading...</p>
         ) : (

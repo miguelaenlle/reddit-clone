@@ -12,6 +12,7 @@ import Modal from "../../shared/components/Modal";
 import TextField from "../../shared/components/TextField";
 import { imageCSS } from "../../shared/constants/image-class";
 import { AuthContext } from "../../context/auth-context";
+import UploadImages from "../components/UploadImages";
 
 const validate = (values: { [key: string]: string }) => {
   const errors: { [key: string]: string } = {};
@@ -42,27 +43,46 @@ const CreatePost: React.FC<{}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("");
   const [loadingSubreddit, setLoadingSubreddit] = useState(false);
 
+  const [uploadedImageFiles, setUploadedImageFiles] = useState<
+    { file: File; number: number }[]
+  >([]);
+
   const handleSubmit = async (values: { [key: string]: string }) => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/posts`;
+
     const inputData = {
       subId: values.subreddit,
       title: values.title,
       text: values.text,
     };
     try {
-      const response = await httpClient.sendRequest(
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("text", values.text);
+      formData.append("subId", values.subreddit);
+      for (const file of uploadedImageFiles.sort(
+        (a, b) => a.number - b.number
+      )) {
+        formData.append("images", file.file);
+      }
+
+      const response = await httpClient.sendFormDataRequest(
         url,
         "POST",
-        inputData,
+        formData,
         authContext?.token
       );
-      const postId = response.id;
+      const responseData = response.data;
+
+      const postId = responseData.id;
       history.push({
         pathname: `/post/${postId}`,
         state: {
           background: location.state.background,
         },
       });
+
+      window.location.reload();
       // redirect to the post location
     } catch (error) {}
   };
@@ -73,7 +93,7 @@ const CreatePost: React.FC<{}> = (props) => {
       title: "",
       text: "",
     },
-    // validate,
+    validate,
     onSubmit: (values) => {
       handleSubmit(values);
     },
@@ -97,18 +117,23 @@ const CreatePost: React.FC<{}> = (props) => {
           subredditData._id,
           subredditData.sub_owner,
           subredditData.num_members,
-          subredditData.description
+          subredditData.description,
+          subredditData.background_image_url,
+          subredditData.picture_url
         );
         setSelectedOption(subredditItem.subName);
         formik.setFieldValue("subreddit", subredditItem.subId);
-      } catch (error) {
-      }
+      } catch (error) {}
       setLoadingSubreddit(false);
     }
   };
 
+  const handleImagesChange = (images: { file: File; number: number }[]) => {
+    setUploadedImageFiles(images);
+  };
+
   return (
-    <Modal>
+    <Modal confirmLeave={true}>
       <div className="mt-20 p-5 mx-auto max-w-4xl w/80 bg-zinc-800 border border-zinc-700 text-white">
         <h1 className="text-2xl text-white">Create a Post</h1>
         <div className="mt-5 relative">
@@ -170,7 +195,7 @@ const CreatePost: React.FC<{}> = (props) => {
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
             />
-            {/* <DragAndDrop id = "banner-icon" dragText={"Add images"} /> */}
+            <UploadImages handleImagesChange={handleImagesChange} />
             <br />
             <div className="flex">
               <div className="grow"></div>

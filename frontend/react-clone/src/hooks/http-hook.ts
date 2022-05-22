@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Post } from "../models/Post";
 import { Subreddit } from "../models/Subreddit";
 import { User } from "../models/User";
+import axios from "axios";
 
 export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,30 +14,53 @@ export const useHttpClient = () => {
       url: string,
       method: string,
       formData: FormData,
-      authToken: string
+      authToken?: string | null
     ) => {
       const httpAbortController = new AbortController();
       activeHttpRequests.current.push(httpAbortController);
-      let headers: { [key: string]: string } = {
-        Authorization: "Bearer " + authToken,
-      };
       try {
         setIsLoading(true);
-        const response = await fetch(url, {
-          method,
-          headers,
-          body: formData,
-          signal: httpAbortController.signal,
-        });
-        const responseData = await response.json();
-        activeHttpRequests.current = activeHttpRequests.current.filter(
-          (reqCtrl) => reqCtrl !== httpAbortController
-        );
-        if (!response.ok) {
-          throw new Error(responseData.message);
+        let headers: {
+          [key: string]: string;
+        } = {
+          "content-type": "multipart/form-data",
+        };
+        if (authToken) {
+          headers["Authorization"] = `Bearer ${authToken}`;
         }
-        setIsLoading(false);
-        return responseData;
+        const config = {
+          headers,
+        };
+        if (method === "POST") {
+          const response = await axios.post(url, formData, config);
+          activeHttpRequests.current = activeHttpRequests.current.filter(
+            (reqCtrl) => reqCtrl !== httpAbortController
+          );
+          setIsLoading(false);
+          return {
+            error: response.statusText,
+            data: response.data,
+            message: response.data.message,
+          };
+        } else if (method === "PATCH") {
+          const response = await axios.patch(url, formData, config);
+          
+          activeHttpRequests.current = activeHttpRequests.current.filter(
+            (reqCtrl) => reqCtrl !== httpAbortController
+          );
+          setIsLoading(false);
+          return {
+            error: response.statusText,
+            data: response.data,
+            message: response.data.message,
+          };
+        } else {
+          return {
+            error: "Method not supported",
+            data: null,
+            message: null,
+          };
+        }
       } catch (error) {
         setIsLoading(false);
         throw error;
@@ -99,7 +123,9 @@ export const useHttpClient = () => {
               subredditData._id,
               subredditData.sub_owner,
               subredditData.num_members,
-              subredditData.description
+              subredditData.description,
+              subredditData.background_image_url,
+              subredditData.picture_url
             );
           }
         );
@@ -140,7 +166,8 @@ export const useHttpClient = () => {
             post.post_time,
             post.num_upvotes,
             post.num_comments,
-            post.deleted
+            post.deleted,
+            post.image_ids
           );
         });
         return formattedPosts;
@@ -164,7 +191,9 @@ export const useHttpClient = () => {
               result.id,
               result.sub_owner,
               result.num_members,
-              result.description
+              result.description,
+              result.background_image_url,
+              result.picture_url
             );
           }
         );
@@ -191,7 +220,9 @@ export const useHttpClient = () => {
               result.id,
               result.sub_owner,
               result.num_members,
-              result.description
+              result.description,
+              result.background_image_url,
+              result.picture_url
             );
           }
         );
