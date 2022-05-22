@@ -5,6 +5,7 @@ import ButtonNoBorder from "../../shared/components/ButtonNoBorder";
 import InputField from "../../shared/components/InputField";
 import LightButton from "../../shared/components/LightButton";
 import { imageCSS } from "../../shared/constants/image-class";
+import { useWindowDimensions } from "../../shared/hooks/use-window-dimensions";
 
 const MIN_DESCRIPTION_CHARACTERS = 10;
 const MAX_DESCRIPTION_CHARACTERS = 300;
@@ -32,6 +33,7 @@ const SubredditInfo: React.FC<{
   handleStopEditDescription: () => void;
   handleEditDescription: () => void;
 }> = (props) => {
+  const windowDimensions = useWindowDimensions();
   return (
     <div className="w-full">
       {props.isLoading ? (
@@ -42,29 +44,51 @@ const SubredditInfo: React.FC<{
       ) : (
         props.subreddit && (
           <React.Fragment>
-            <div className="items-center flex space-x-3">
+            <div className="items-center xs:justify-center flex xs:flex-col xs:pt-10 space-x-3">
               <React.Fragment>
                 <h1 className="text-white text-2xl">
                   r/{props.subreddit.subName}
                 </h1>
-                <h2 className="text-zinc-400"> •</h2>
-                <h1 className="text-zinc-400 text-lg">
-                  {props.memberCount}{" "}
-                  {props.memberCount === 1 ? "member" : "members"}
-                </h1>
-                {props.isLoggedIn && (
-                  <div className="pl-2">
-                    <LightButton
-                      onClick={props.handleChangeSubredditState}
-                      loading={props.subredditIsLoading}
-                      buttonText={
-                        props.isSubredditMember
-                          ? "Leave Subreddit"
-                          : "Join Subreddit"
-                      }
-                    />
-                  </div>
+                {windowDimensions.width <= 640 && (
+                  <React.Fragment>
+                    <p className="my-3 text-zinc-400 text-sm">
+                      {props.subreddit.description}{" "}
+                      {!props.editingDescription && (
+                        <span
+                          onClick={props.handleEditDescription}
+                          className="text-zinc-200 hover:underline hover:cursor-pointer"
+                        >
+                          {"Edit Description"}
+                        </span>
+                      )}
+                    </p>
+                  </React.Fragment>
                 )}
+                {windowDimensions.width > 640 && (
+                  <h2 className="text-zinc-400"> •</h2>
+                )}
+                <div className="flex items-center space-x-3 xs:py-2">
+                  <h1 className="text-zinc-400 text-lg">
+                    {props.memberCount}{" "}
+                    {props.memberCount === 1 ? "member" : "members"}
+                  </h1>
+                  {windowDimensions.width <= 640 && (
+                    <h2 className="text-zinc-400"> •</h2>
+                  )}
+                  {props.isLoggedIn && (
+                    <div className="md:pl-2">
+                      <LightButton
+                        onClick={props.handleChangeSubredditState}
+                        loading={props.subredditIsLoading}
+                        buttonText={
+                          props.isSubredditMember
+                            ? "Leave Subreddit"
+                            : "Join Subreddit"
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
               </React.Fragment>
             </div>
             {props.editingDescription ? (
@@ -108,17 +132,17 @@ const SubredditInfo: React.FC<{
                 </div>
               </div>
             ) : (
-              <p className="my-3 text-zinc-400 text-sm">
-                {props.subreddit.description}{" "}
-                {props.editingEnabled && (
+              <div className="xs:w-full xs:justify-center xs:hidden">
+                <p className="my-3 text-zinc-400 text-sm">
+                  {props.subreddit.description}{" "}
                   <span
                     onClick={props.handleEditDescription}
                     className="text-zinc-200 hover:underline hover:cursor-pointer"
                   >
                     {"Edit Description"}
                   </span>
-                )}
-              </p>
+                </p>
+              </div>
             )}
           </React.Fragment>
         )
