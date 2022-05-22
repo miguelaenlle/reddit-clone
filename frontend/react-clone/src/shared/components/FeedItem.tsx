@@ -4,6 +4,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import VoteItem from "./VoteItem";
 import { Post } from "../../models/Post";
 import { useVotes } from "../../posts/hooks/use-votes";
+import ImagePreview from "./ImagePreview";
 
 const FeedItem: React.FC<{
   post: Post;
@@ -43,6 +44,7 @@ const FeedItem: React.FC<{
 
   return (
     <div className="p-1.5">
+      <ImagePreview post={props.post} />
       <div
         ref={feedItemDivRef}
         className="z-10 hover:cursor-pointer group bg-zinc-800 border border-zinc-700 p-3 hover:border-zinc-400 max-h-fit transition-colors"
@@ -53,6 +55,7 @@ const FeedItem: React.FC<{
         >
           {props.post.title}
         </h1>
+        <div className="bg-zinc-400"></div>
         <p className="text-zinc-400">
           {props.post.isDeleted ? "[removed]" : ""}
         </p>

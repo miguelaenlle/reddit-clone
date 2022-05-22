@@ -167,7 +167,8 @@ export const useHttpClient = () => {
             post.post_time,
             post.num_upvotes,
             post.num_comments,
-            post.deleted
+            post.deleted,
+            post.image_ids
           );
         });
         return formattedPosts;

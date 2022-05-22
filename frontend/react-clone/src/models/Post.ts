@@ -10,6 +10,7 @@ export class Post {
   initialUpvotes = 0;
   numComments = 0;
   isDeleted = false;
+  imageURLs: string[] = []
   constructor(
     id: string,
     title: string,
@@ -21,7 +22,8 @@ export class Post {
     postDate: Date,
     initialUpvotes: number,
     numComments: number,
-    isDeleted: boolean
+    isDeleted: boolean,
+    imageURLs: string[]
   ) {
     this.id = id;
     this.title = title;
@@ -36,5 +38,6 @@ export class Post {
     this.initialUpvotes = initialUpvotes;
     this.numComments = numComments;
     this.isDeleted = isDeleted;
+    this.imageURLs = imageURLs;
   }
 }

@@ -32,7 +32,8 @@ const PostPage: React.FC<{}> = (props) => {
         postData.post_time,
         postData.num_upvotes,
         postData.num_comments,
-        postData.deleted
+        postData.deleted,
+        postData.image_ids
       );
       setPost(post);
     } catch (error) {}
