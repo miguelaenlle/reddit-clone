@@ -21,6 +21,7 @@ import { useEditPost } from "../hooks/use-edits";
 import DeleteConfirmationButton from "./DeleteConfirmationButton";
 import { useComments } from "../hooks/use-comment";
 import CommentField from "./CommentField";
+import ImagePreview from "../../shared/components/ImagePreview";
 
 const PrimaryContent: React.FC<{
   post: Post;
@@ -121,6 +122,9 @@ const PrimaryContent: React.FC<{
           {editsHandler.isEditing && editsHandler.error && (
             <p className="pt-5 text-red-500 text-lg">{editsHandler.error}</p>
           )}
+          <div className = "pt-5">
+            <ImagePreview post={props.post} />
+          </div>
           <div className="mt-14 space-x-2 flex">
             {!editsHandler.isEditing && (
               <React.Fragment>

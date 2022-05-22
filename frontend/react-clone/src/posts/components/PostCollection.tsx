@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import StackGrid from "react-stack-grid";
 import { Post } from "../../models/Post";
 import FeedItem from "../../shared/components/FeedItem";
 import FeedItemLoader from "../../shared/components/FeedItemLoader";
@@ -50,7 +51,7 @@ const PostCollection: React.FC<{
             No posts yet. Be the first one to post!
           </p>
         )}
-        <div className={`z-1 animate-fade flex flex-wrap`}>
+        <StackGrid columnWidth={500} gutterHeight={5} gutterWidth={0}>
           {props.posts.map((post) => (
             <FeedItem key={`post-${post.id}`} post={post} />
           ))}
@@ -65,7 +66,7 @@ const PostCollection: React.FC<{
               })}
             </React.Fragment>
           )}
-        </div>
+        </StackGrid>
       </div>
       {props.numResultsPerPage * (props.page + 1) === props.posts.length &&
         !props.isLoading &&

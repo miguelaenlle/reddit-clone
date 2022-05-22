@@ -3,6 +3,9 @@ import {
   ChevronRightIcon,
   XIcon,
 } from "@heroicons/react/outline";
+import ImageCounter from "./ImageCounter";
+import LeftRightIcon from "./LeftRightIcon";
+import XMarkButton from "./XMarkButton";
 
 const ImageUpload: React.FC<{
   uploadedImages: { imageUrl: string; number: number }[];
@@ -26,42 +29,39 @@ const ImageUpload: React.FC<{
           const imageSelected = imageNumber === props.selectedImage;
           return (
             <div className="relative">
-              <div className="m-2 px-5 py-2 bg-zinc-700 bg-opacity-50 rounded-lg absolute z-10 w-fit">
-                <p>
-                  {imageNumber}/{props.uploadedImages.length}
-                </p>
+              <div className="absolute z-10">
+                <ImageCounter
+                  light={false}
+                  imageNumber={imageNumber}
+                  totalImages={props.uploadedImages.length}
+                />
               </div>
 
               <div className="hover:cursor-pointer group absolute z-10 top-0 right-0 p-2">
-                <div
-                  onClick={() => {
+                <XMarkButton
+                  handleClick={() => {
                     props.removeNumber(imageNumber);
                   }}
-                  className={`flex items-center space-x-1 bg-zinc-700 bg-opacity-50 hover:bg-opacity-100 rounded-lg p-1`}
-                >
-                  <XIcon className="h-5 group-hover:text-zinc-200" />
-                </div>
+                />
               </div>
               {imageSelected && (
-                <div className="flex absolute z-9 top-0 right-0 w-full h-full items-center">
+                <div className="flex absolute z-9 top-0 right-0 w-full h-fulls items-center">
                   <div className="w-full flex px-2">
-                    <div
-                      onClick={() => {
+                    <LeftRightIcon
+                      light={false}
+                      left={true}
+                      handleClick={() => {
                         props.handleMoveImageLeft(imageNumber);
                       }}
-                      className=" bg-zinc-700 p-1 bg-opacity-50 hover:bg-opacity-100 hover:cursor-pointer rounded-lg"
-                    >
-                      <ChevronLeftIcon className="h-5" />
-                    </div>
+                    />
                     <div className="flex-grow"></div>
-                    <div
-                      onClick={() => {
+                    <LeftRightIcon
+                      light={false}
+                      left={false}
+                      handleClick={() => {
                         props.handleMoveImageRight(imageNumber);
                       }}
-                      className="bg-zinc-700 p-1 bg-opacity-50 hover:bg-opacity-100 hover:cursor-pointer rounded-lg"
-                    >
-                      <ChevronRightIcon className="h-5" />
-                    </div>
+                    />
                   </div>
                 </div>
               )}
