@@ -43,29 +43,53 @@ const CreatePost: React.FC<{}> = (props) => {
   const [selectedOption, setSelectedOption] = useState("");
   const [loadingSubreddit, setLoadingSubreddit] = useState(false);
 
+  const [uploadedImageFiles, setUploadedImageFiles] = useState<
+    { file: File; number: number }[]
+  >([]);
+
   const handleSubmit = async (values: { [key: string]: string }) => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/posts`;
+
     const inputData = {
       subId: values.subreddit,
       title: values.title,
       text: values.text,
     };
     try {
-      const response = await httpClient.sendRequest(
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("text", values.text);
+      formData.append("subId", values.subreddit);
+      for (const file of uploadedImageFiles.sort(
+        (a, b) => a.number - b.number
+      )) {
+        formData.append("images", file.file);
+      }
+
+      console.log(formData);
+
+      const response = await httpClient.sendFormDataRequest(
         url,
         "POST",
-        inputData,
+        formData,
         authContext?.token
       );
-      const postId = response.id;
+      console.log(response);
+      const responseData = response.data;
+
+      const postId = responseData.id;
       history.push({
         pathname: `/post/${postId}`,
         state: {
           background: location.state.background,
         },
       });
+
+      window.location.reload();
       // redirect to the post location
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const formik = useFormik({
@@ -74,7 +98,7 @@ const CreatePost: React.FC<{}> = (props) => {
       title: "",
       text: "",
     },
-    // validate,
+    validate,
     onSubmit: (values) => {
       handleSubmit(values);
     },
@@ -107,6 +131,10 @@ const CreatePost: React.FC<{}> = (props) => {
       } catch (error) {}
       setLoadingSubreddit(false);
     }
+  };
+
+  const handleImagesChange = (images: { file: File; number: number }[]) => {
+    setUploadedImageFiles(images);
   };
 
   return (
@@ -172,7 +200,7 @@ const CreatePost: React.FC<{}> = (props) => {
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
             />
-            <UploadImages />
+            <UploadImages handleImagesChange={handleImagesChange} />
             <br />
             <div className="flex">
               <div className="grow"></div>

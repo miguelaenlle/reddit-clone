@@ -49,9 +49,11 @@
     ]
   },
   "devDependencies": {
+    "@types/react-stack-grid": "^0.7.3",
     "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.4",
     "postcss": "^8.4.12",
+    "react-stack-grid": "^0.7.1",
     "tailwind-scrollbar": "^1.3.1",
     "tailwindcss": "^3.0.23"
   }

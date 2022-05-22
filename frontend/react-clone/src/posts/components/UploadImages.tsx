@@ -1,14 +1,17 @@
 import DragAndDrop from "../../shared/components/DragAndDrop";
 import { PhotographIcon } from "@heroicons/react/solid";
 import AddImageButton from "./AddImageButton";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   XIcon,
 } from "@heroicons/react/outline";
+import ImageUpload from "./ImageUpload";
 
-const UploadImages: React.FC<{}> = (props) => {
+const UploadImages: React.FC<{
+  handleImagesChange: (images: { file: File; number: number }[]) => void;
+}> = (props) => {
   const [error, setError] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<
@@ -19,6 +22,10 @@ const UploadImages: React.FC<{}> = (props) => {
   >([]);
 
   const [selectedImage, setSelectedImage] = useState<number | undefined>();
+
+  useEffect(() => {
+    props.handleImagesChange(uploadedImageFiles);
+  }, [uploadedImageFiles]);
 
   const handleImageSelected = (newSelectedImage: number) => {
     setSelectedImage(newSelectedImage);
@@ -147,71 +154,16 @@ const UploadImages: React.FC<{}> = (props) => {
 
   return (
     <React.Fragment>
-      <div
-        className={`overflow-x-auto py-2 scrollbar-track-black scrollbar-thumb-slate-600 flex ${
-          uploadedImages.length > 0 ? "space-x-2" : ""
-        }`}
-      >
-        {uploadedImages
-          .sort((a, b) => a.number - b.number)
-          .map((imageData) => {
-            const imageNumber = imageData.number;
-            const imageSelected = imageNumber === selectedImage;
-            return (
-              <div className="relative">
-                <div className="m-2 px-5 py-2 bg-zinc-700 bg-opacity-50 rounded-lg absolute z-10 w-fit">
-                  <p>
-                    {imageNumber}/{uploadedImages.length}
-                  </p>
-                </div>
+      <ImageUpload
+        uploadedImages={uploadedImages}
+        selectedImage={selectedImage}
+        handleImageUploaded={handleImageUploaded}
+        handleImageSelected={handleImageSelected}
+        removeNumber={removeNumber}
+        handleMoveImageLeft={handleMoveImageLeft}
+        handleMoveImageRight={handleMoveImageRight}
+      />
 
-                <div className="hover:cursor-pointer group absolute z-10 top-0 right-0 p-2">
-                  <div
-                    onClick={() => {
-                      removeNumber(imageNumber);
-                    }}
-                    className={`flex items-center space-x-1 bg-zinc-700 bg-opacity-50 hover:bg-opacity-100 rounded-lg p-1`}
-                  >
-                    <XIcon className="h-5 group-hover:text-zinc-200" />
-                  </div>
-                </div>
-                {imageSelected && (
-                  <div className="flex absolute z-9 top-0 right-0 w-full h-full items-center">
-                    <div className="w-full flex px-2">
-                      <div
-                        onClick={() => {
-                          handleMoveImageLeft(imageNumber);
-                        }}
-                        className=" bg-zinc-700 p-1 bg-opacity-50 hover:bg-opacity-100 hover:cursor-pointer rounded-lg"
-                      >
-                        <ChevronLeftIcon className="h-5" />
-                      </div>
-                      <div className="flex-grow"></div>
-                      <div
-                        onClick={() => {
-                            handleMoveImageRight(imageNumber);
-                        }}
-                        className="bg-zinc-700 p-1 bg-opacity-50 hover:bg-opacity-100 hover:cursor-pointer rounded-lg"
-                      >
-                        <ChevronRightIcon className="h-5" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <img
-                  onClick={() => {
-                    handleImageSelected(imageNumber);
-                  }} // set selected image
-                  className={`z-5 h-52 max-w-2xl min-w-xl rounded-sm object-cover border-2 ${
-                    imageSelected ? "border-zinc-400" : "border-zinc-700"
-                  }`}
-                  src={imageData.imageUrl}
-                  alt="Preview"
-                />
-              </div>
-            );
-          })}
-      </div>
       {uploadedImages.length < 10 && (
         <AddImageButton
           handleImageUploaded={handleImageUploaded}
