@@ -11,6 +11,7 @@ import {
 } from "../constants/sort-modes";
 import NewCommunityButton from "./NewCommunityButton";
 import NewPostButton from "./NewPostButton";
+import MasonryPosts from "../../shared/components/MasonryPosts";
 
 const MAX_RESULTS_PER_PAGE = 25;
 
@@ -20,6 +21,7 @@ const Feed: React.FC<{}> = (props) => {
   const [page, setPage] = useState(0);
   const [maxReached, setMaxReached] = useState(false);
   const [hitBottom, setHitBottom] = useState(false);
+  const [stackGrid, setStackGrid] = useState<StackGrid | null>();
 
   const httpClient = useHttpClient();
   const handleSelectedOption = (option: string) => {
@@ -57,13 +59,21 @@ const Feed: React.FC<{}> = (props) => {
         setPosts(formattedPosts);
       }
       setHitBottom(false);
-      updateGridLayout();
     },
     [selectedOption, page]
   );
 
   const listInnerRef = useRef<HTMLDivElement | null>(null);
 
+  const handleScroll = () => {
+    const { scrollTop, offsetHeight } = document.documentElement;
+    const { innerHeight } = window;
+    const bottomOfWindow = Math.round(scrollTop) + innerHeight === offsetHeight;
+    if (bottomOfWindow && !maxReached) {
+      setHitBottom(true);
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
   useEffect(() => {
     setPage(0);
   }, []);
@@ -76,16 +86,6 @@ const Feed: React.FC<{}> = (props) => {
     pullData(false);
   }, [selectedOption]);
 
-  const handleScroll = () => {
-    const { scrollTop, offsetHeight } = document.documentElement;
-    const { innerHeight } = window;
-    const bottomOfWindow = Math.round(scrollTop) + innerHeight === offsetHeight;
-    if (bottomOfWindow && !maxReached) {
-      setHitBottom(true);
-      setPage((prevPage) => prevPage + 1);
-    }
-  };
-
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
 
@@ -94,16 +94,15 @@ const Feed: React.FC<{}> = (props) => {
     };
   }, []);
 
-  const [stackGrid, setStackGrid] = useState<StackGrid | null>();
-
   const updateGridLayout = () => {
     if (stackGrid) {
       stackGrid.updateLayout();
     }
   };
+
   return (
     <div className="pt-20 px-5" ref={listInnerRef}>
-      <div className="z-10 flex space-x-2 relative">
+      <div className="md:absolute z-40 md:flex xs:space-y-1 md:space-x-2 px-1.5">
         <Dropdown
           navbar={false}
           optionIds={optionIds}
@@ -117,23 +116,8 @@ const Feed: React.FC<{}> = (props) => {
       </div>
       <div className={`mx-1 my-6 animate-pulse h-2 bg-transparent`}></div>
       <div className="z-0 animate-fade relative ">
-        <div className={`z-1  w-full`}>
-          {posts.length > 0 && (
-            <StackGrid
-              gridRef={(grid) => setStackGrid(grid)}
-              columnWidth={500}
-              gutterHeight={5}
-              gutterWidth={0}
-            >
-              {posts.map((post) => (
-                <FeedItem
-                  key={`post-${post.id}`}
-                  post={post}
-                  handleUpdateLayout={updateGridLayout}
-                />
-              ))}
-            </StackGrid>
-          )}
+        <div className={`z-0 w-full`}>
+          <MasonryPosts posts={posts} />
         </div>
 
         {posts.length % MAX_RESULTS_PER_PAGE === 0 &&

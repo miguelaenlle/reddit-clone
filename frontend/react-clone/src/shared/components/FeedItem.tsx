@@ -60,7 +60,7 @@ const FeedItem: React.FC<{
   };
 
   return (
-    <div className="p-1.5">
+    <div className="z-0 p-1.5">
       <ImagePreview
         post={props.post}
         handleUpdateLayout={props.handleUpdateLayout}

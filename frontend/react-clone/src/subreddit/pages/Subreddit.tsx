@@ -32,7 +32,7 @@ const Subreddit: React.FC<{}> = (props) => {
     <div className="pt-14 bg-zinc-900 min-h-screen">
       <SubredditHeader subId={params.subId} />
       <div className="p-5">
-        <div className="z-10 flex space-x-2 relative">
+        <div className="z-10 md:flex xs:space-y-2 md:marker md:space-x-2 relative">
           <Dropdown
             navbar={false}
             optionIds={optionIds}
