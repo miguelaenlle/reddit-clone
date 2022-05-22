@@ -4,10 +4,31 @@ const checkAuth = require("../middleware/check-auth");
 const router = express.Router();
 
 const postsController = require("../controllers/posts-controller");
+const multerGoogleStorage = require("multer-cloud-storage");
+
+const multer = require("multer");
+
+const upload = multer({
+  storage: multerGoogleStorage.storageEngine({
+    bucket: "redddit-bucket", //GCS_BUCKET
+    projectId: "enhanced-tuner-347902", //GCLOUD_PROJECT
+    keyFilename: "./keys/enhanced-tuner-347902-e1303528f500.json", //GSC_KEYFILE, path to a json file,
+    destination: (request, file, callback) => {
+      callback(null, "./post-images");
+    },
+    filename: (request, file, callback) => {
+      callback(
+        null,
+        Date.now() + "--" + Math.random().toString() + "--" + file.originalname
+      );
+    },
+  }),
+});
 
 router.post(
   "/",
   checkAuth,
+  upload.array("images", 10), // optional
   [
     check("subId").notEmpty(),
     check("title").trim().notEmpty().isLength({
@@ -29,7 +50,7 @@ router.get(
     check("numResults").notEmpty().isInt({ min: 1, max: 100 }),
     check("sortMode").trim().notEmpty(),
   ],
-  postsController.getAllPosts 
+  postsController.getAllPosts
 );
 
 router.get("/:postId/", [], postsController.getPost);
@@ -68,6 +89,6 @@ router.get(
   "/:postId/vote-direction",
   checkAuth,
   postsController.getVoteDirection
-)
+);
 
 module.exports = router;
