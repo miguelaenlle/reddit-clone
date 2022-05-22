@@ -102,7 +102,7 @@ const Feed: React.FC<{}> = (props) => {
 
   return (
     <div className="pt-20 px-5" ref={listInnerRef}>
-      <div className="md:absolute z-40 md:flex xs:space-y-1 md:space-x-2 px-1.5">
+      <div className="relative z-10 md:flex xs:space-y-1 md:space-x-2 px-1.5">
         <Dropdown
           navbar={false}
           optionIds={optionIds}
