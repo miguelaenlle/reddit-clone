@@ -72,8 +72,8 @@ const SubredditInfo: React.FC<{
                     {props.memberCount}{" "}
                     {props.memberCount === 1 ? "member" : "members"}
                   </h1>
-                  {windowDimensions.width <= 640 && (
-                    <h2 className="text-zinc-400"> •</h2>
+                  {windowDimensions.width <= 640 && props.isLoggedIn && (
+                    <h2 className="text-zinc-400 md:hidden"> •</h2>
                   )}
                   {props.isLoggedIn && (
                     <div className="md:pl-2">

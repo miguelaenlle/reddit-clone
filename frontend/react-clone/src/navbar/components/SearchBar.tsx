@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import SearchPopup from "../../search/components/SearchPopup";
-import { XIcon } from "@heroicons/react/outline";
+import { ChevronRightIcon, XIcon } from "@heroicons/react/outline";
 import { useHttpClient } from "../../hooks/http-hook";
 import { Subreddit } from "../../models/Subreddit";
+import { imageCSS } from "../../shared/constants/image-class";
 
 const SearchBar: React.FC<{
   isCompact: boolean;
+  isMobile?: boolean;
   displayedValue?: string;
   handleSelectResult?: (name: string, subId: string) => void;
+  handleClose?: () => void;
 }> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const httpClient = useHttpClient();
@@ -54,11 +57,14 @@ const SearchBar: React.FC<{
 
       history.push(`/search/${pathExt}?query=${searchQuery}`);
       setPopupDisplayed(false);
+      if (props.isMobile && props.handleClose) {
+        props.handleClose();
+      }
     }
   };
   const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      if (props.isCompact) {
+      if (props.isCompact && !props.isMobile) {
         if (props.handleSelectResult && results[0]) {
           props.handleSelectResult(results[0].subName, results[0].subId);
           setPopupDisplayed(false);
@@ -92,33 +98,35 @@ const SearchBar: React.FC<{
   const handleClickOutside = () => {};
 
   useEffect(() => {
-    if (searchQuery.length > 0) {
-      if (!popupDisplayed) {
-        setPopupDisplayed(true);
-      }
-    }
-    setIsLoading(true);
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
+    if (!props.isMobile) {
       if (searchQuery.length > 0) {
         if (!popupDisplayed) {
           setPopupDisplayed(true);
         }
-        updateSearchResults(searchQuery);
-        setSearchQuery(searchQuery);
-      } else {
-        if (popupDisplayed) {
-          setPopupDisplayed(false);
-        }
-        setSearchQuery(searchQuery);
       }
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [searchQuery]);
+      setIsLoading(true);
+      const timeout = setTimeout(() => {
+        setIsLoading(false);
+        if (searchQuery.length > 0) {
+          if (!popupDisplayed) {
+            setPopupDisplayed(true);
+          }
+          updateSearchResults(searchQuery);
+          setSearchQuery(searchQuery);
+        } else {
+          if (popupDisplayed) {
+            setPopupDisplayed(false);
+          }
+          setSearchQuery(searchQuery);
+        }
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [searchQuery, props.isMobile]);
 
   return (
     <div className="relative flex-grow">
-      <div className="relative">
+      <div className="relative xs:flex">
         <input
           onFocus={handleOpenInput}
           placeholder="Search"
@@ -129,8 +137,16 @@ const SearchBar: React.FC<{
           onChange={handleSearchQuery}
           onKeyDown={handleEnter}
         ></input>
+        <div
+          onClick={handleConfirmSearch}
+          className="group md:hidden flex items-center px-2"
+        >
+          <ChevronRightIcon
+            className={"w-7 h-7 text-zinc-200 group-hover:text-zinc-400"}
+          />
+        </div>
       </div>
-      {popupDisplayed && searchQuery.length > 0 && (
+      {(popupDisplayed && searchQuery.length && !props.isMobile) > 0 && (
         <SearchPopup
           isCompact={props.isCompact}
           loading={isLoading}
