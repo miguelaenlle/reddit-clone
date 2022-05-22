@@ -13,13 +13,13 @@ const UserResult: React.FC<{
         </div>
       </div>
       <div className="space-y-1.5">
-        <div className="flex items-center space-x-2">
+        <div className="md:flex md:space-x-2">
           <Link to={`/user/${props.userId}`}>
-            <h2 className="hover:cursor-pointer hover:text-white hover:underline text-zinc-200 text-xl">
+            <h2 className="hover:cursor-pointer hover:text-white hover:underline text-zinc-200 md:text-xl">
               {`u/${props.username}`}
             </h2>
           </Link>
-          <h2 className="text-zinc-400"> •</h2>
+          <h2 className="text-zinc-400 xs:hidden"> •</h2>
           <h2 className="text-zinc-400 text-md">{`${props.upvotes} upvotes`}</h2>
         </div>
       </div>

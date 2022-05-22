@@ -157,7 +157,7 @@ const PostItem: React.FC<{
                 {editsHandler.error && (
                   <p className="text-red-500 pb-2">{editsHandler.error}</p>
                 )}
-                <div className="flex space-x-4">
+                <div className="md:flex md:space-x-4">
                   {!isDeleted && (
                     <React.Fragment>
                       <VoteItem
@@ -167,6 +167,7 @@ const PostItem: React.FC<{
                         handleUpvote={votesHandler.handleUpvote}
                         handleDownvote={votesHandler.handleDownvote}
                       />
+                      <br className="md:hidden h-1" />
 
                       {!commentsHandler.replying && !editsHandler.editing && (
                         <ButtonNoBorder
@@ -190,7 +191,7 @@ const PostItem: React.FC<{
                         </React.Fragment>
                       )}
                       {editsHandler.editing && (
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2 xs:pt-2">
                           <LightButton
                             loading={editsHandler.loading}
                             onClick={editsHandler.handleSubmitEdit}
