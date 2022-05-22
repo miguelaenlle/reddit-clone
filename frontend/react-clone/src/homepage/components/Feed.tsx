@@ -46,7 +46,8 @@ const Feed: React.FC<{}> = (props) => {
             post.post_time,
             post.num_upvotes,
             post.num_comments,
-            post.deleted
+            post.deleted,
+            post.image_ids
           )
       );
 
@@ -112,16 +113,14 @@ const Feed: React.FC<{}> = (props) => {
         </div>
         <div className={`mx-1 my-6 animate-pulse h-2 bg-transparent`}></div>
         <div className="z-0 animate-fade relative ">
-          <div
-            className={`${
-              httpClient.isLoading ? "blur-sm" : ""
-            } z-1 animate-fade w-full`}
-          >
-            <StackGrid columnWidth={300} gutterHeight={5} gutterWidth={0}>
-              {posts.map((post) => (
-                <FeedItem key={`post-${post.id}`} post={post} />
-              ))}
-            </StackGrid>
+          <div className={`z-1  w-full`}>
+            {posts.length > 0 && (
+              <StackGrid columnWidth={300} gutterHeight={5} gutterWidth={0}>
+                {posts.map((post) => (
+                  <FeedItem key={`post-${post.id}`} post={post} />
+                ))}
+              </StackGrid>
+            )}
           </div>
 
           {posts.length % MAX_RESULTS_PER_PAGE === 0 &&
