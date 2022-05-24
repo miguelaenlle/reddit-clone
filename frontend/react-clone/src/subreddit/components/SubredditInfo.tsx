@@ -53,7 +53,7 @@ const SubredditInfo: React.FC<{
                   <React.Fragment>
                     <p className="my-3 text-zinc-400 text-sm">
                       {props.subreddit.description}{" "}
-                      {!props.editingDescription && (
+                      {!props.editingDescription && props.editingEnabled && (
                         <span
                           onClick={props.handleEditDescription}
                           className="text-zinc-200 hover:underline hover:cursor-pointer"
@@ -135,12 +135,14 @@ const SubredditInfo: React.FC<{
               <div className="xs:w-full xs:justify-center xs:hidden">
                 <p className="my-3 text-zinc-400 text-sm">
                   {props.subreddit.description}{" "}
-                  <span
-                    onClick={props.handleEditDescription}
-                    className="text-zinc-200 hover:underline hover:cursor-pointer"
-                  >
-                    {"Edit Description"}
-                  </span>
+                  {props.editingEnabled && (
+                    <span
+                      onClick={props.handleEditDescription}
+                      className="text-zinc-200 hover:underline hover:cursor-pointer"
+                    >
+                      {"Edit Description"}
+                    </span>
+                  )}
                 </p>
               </div>
             )}
