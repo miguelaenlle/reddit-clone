@@ -74,49 +74,55 @@ const NavbarOverlay: React.FC<{
         <br />
         <div className="h-0.5 w-full bg-zinc-700"></div>
         <br />
-        {optionIds.map((optionId) => {
-          return (
-            <DropdownOption
-              optionId={optionId}
-              optionIcon={pageOptionIcons[optionId]}
-              optionText={pageOptionValues[optionId]}
-              selectedOption={""}
-              handleSelectedOption={() => {
-                handleSelectOption(optionId);
-              }}
-            />
-          );
-        })}
+        <div className="p-1 space-y-2">
+          {optionIds.map((optionId) => {
+            return (
+              <DropdownOption
+                optionId={optionId}
+                optionIcon={pageOptionIcons[optionId]}
+                optionText={pageOptionValues[optionId]}
+                selectedOption={""}
+                handleSelectedOption={() => {
+                  handleSelectOption(optionId);
+                }}
+              />
+            );
+          })}
+        </div>
         <br />
         <div className="h-0.5 w-full bg-zinc-700"></div>
         <br />
         {authContext?.token ? (
           <React.Fragment>
-            {userOptionIds.map((optionId) => {
-              return (
-                <DropdownOption
-                  optionId={optionId}
-                  optionIcon={userOptionIcons[optionId]}
-                  optionText={userOptionValues[optionId]}
-                  selectedOption={""}
-                  handleSelectedOption={() => {
-                    handleSelectOption(optionId);
-                  }}
-                />
-              );
-            })}
+            <div className="p-1 space-y-2">
+              {userOptionIds.map((optionId) => {
+                return (
+                  <DropdownOption
+                    optionId={optionId}
+                    optionIcon={userOptionIcons[optionId]}
+                    optionText={userOptionValues[optionId]}
+                    selectedOption={""}
+                    handleSelectedOption={() => {
+                      handleSelectOption(optionId);
+                    }}
+                  />
+                );
+              })}
+            </div>
             <br />
             <div className="h-0.5 w-full bg-zinc-700"></div>
             <br />
-            <DropdownOption
-              optionId={"logout"}
-              optionIcon={userOptionIcons["logout"]}
-              optionText={userOptionValues["logout"]}
-              selectedOption={""}
-              handleSelectedOption={() => {
-                handleSelectOption("logout");
-              }}
-            />
+            <div className = "p-1">
+              <DropdownOption
+                optionId={"logout"}
+                optionIcon={userOptionIcons["logout"]}
+                optionText={userOptionValues["logout"]}
+                selectedOption={""}
+                handleSelectedOption={() => {
+                  handleSelectOption("logout");
+                }}
+              />
+            </div>
           </React.Fragment>
         ) : (
           <div
