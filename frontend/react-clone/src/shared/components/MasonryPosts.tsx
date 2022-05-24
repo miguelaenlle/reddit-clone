@@ -6,7 +6,9 @@ import Masonry from "@mui/lab/Masonry";
 import { useWindowDimensions } from "../hooks/use-window-dimensions";
 import { useEffect, useState } from "react";
 
-const MasonryPosts: React.FC<{ posts: Post[] }> = (props) => {
+const MasonryPosts: React.FC<{ posts: Post[]; isLoading?: boolean }> = (
+  props
+) => {
   const windowDimensions = useWindowDimensions();
   const [columns, setNumColumns] = useState(1);
 
@@ -29,7 +31,8 @@ const MasonryPosts: React.FC<{ posts: Post[] }> = (props) => {
   }, [windowDimensions, props.posts.length]);
 
   return (
-    <div>
+    <div className={props.posts.length === 1 ? `max-w-xl` : ""}>
+      
       <Masonry columns={columns} spacing={0}>
         {props.posts.map((post) => (
           <FeedItem
