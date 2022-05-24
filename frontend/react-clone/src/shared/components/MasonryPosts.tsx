@@ -6,7 +6,9 @@ import Masonry from "@mui/lab/Masonry";
 import { useWindowDimensions } from "../hooks/use-window-dimensions";
 import { useEffect, useState } from "react";
 
-const MasonryPosts: React.FC<{ posts: Post[] }> = (props) => {
+const MasonryPosts: React.FC<{ posts: Post[]; isLoading?: boolean }> = (
+  props
+) => {
   const windowDimensions = useWindowDimensions();
   const [columns, setNumColumns] = useState(1);
 
@@ -14,24 +16,33 @@ const MasonryPosts: React.FC<{ posts: Post[] }> = (props) => {
     if (windowDimensions.width < 640) {
       setNumColumns(1);
     } else {
-      setNumColumns(Math.floor(windowDimensions.width / 500));
+      setNumColumns(
+        Math.min(
+          Math.floor(windowDimensions.width / 500),
+          5,
+          props.posts.length
+        )
+      );
     }
   };
 
   useEffect(() => {
     handleUpdateColCount();
-  }, [windowDimensions]);
+  }, [windowDimensions, props.posts.length]);
 
   return (
-    <Masonry columns={columns} spacing={0}>
-      {props.posts.map((post) => (
-        <FeedItem
-          key={`post-${post.id}`}
-          post={post}
-          handleUpdateLayout={() => {}}
-        />
-      ))}
-    </Masonry>
+    <div className={props.posts.length === 1 ? `max-w-xl` : ""}>
+      
+      <Masonry columns={columns} spacing={0}>
+        {props.posts.map((post) => (
+          <FeedItem
+            key={`post-${post.id}`}
+            post={post}
+            handleUpdateLayout={() => {}}
+          />
+        ))}
+      </Masonry>
+    </div>
   );
 };
 export default MasonryPosts;

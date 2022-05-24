@@ -14,6 +14,7 @@ import LightButton from "../../shared/components/LightButton";
 import TextField from "../../shared/components/TextField";
 import VoteItem from "../../shared/components/VoteItem";
 import { imageCSS } from "../../shared/constants/image-class";
+import { useWindowDimensions } from "../../shared/hooks/use-window-dimensions";
 import { useComments } from "../hooks/use-comment";
 import { useEditPost } from "../hooks/use-edits";
 import { useVotes } from "../hooks/use-votes";
@@ -26,11 +27,12 @@ const PrimaryContent: React.FC<{
 }> = (props) => {
   const editsHandler = useEditPost(props.post);
 
+  const currentSize = useWindowDimensions();
+
   const location = useLocation();
   const history = useHistory();
 
   const handleOpenSignup = () => {
-    console.log("Signup");
     history.push({
       pathname: `/signup`,
       state: {
