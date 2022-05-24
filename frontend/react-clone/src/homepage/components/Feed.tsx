@@ -12,6 +12,7 @@ import {
 import NewCommunityButton from "./NewCommunityButton";
 import NewPostButton from "./NewPostButton";
 import MasonryPosts from "../../shared/components/MasonryPosts";
+import LoadingSpinner from "../../shared/components/LoadingSpinner";
 
 const MAX_RESULTS_PER_PAGE = 25;
 
@@ -114,6 +115,12 @@ const Feed: React.FC<{}> = (props) => {
         <NewPostButton />
         <NewCommunityButton />
       </div>
+      {httpClient.isLoading && (
+        <div className="p-4 flex items-center">
+          <LoadingSpinner />
+          <p className = "text-zinc-200">Loading...</p>
+        </div>
+      )}
       <div className={`mx-1 my-6 animate-pulse h-2 bg-transparent`}></div>
       <div className="z-0 animate-fade relative ">
         <div className={`z-0 w-full`}>
