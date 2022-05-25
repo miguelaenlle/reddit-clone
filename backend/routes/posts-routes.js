@@ -12,7 +12,7 @@ const upload = multer({
   storage: multerGoogleStorage.storageEngine({
     bucket: "redddit-bucket", //GCS_BUCKET
     projectId: "enhanced-tuner-347902", //GCLOUD_PROJECT
-    keyFilename: "./keys/enhanced-tuner-347902-e1303528f500.json", //GSC_KEYFILE, path to a json file,
+    keyFilename: process.env.GCS_KEYFILE, //GSC_KEYFILE, path to a json file,
     destination: (request, file, callback) => {
       callback(null, "./post-images");
     },
