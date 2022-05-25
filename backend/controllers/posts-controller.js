@@ -11,7 +11,7 @@ const HttpError = require("../models/http-error");
 
 const { Storage } = require("@google-cloud/storage");
 const storage = new Storage({
-  keyFilename: "./keys/enhanced-tuner-347902-e1303528f500.json",
+  keyFilename: process.env.GCS_KEYFILE
 });
 
 const deleteFile = async (fileName) => {
