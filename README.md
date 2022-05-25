@@ -52,7 +52,7 @@
 - User View
 
 ## How to Use
-See [Installation.md](https://github.com/miguelaenlle/reddit-clone/blob/main/Installation.md)
+See [installation.md](https://github.com/miguelaenlle/reddit-clone/blob/main/installation.md)
     
 ## License
 MIT
