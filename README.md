@@ -5,7 +5,7 @@
 <div align="center">
 	<a href="https://github.com/miguelaenlle/reddit-clone"><img src="https://raw.githubusercontent.com/miguelaenlle/reddit-clone/main/imgs/project-icon.png" width="200"/></a>
   <h1 align="center">Redddit</h1>
-<h4 align="center">Open-source Reddit clone built using the MERN stack <a align="center" href="https://www.youtube.com/watch?v=SUX5xflrFCo">Demo Video</a></h4>
+<h4 align="center">Open-source Reddit clone built using the MERN stack. <a align="center" href="https://www.youtube.com/watch?v=SUX5xflrFCo">Demo Video</a></h4>
 <p>
 <img src="https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB" />
 <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" />
